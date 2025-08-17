@@ -8,7 +8,7 @@
 	path = bangaz
 	url = https://github.com/kasmsdk/bangaz
 [submodule "triggaz"]
-	path = bangaz
+	path = triggaz
 	url = https://github.com/kasmsdk/triggaz
 [submodule "belfry"]
 	path = belfry
