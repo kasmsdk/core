@@ -47,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
   const navigationItems = getNavigationItems();
 
   const handleItemClick = (itemId: string) => {
-    console.log('Sidebar clicked:', itemId);
+    // Sidebar clicked: itemId (removed console.log for production best practices)
     // In standalone mode (kasm, emanator, tech), treat clicks as filter changes
     if (appContext !== 'main' && onFilterChange) {
       onFilterChange(itemId);
