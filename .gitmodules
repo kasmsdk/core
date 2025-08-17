@@ -1,18 +1,18 @@
 [submodule "arpy"]
 	path = arpy
-	url = https://github.com/kasmsdk/arpy
+	url = https://github.com/kasmsdk/arpy.git
 [submodule "emanator"]
 	path = emanator
-	url = https://github.com/kasmsdk/emanator
+	url = https://github.com/kasmsdk/emanator.git
 [submodule "bangaz"]
 	path = bangaz
-	url = https://github.com/kasmsdk/bangaz
+	url = https://github.com/kasmsdk/bangaz.git
 [submodule "triggaz"]
 	path = triggaz
-	url = https://github.com/kasmsdk/triggaz
+	url = https://github.com/kasmsdk/triggaz.git
 [submodule "belfry"]
 	path = belfry
-	url = https://github.com/kasmsdk/belfry
+	url = https://github.com/kasmsdk/belfry.git
 [submodule "chimez"]
 	path = chimez
-	url = https://github.com/kasmsdk/chimez
+	url = https://github.com/kasmsdk/chimez.git
