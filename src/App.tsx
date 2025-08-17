@@ -4,9 +4,9 @@ import Kasm from './components/Kasm';
 import Tech from './components/Tech';
 import About from './components/About';
 import Sidebar from './components/Sidebar';
-import Bangaz from './components/Bangaz';
-import Emanator from './components/Emanator';
-import Arpy from './components/Arpy';
+import Bangaz from '../bangaz/Bangaz';
+import Emanator from '../emanator/Emanator';
+import Arpy from './arpy/Arpy';
 import './App.css';
 
 function App() {
