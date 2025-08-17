@@ -6,14 +6,15 @@
   top: 1rem;
   left: 1rem;
   z-index: 1001;
-  background: var(--sandstone-surface-2);
-  background-image: var(--sandstone-texture-fine);
-  border: 2px solid #fff; /* White border for visibility */
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18); /* Glass effect background */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 2px solid rgba(255,255,255,0.35); /* Subtle glass border */
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1.5px 6px rgba(0,0,0,0.08);
   padding: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Stronger shadow for contrast */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -26,10 +27,13 @@
 }
 
 .hamburger-menu:hover {
-  background: var(--sandstone-hover);
-  border-color: var(--sandstone-iron);
-  transform: translateY(-2px);
-  box-shadow: var(--sandstone-shadow-lg);
+  background: rgba(248, 255, 0, 0.82); /* Inverted glass effect background */
+  border-color: #222; /* Inverted border color */
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12);
+}
+
+.hamburger-menu:hover .hamburger-line {
+  background: #222; /* Invert lines to black on hover */
 }
 
 .hamburger-line {
@@ -377,30 +381,6 @@
 
   .sidebar-footer {
     padding: 1rem;
-  }
-}
-
-/* Desktop - Hide hamburger, show sidebar by default */
-@media (min-width: 1024px) {
-  .hamburger-menu {
-    display: none;
-  }
-
-  .sidebar {
-    transform: translateX(0);
-    position: relative;
-    height: auto;
-    min-height: 100vh;
-    width: 300px;
-    flex-shrink: 0;
-  }
-
-  .sidebar-overlay {
-    display: none;
-  }
-
-  .sidebar-close {
-    display: none;
   }
 }
 

@@ -49,7 +49,6 @@ function CompanyInfo() {
         outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/monospace.woff"
       >
         {current.title}
       </Text>
@@ -278,7 +277,7 @@ export default function About() {
         borderRadius: '10px',
         color: 'white'
       }}>
-        <h2>ℹ️ About</h2>
+        <h2>About</h2>
         <p>Kasm SDK Open Source Community</p>
         <p style={{ fontSize: '0.9em', marginTop: '10px', color: '#aaa' }}>
           Kasm SDK is an open source community project focused on building advanced web based musical instruments including AR and VR instruments and MIDI controllers

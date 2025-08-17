@@ -7,16 +7,11 @@
     <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="Kams SDK Baseline">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/About.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/About.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Arpy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Arpy.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Bangaz.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Bangaz.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Emanator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Emanator.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/Sidebar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/TechWebGPU.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/TechWebGPU.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/TechWebMIDI.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/TechWebMIDI.tsx" afterDir="false" />
     </list>
-    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,18 +19,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/.idea/workspace.xml">
-      <ranges>
-        <range start1="7" end1="11" start2="7" end2="11" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="12" end1="13" start2="12" end2="13" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="14" end1="15" start2="14" end2="14" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="16" end1="17" start2="15" end2="18" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="107" end1="108" start2="108" end2="109" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="133" end1="134" start2="134" end2="143" changelist="e60e3b21-c01f-44be-8745-e98d4eb406ee" />
-      </ranges>
-    </file>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -158,6 +141,42 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="aa00f847-0958-4414-8843-4a5d52495aa6" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="aa00f847-0958-4414-8843-4a5d52495aa6">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="roots">
+                    <value>
+                      <list>
+                        <option value="$PROJECT_DIR$" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Kams SDK Baseline" />

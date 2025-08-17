@@ -38,7 +38,6 @@ function WebMIDIStats() {
         color="#00ff00"
         anchorX="center"
         anchorY="middle"
-        font="/fonts/monospace.woff"
       >
         WebMIDI
       </Text>
