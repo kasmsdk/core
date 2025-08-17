@@ -7,23 +7,24 @@ import Sidebar from './components/Sidebar';
 import Bangaz from '../bangaz/Bangaz';
 import Emanator from '../emanator/Emanator';
 import Arpy from '../arpy/Arpy';
+import Triggaz from '../triggaz/Triggaz';
 import './App.css';
 
 function App() {
-  const [currentApp, setCurrentApp] = useState<'kasm' | 'emanator' | 'tech' | 'bangaz' | 'arpy' | 'about' | 'ar' | 'brewers-reference'>('bangaz');
+  const [currentApp, setCurrentApp] = useState<'kasm' | 'emanator' | 'tech' | 'bangaz' | 'arpy' | 'about' | 'triggaz'>('bangaz');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const appParam = urlParams.get('app');
     if (appParam && ['kasm', 'tech', 'about', 'bangaz', 'arpy'].includes(appParam)) {
-      setCurrentApp(appParam as 'kasm' | 'tech' | 'about' | 'bangaz' | 'arpy');
+      setCurrentApp(appParam as 'kasm' | 'tech' | 'about' | 'bangaz' | 'arpy' | 'emanator' | 'triggaz');
     } else if (appParam && ['webmidi', 'webgpu'].includes(appParam)) {
       setCurrentApp('tech');
     }
   }, []);
 
-  const isStandaloneMode = ['kasm', 'emanator', 'bangaz', 'arpy'].includes(currentApp);
+  const isStandaloneMode = ['kasm', 'emanator', 'bangaz', 'arpy', 'triggaz'].includes(currentApp);
 
   const getSidebarContext = (): 'main' | 'kasm' | 'tech' => {
     if (currentApp === 'kasm') return 'kasm';
@@ -72,7 +73,7 @@ function App() {
   }, []);
 
   const handleAppChange = (app: string) => {
-    setCurrentApp(app as 'kasm' | 'tech' | 'about' | 'emanator' | 'bangaz' | 'arpy');
+    setCurrentApp(app as 'kasm' | 'tech' | 'about' | 'emanator' | 'bangaz' | 'arpy' | 'triggaz');
   };
 
   return (
@@ -87,6 +88,7 @@ function App() {
         <div className={`app-content ${isStandaloneMode ? 'standalone-mode' : ''}`}>
           {currentApp === 'bangaz' && <Bangaz />}
           {currentApp === 'arpy' && <Arpy />}
+          {currentApp === 'triggaz' && <Triggaz />}
           {currentApp === 'kasm' && <Kasm />}
           {currentApp === 'emanator' && <Emanator />}
           {currentApp === 'tech' && <Tech />}

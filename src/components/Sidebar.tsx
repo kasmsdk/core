@@ -33,6 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
           { id: 'emanator', label: 'Emanations Editor', icon: '🎹', description: 'Emanator editor tool' },
           { id: 'bangaz', label: 'Bangaz Drum Machine', icon: '🎹', description: 'Drum machine pattern editor tool' },
           { id: 'arpy', label: 'Arpy Arpeggiator Editor', icon: '🎹', description: 'Arpeggiator editor tool' },
+          { id: 'triggaz', label: 'Triggers Editor', icon: '🎹', description: 'Triggers MIDI note/cc pattern detection editor tool' },
         ];
     }
   };

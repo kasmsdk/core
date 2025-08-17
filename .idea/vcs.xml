@@ -4,6 +4,9 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/arpy" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/bangaz" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/belfry" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/chimez" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/emanator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/triggaz" vcs="Git" />
   </component>
 </project>
