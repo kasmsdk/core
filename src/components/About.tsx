@@ -164,7 +164,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1.2, 0]}
         fontSize={0.06}
-        color="#ce422b"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -174,7 +176,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1.35, 0]}
         fontSize={0.06}
-        color="#00d4ff"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -184,7 +188,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1.5, 0]}
         fontSize={0.06}
-        color="#ff6b35"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -206,7 +212,9 @@ function FeaturesDisplay() {
       <Text
         position={[0, 1, 0]}
         fontSize={0.12}
-        color="#ffffff"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -218,7 +226,9 @@ function FeaturesDisplay() {
           key={index}
           position={[0, 0.6 - index * 0.2, 0]}
           fontSize={0.08}
-          color="#00ff88"
+          color="#fff600"
+          outlineColor="#fff600"
+          outlineWidth={0.01}
           anchorX="center"
           anchorY="middle"
         >
@@ -229,7 +239,9 @@ function FeaturesDisplay() {
       <Text
         position={[0, -0.8, 0]}
         fontSize={0.06}
-        color="#888888"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >

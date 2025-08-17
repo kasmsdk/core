@@ -15,10 +15,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
     switch (appContext) {
       case 'kasm':
         return [
-          { id: 'all-instruments', label: 'All Instruments', icon: '🎵', description: 'View all available instruments' },
-          { id: 'oscillators', label: 'Oscillators', icon: '〰️', description: 'Basic waveform generators' },
+          { id: 'all-instruments', label: 'All Instruments', icon: '🎹', description: 'View all available instruments' },
+          { id: 'oscillators', label: 'Oscillators', icon: '🎹', description: 'Basic waveform generators' },
           { id: 'synthesizers', label: 'Synthesizers', icon: '🎹', description: 'Complex multi-oscillator synths' },
-          { id: 'effects', label: 'Effects', icon: '🎛️', description: 'Audio processing effects' },
+          { id: 'effects', label: 'Effects', icon: '🎹', description: 'Audio processing effects' },
           { id: 'sequencers', label: 'Sequencers', icon: '📊', description: 'Pattern and sequence generators' },
           { id: 'midi-devices', label: 'MIDI Devices', icon: '🔌', description: 'Connected MIDI controllers' },
           { id: 'presets', label: 'Presets', icon: '💾', description: 'Saved instrument configurations' },
@@ -30,10 +30,10 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
         ];
       default:
         return [
-          { id: 'emanator', label: 'Emanations Editor', icon: '🎼', description: 'Emanator editor tool' },
-          { id: 'bangaz', label: 'Bangaz Drum Machine', icon: '🥁', description: 'Drum machine pattern editor tool' },
-          { id: 'arpy', label: 'Arpy Arpeggiator Editor', icon: '🎼', description: 'Arpeggiator editor tool' },
-          { id: 'about', label: 'About', icon: 'ℹ️', description: 'Project information and credits' },
+          { id: 'emanator', label: 'Emanations Editor', icon: '🎹', description: 'Emanator editor tool' },
+          { id: 'bangaz', label: 'Bangaz Drum Machine', icon: '🎹', description: 'Drum machine pattern editor tool' },
+          { id: 'arpy', label: 'Arpy Arpeggiator Editor', icon: '🎹', description: 'Arpeggiator editor tool' },
+          { id: 'about', label: 'About', icon: '🎹', description: 'Project information and credits' },
         ];
     }
   };
@@ -80,15 +80,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
     }
   };
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
   return (
     <>
+      {/* Hamburger button: always rendered, only hidden by CSS on desktop */}
       <button
-        className={`hamburger-menu ${isOpen ? 'open' : ''}`}
-        onClick={toggleSidebar}
+        className={`hamburger-menu${isOpen ? ' open' : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle navigation menu"
         aria-expanded={isOpen}
       >
@@ -97,12 +94,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
         <span className="hamburger-line"></span>
       </button>
       {isOpen && <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />}
-      <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <nav className={`sidebar${isOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
           <h2 className="sidebar-title">
             Kasm SDK
           </h2>
-          <small>Open Source Community</small>
         </div>
         {appContext !== 'main' && (
           <div className="sidebar-back-main">
