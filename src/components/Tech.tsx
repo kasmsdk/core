@@ -76,7 +76,7 @@ export default function Tech() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.2rem' }}>{module.icon}</span>
+                <span style={{ fontSize: '1.2rem', color: 'var(--sandstone-base)' }}>{module.icon}</span>
                 <div>
                   <div style={{ fontWeight: 'bold' }}>{module.name}</div>
                   <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>
@@ -118,7 +118,7 @@ export default function Tech() {
         color: 'white',
         maxWidth: '300px'
       }}>
-        <h4 style={{ marginBottom: '0.5rem', color: '#00ff88' }}>
+        <h4 style={{ marginBottom: '0.5rem', color: 'var(--sandstone-base)' }}>
           {modules.find(m => m.id === currentModule)?.icon} {modules.find(m => m.id === currentModule)?.name}
         </h4>
         <p style={{ fontSize: '0.9rem', lineHeight: '1.4', margin: 0 }}>

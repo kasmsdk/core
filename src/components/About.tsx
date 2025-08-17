@@ -44,7 +44,9 @@ function CompanyInfo() {
         ref={textRef}
         position={[0, 0.8, 0]}
         fontSize={0.25}
-        color="#00ff00"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
         font="/fonts/monospace.woff"
@@ -56,7 +58,9 @@ function CompanyInfo() {
       <Text
         position={[0, 0.4, 0]}
         fontSize={0.15}
-        color="#ffff00"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -67,7 +71,9 @@ function CompanyInfo() {
       <Text
         position={[0, 0, 0]}
         fontSize={0.12}
-        color="#ff6600"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -78,7 +84,9 @@ function CompanyInfo() {
       <Text
         position={[0, -0.4, 0]}
         fontSize={0.08}
-        color="#888888"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -144,7 +152,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1, 0]}
         fontSize={0.08}
-        color="#ffffff"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >

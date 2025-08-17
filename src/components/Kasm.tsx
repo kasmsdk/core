@@ -50,7 +50,7 @@ export default function Tech() {
         {currentModule === 'webgpu' && <TechWebGPU />}
       </div>
       <div className="tech-info">
-        <h4>
+        <h4 style={{ color: 'var(--sandstone-base)' }}>
           {modules.find(m => m.id === currentModule)?.icon} {modules.find(m => m.id === currentModule)?.name}
         </h4>
         <p>

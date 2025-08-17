@@ -262,31 +262,31 @@ export class SandstoneWebGPUMaterial {
 // CSS Custom Properties for Sandstone Theme
 export const sandstoneThemeProperties = {
   // Primary sandstone colors
-  '--sandstone-base': '#D9BF8C',      // Warm cream base
-  '--sandstone-light': '#F2E1B8',     // Light cream
-  '--sandstone-dark': '#A68B59',      // Darker ochre
-  '--sandstone-iron': '#BF7340',      // Iron oxide staining
-  '--sandstone-shadow': '#8C7853',    // Deep shadow
+  '--sandstone-base': '#FFE14A',      // Image yellow
+  '--sandstone-light': '#FFF6B0',     // Light yellow
+  '--sandstone-dark': '#C7B200',      // Darker yellow
+  '--sandstone-iron': '#6A6762',      // Image gray background
+  '--sandstone-shadow': '#4A4844',    // Deep shadow
 
-  // Accent colors derived from sandstone
-  '--sandstone-accent': '#D4A574',    // Warm accent
-  '--sandstone-highlight': '#F5E8C8', // Highlight
+  // Accent colors derived from image
+  '--sandstone-accent': '#FFD600',    // Accent yellow
+  '--sandstone-highlight': '#FFF6B0', // Highlight
   '--sandstone-muted': '#B8A082',     // Muted tone
 
   // Functional colors
-  '--sandstone-text': '#4A3F2A',      // Dark brown text
-  '--sandstone-text-light': '#6B5D42', // Lighter text
-  '--sandstone-text-muted': '#8C7853', // Muted text
+  '--sandstone-text': '#FFE14A',      // Main text color (yellow)
+  '--sandstone-text-light': '#FFF6B0', // Lighter text
+  '--sandstone-text-muted': '#C7B200', // Muted text
 
   // Interactive states
-  '--sandstone-hover': '#E6C999',     // Hover state
-  '--sandstone-active': '#CC9966',    // Active state
-  '--sandstone-focus': '#D4A574',     // Focus state
+  '--sandstone-hover': '#FFF6B0',     // Hover state
+  '--sandstone-active': '#FFD600',    // Active state
+  '--sandstone-focus': '#FFE14A',     // Focus state
 
   // Surface variations
-  '--sandstone-surface-1': '#F0E4C1', // Lightest surface
-  '--sandstone-surface-2': '#E8D7B3', // Light surface
-  '--sandstone-surface-3': '#D9BF8C', // Base surface
-  '--sandstone-surface-4': '#C7A876', // Dark surface
-  '--sandstone-surface-5': '#A68B59', // Darkest surface
+  '--sandstone-surface-1': '#6A6762', // Main background
+  '--sandstone-surface-2': '#4A4844', // Dark surface
+  '--sandstone-surface-3': '#B8A082', // Base surface
+  '--sandstone-surface-4': '#C7B200', // Accent surface
+  '--sandstone-surface-5': '#FFD600', // Highlight surface
 };

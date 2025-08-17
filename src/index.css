@@ -1,11 +1,13 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Varela Round', Arial, Helvetica, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 700; /* Bolder font globally */
+  letter-spacing: 0.03em; /* Slightly increased for clarity */
+  text-shadow: 1px 1px 2px rgba(40,40,40,0.25), 0 0 1px #fff; /* Screen painted effect */
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--sandstone-base, #fff600);
+  background-color: var(--sandstone-surface-1, #6A6762);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,11 +17,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--sandstone-base, #fff600);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--sandstone-hover, #FFF6B0);
 }
 
 body {
@@ -28,41 +30,55 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-image: url('./assets/textures/metallic.png');
-  background-size: cover;
-  background-repeat: repeat;
-  background-position: center;
-  background-color: #242424;
+  background: var(--sandstone-surface-1, #6A6762);
+  color: var(--sandstone-base, #fff600);
+
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h1, h2, h3, h4, h5, h6 {
+  color: var(--sandstone-base, #fff600);
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
+  font-weight: 800;
+}
+
+button, .nav-icon, .tech-selector-icon {
+  color: var(--sandstone-base, #fff600);
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
+  font-weight: 800;
 }
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid var(--sandstone-shadow, #4A4844);
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+  font-weight: 700;
+  font-family: 'Varela Round', Arial, Helvetica, sans-serif;
+  background-color: var(--sandstone-iron, #6A6762);
+  color: var(--sandstone-base, #fff600);
+  transition: background 0.2s, color 0.2s;
+
+  letter-spacing: 0.03em;
+  text-shadow: 1px 1px 2px rgba(40,40,40,0.25), 0 0 1px #fff;
 }
 button:hover {
-  border-color: #646cff;
+  background-color: var(--sandstone-shadow, #4A4844);
+  color: var(--sandstone-hover, #FFF6B0);
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+.tech-selector-icon {
+  color: var(--sandstone-base);
+  font-weight: bold;
+  font-size: 1.3em;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #020202;
   }
   a:hover {
     color: #747bff;
