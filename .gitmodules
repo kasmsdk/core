@@ -7,3 +7,12 @@
 [submodule "bangaz"]
 	path = bangaz
 	url = https://github.com/kasmsdk/bangaz
+[submodule "triggaz"]
+	path = bangaz
+	url = https://github.com/kasmsdk/triggaz
+[submodule "belfry"]
+	path = belfry
+	url = https://github.com/kasmsdk/belfry
+[submodule "chimez"]
+	path = chimez
+	url = https://github.com/kasmsdk/chimez
