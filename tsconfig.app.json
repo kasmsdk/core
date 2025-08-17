@@ -25,5 +25,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "arpy", "bangaz", "emanator"]
+  "include": ["src", "arpy", "bangaz", "emanator"],
+  "exclude": [
+    "**/*.test.tsx",
+    "**/*.test.ts",
+    "**/*.spec.tsx",
+    "**/*.spec.ts"
+  ]
 }

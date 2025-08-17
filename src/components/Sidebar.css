@@ -1,5 +1,13 @@
 /* Sidebar Component - Mobile-First Responsive Design */
 
+.sidebar {
+  /* Sharper font rendering */
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
 /* Hamburger Menu Button */
 .hamburger-menu {
   position: fixed;
@@ -24,6 +32,10 @@
   align-items: center;
   font-size: 1.3rem; /* Larger sidebar button text */
   font-weight: 900; /* Maximum boldness */
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  font-smooth: never;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
 }
 
 .hamburger-menu:hover {

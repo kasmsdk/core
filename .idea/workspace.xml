@@ -5,28 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="Kams SDK Baseline">
-      <change afterPath="$PROJECT_DIR$/arpy/Arpy.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bangaz/Bangaz.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/emanator/Emanator.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/arpy/Arpy.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arpy" beforeDir="false" afterPath="$PROJECT_DIR$/arpy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bangaz" beforeDir="false" afterPath="$PROJECT_DIR$/bangaz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emanator" beforeDir="false" afterPath="$PROJECT_DIR$/emanator" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Arpy.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Bangaz.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Emanator.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Sidebar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tsconfig.app.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.app.json" afterDir="false" />
     </list>
-    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="" />
+    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="">
+      <change beforePath="$PROJECT_DIR$/arpy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bangaz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emanator" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/bangaz" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -45,13 +39,14 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHELLCHECK.PATH": "/Users/klambert/Library/Application Support/JetBrains/WebStorm2025.1/plugins/Shell Script/shellcheck",
-    "git-widget-placeholder": "544bff32",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/klambert/workspace/github_kevleyski/kasmsdk-core/src/assets",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "npm.build:static.executor": "Run",
     "npm.deploy.executor": "Run",
     "npm.dev.executor": "Run",
     "ts.external.directory.path": "/Users/klambert/workspace/github_kevleyski/kasmsdk-core/node_modules/typescript/lib",
@@ -63,7 +58,7 @@
       <recent name="$PROJECT_DIR$/src/assets" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build:static">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="build:static" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -96,8 +91,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.build:static" />
         <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build:static" />
         <item itemvalue="npm.deploy" />
       </list>
     </recent_temporary>
