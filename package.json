@@ -15,7 +15,8 @@
     "build": "tsc -b && vite build",
     "build:static": "tsc -b && vite build --mode production",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build:static && rsync -av --delete --exclude='.git' --exclude='.gitignore' dist/ /Users/klambert/workspace/github_kasmsdk/kasmsdk.github.io/"
   },
   "dependencies": {
     "@react-three/drei": "^10.6.1",

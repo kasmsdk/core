@@ -11,7 +11,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext = 'main', onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Define navigation items based on app context
   const getNavigationItems = () => {
     switch (appContext) {
       case 'kasm':
@@ -24,21 +23,16 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
           { id: 'midi-devices', label: 'MIDI Devices', icon: '🔌', description: 'Connected MIDI controllers' },
           { id: 'presets', label: 'Presets', icon: '💾', description: 'Saved instrument configurations' },
         ];
-
       case 'tech':
         return [
           { id: 'webmidi', label: 'TechWebMIDI', icon: '🎥', description: 'Everything TechWebMIDI' },
           { id: 'webgpu', label: 'WebGPU', icon: '🎮', description: 'Using GPU compute shaders with music' },
         ];
-
-      default: // 'main'
+      default:
         return [
           { id: 'emanator', label: 'Emanations Editor', icon: '🎼', description: 'Emanator editor tool' },
-          { id: 'bangaz', label: 'Bangaz Drum Machine', icon: '🥁', description: 'Drum machine patter editor tool' },
+          { id: 'bangaz', label: 'Bangaz Drum Machine', icon: '🥁', description: 'Drum machine pattern editor tool' },
           { id: 'arpy', label: 'Arpy Arpeggiator Editor', icon: '🎼', description: 'Arpeggiator editor tool' },
-          // { id: 'kasm', label: 'KASM SDK', icon: '🎵', description: 'Documentation for the Kasm SDK' },
-          // { id: 'kasmxr', label: 'Kasm VR/AR MIDI controllers', icon: '🥽', description: 'Augmented and virtual reality MIDI instruments, control and play musical instruments that are not quite all there' },
-          // { id: 'tech', label: 'More Tech Demos/Experiments', icon: '🔧', description: 'TechWebMIDI, Ableton SMPTE video sync and more' },
           { id: 'about', label: 'About', icon: 'ℹ️', description: 'Project information and credits' },
         ];
     }
@@ -47,15 +41,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
   const navigationItems = getNavigationItems();
 
   const handleItemClick = (itemId: string) => {
-    // Sidebar clicked: itemId (removed console.log for production best practices)
-    // In standalone mode (kasm, emanator, tech), treat clicks as filter changes
     if (appContext !== 'main' && onFilterChange) {
       onFilterChange(itemId);
-      // Do NOT close sidebar for nested submenus
     } else {
       onAppChange(itemId);
-      // Determine if the next context has filters
-      let nextContext = itemId;
+      const nextContext = itemId;
       let nextNavItems;
       switch (nextContext) {
         case 'kasm':
@@ -78,17 +68,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
         default:
           nextNavItems = [];
       }
-      // If there are no filters to show, close sidebar
       if (nextNavItems.length === 0) {
         setIsOpen(false);
       }
     }
   };
 
-  // Handler to go back to main sidebar
   const handleBackToMain = () => {
     if (onAppChange) {
-      onAppChange('bangaz'); // or any default main app
+      onAppChange('bangaz');
     }
   };
 
@@ -98,7 +86,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
 
   return (
     <>
-      {/* Hamburger Menu Button */}
       <button
         className={`hamburger-menu ${isOpen ? 'open' : ''}`}
         onClick={toggleSidebar}
@@ -109,11 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
         <span className="hamburger-line"></span>
         <span className="hamburger-line"></span>
       </button>
-
-      {/* Overlay for mobile */}
       {isOpen && <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />}
-
-      {/* Sidebar */}
       <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h2 className="sidebar-title">
@@ -128,7 +111,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
             ✕
           </button>
         </div>
-        {/* Back to Main button for nested contexts */}
         {appContext !== 'main' && (
           <div className="sidebar-back-main">
             <button
@@ -140,8 +122,6 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
             </button>
           </div>
         )}
-
-        {/* Navigation Items */}
         <div className="sidebar-nav">
           <ul className="nav-list">
             {navigationItems.map((item) => (
