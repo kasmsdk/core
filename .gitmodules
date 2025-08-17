@@ -1,0 +1,9 @@
+[submodule "arpy"]
+	path = arpy
+	url = https://github.com/kasmsdk/arpy
+[submodule "emanator"]
+	path = emanator
+	url = https://github.com/kasmsdk/emanator
+[submodule "bangaz"]
+	path = bangaz
+	url = https://github.com/kasmsdk/bangaz
