@@ -23,7 +23,7 @@ function App() {
     }
   }, []);
 
-  const isStandaloneMode = currentApp === 'kasm' || currentApp === 'emanator';
+  const isStandaloneMode = ['kasm', 'emanator', 'bangaz', 'arpy'].includes(currentApp);
 
   const getSidebarContext = (): 'main' | 'kasm' | 'tech' => {
     if (currentApp === 'kasm') return 'kasm';

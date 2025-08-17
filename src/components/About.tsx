@@ -270,12 +270,13 @@ export default function About() {
       <div className="about-header" style={{
         position: 'absolute',
         top: '20px',
-        left: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
         zIndex: 10,
-        background: 'rgba(0, 0, 0, 0.7)',
-        padding: '1rem',
-        borderRadius: '10px',
-        color: 'white'
+        maxWidth: '800px',
+        width: '90%',
+        color: 'white',
+        textAlign: 'center',
       }}>
         <h2>About</h2>
         <p>Kasm SDK Open Source Community</p>
@@ -286,7 +287,7 @@ export default function About() {
 
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
-        style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)' }}
+        style={{  }}
       >
         <AboutScene />
       </Canvas>

@@ -6,10 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="Kams SDK Baseline">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/About.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/About.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Arpy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Arpy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Bangaz.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Bangaz.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/Sidebar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/TechWebGPU.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/TechWebGPU.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/TechWebMIDI.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/TechWebMIDI.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.tsx" afterDir="false" />
     </list>
     <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -136,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755397917079</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Kams SDK Baseline">
+      <option name="closed" value="true" />
+      <created>1755399339720</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1755399339720</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
