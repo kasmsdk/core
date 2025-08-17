@@ -44,10 +44,11 @@ function CompanyInfo() {
         ref={textRef}
         position={[0, 0.8, 0]}
         fontSize={0.25}
-        color="#00ff00"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/monospace.woff"
       >
         {current.title}
       </Text>
@@ -56,7 +57,9 @@ function CompanyInfo() {
       <Text
         position={[0, 0.4, 0]}
         fontSize={0.15}
-        color="#ffff00"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -67,7 +70,9 @@ function CompanyInfo() {
       <Text
         position={[0, 0, 0]}
         fontSize={0.12}
-        color="#ff6600"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -78,7 +83,9 @@ function CompanyInfo() {
       <Text
         position={[0, -0.4, 0]}
         fontSize={0.08}
-        color="#888888"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -144,7 +151,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1, 0]}
         fontSize={0.08}
-        color="#ffffff"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -154,7 +163,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1.2, 0]}
         fontSize={0.06}
-        color="#ce422b"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -164,7 +175,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1.35, 0]}
         fontSize={0.06}
-        color="#00d4ff"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -174,7 +187,9 @@ function TechnologyShowcase() {
       <Text
         position={[0, -1.5, 0]}
         fontSize={0.06}
-        color="#ff6b35"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -196,7 +211,9 @@ function FeaturesDisplay() {
       <Text
         position={[0, 1, 0]}
         fontSize={0.12}
-        color="#ffffff"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -208,7 +225,9 @@ function FeaturesDisplay() {
           key={index}
           position={[0, 0.6 - index * 0.2, 0]}
           fontSize={0.08}
-          color="#00ff88"
+          color="#fff600"
+          outlineColor="#fff600"
+          outlineWidth={0.01}
           anchorX="center"
           anchorY="middle"
         >
@@ -219,7 +238,9 @@ function FeaturesDisplay() {
       <Text
         position={[0, -0.8, 0]}
         fontSize={0.06}
-        color="#888888"
+        color="#fff600"
+        outlineColor="#fff600"
+        outlineWidth={0.01}
         anchorX="center"
         anchorY="middle"
       >
@@ -249,14 +270,15 @@ export default function About() {
       <div className="about-header" style={{
         position: 'absolute',
         top: '20px',
-        left: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
         zIndex: 10,
-        background: 'rgba(0, 0, 0, 0.7)',
-        padding: '1rem',
-        borderRadius: '10px',
-        color: 'white'
+        maxWidth: '800px',
+        width: '90%',
+        color: 'white',
+        textAlign: 'center',
       }}>
-        <h2>ℹ️ About</h2>
+        <h2>About</h2>
         <p>Kasm SDK Open Source Community</p>
         <p style={{ fontSize: '0.9em', marginTop: '10px', color: '#aaa' }}>
           Kasm SDK is an open source community project focused on building advanced web based musical instruments including AR and VR instruments and MIDI controllers
@@ -265,7 +287,7 @@ export default function About() {
 
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75 }}
-        style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)' }}
+        style={{  }}
       >
         <AboutScene />
       </Canvas>
