@@ -6,7 +6,7 @@ import About from './components/About';
 import Sidebar from './components/Sidebar';
 import Bangaz from '../bangaz/Bangaz';
 import Emanator from '../emanator/Emanator';
-import Arpy from '../../arpy/Arpy';
+import Arpy from '../arpy/Arpy';
 import './App.css';
 
 function App() {
