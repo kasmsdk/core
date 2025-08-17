@@ -1,37 +1,30 @@
+/* Import Varela Round font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
 /* Pyrmont Sandstone Theme - Complete Site Redesign */
 
 /* CSS Custom Properties - Authentic Pyrmont Sandstone Palette (1880s Rustic) */
 :root {
-  /* Primary sandstone colors - based on authentic Pyrmont stone */
-  --sandstone-base: #D1AD73;      /* Warm golden base */
-  --sandstone-light: #EBD19E;     /* Light weathered surface */
-  --sandstone-dark: #947A51;      /* Deep weathered blocks */
-  --sandstone-mortar: #B89E7A;    /* Mortar joints */
-  --sandstone-stain: #AE8459;     /* Age staining */
-  --sandstone-shadow: #7A6442;    /* Deep shadow */
-
-  /* Accent colors derived from authentic stone */
-  --sandstone-accent: #C4A470;    /* Subtle warm accent */
-  --sandstone-highlight: #F2E4B8; /* Gentle highlight */
-  --sandstone-muted: #A08866;     /* Muted weathered tone */
-  --sandstone-iron: #8B6914;      /* Iron oxide staining */
-
-  /* Professional text colors */
-  --sandstone-text: #3D3426;      /* Rich dark brown text */
-  --sandstone-text-light: #5A4D3A; /* Lighter readable text */
-  --sandstone-text-muted: #7A6442; /* Muted text */
-
-  /* Subtle interactive states */
-  --sandstone-hover: #D8B87F;     /* Gentle hover state */
-  --sandstone-active: #B89E7A;    /* Subtle active state */
-  --sandstone-focus: #C4A470;     /* Professional focus state */
-
-  /* Surface variations - authentic stone tones */
-  --sandstone-surface-1: #E8D5A8; /* Lightest weathered surface */
-  --sandstone-surface-2: #DCC896; /* Light surface */
-  --sandstone-surface-3: #D1AD73; /* Base surface */
-  --sandstone-surface-4: #B89E7A; /* Darker surface */
-  --sandstone-surface-5: #947A51; /* Darkest weathered surface */
+  /* Sandstone theme colors from image */
+  --sandstone-base: #fff600;
+  --sandstone-light: #FFF6B0;
+  --sandstone-dark: #C7B200;
+  --sandstone-iron: #6A6762;
+  --sandstone-shadow: #4A4844;
+  --sandstone-accent: #FFD600;
+  --sandstone-highlight: #FFF6B0;
+  --sandstone-muted: #B8A082;
+  --sandstone-text: var(--sandstone-base);
+  --sandstone-text-light: #ffff99;
+  --sandstone-text-muted: #fffec0;
+  --sandstone-hover: #FFF6B0;
+  --sandstone-active: #FFD600;
+  --sandstone-focus: #FFE14A;
+  --sandstone-surface-1: #6A6762;
+  --sandstone-surface-2: #4A4844;
+  --sandstone-surface-3: #B8A082;
+  --sandstone-surface-4: #C7B200;
+  --sandstone-surface-5: #FFD600;
 
   /* Gradients */
   --sandstone-gradient-primary: linear-gradient(135deg, var(--sandstone-light) 0%, var(--sandstone-base) 50%, var(--sandstone-dark) 100%);
@@ -71,15 +64,23 @@
 
 /* Base Styles with Sandstone Theme */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  background: transparent;
+  font-family: 'Varela Round', Arial, Helvetica, sans-serif;
+  background: var(--sandstone-surface-1);
   color: var(--sandstone-text);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
-
-  /* Add subtle sandstone texture */
   position: relative;
+
+  /* Use metallic.png as default background */
+  background-image: url('./assets/textures/metallic.png');
+  background-size: cover;
+  background-repeat: repeat;
+  background-position: center;
+
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-shadow: 1px 1px 2px rgba(40,40,40,0.25), 0 0 1px #fff;
 }
 
 body::before {
@@ -168,10 +169,8 @@ body::after {
 .app-title {
   font-size: 1.75rem;
   font-weight: 800;
-  background: linear-gradient(135deg, var(--sandstone-iron) 0%, var(--sandstone-dark) 50%, var(--sandstone-shadow) 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--sandstone-base);
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -341,7 +340,8 @@ body::after {
 
 .session-info h3 {
   margin: 0 0 0.75rem 0;
-  color: var(--sandstone-iron);
+  color: var(--sandstone-base);
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
   font-size: 1.2rem;
   font-weight: 700;
 }
@@ -431,7 +431,8 @@ body::after {
 }
 
 .footer-content p {
-  color: var(--sandstone-light);
+  color: var(--sandstone-base);
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
   font-size: 0.9rem;
 }
 

@@ -1,6 +1,13 @@
 {
   "name": "kasmsdk",
+  "description": "KasmSDK: React, Three.js, and WebGPU/WebMIDI playground.",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevleyski/kasmsdk-core.git"
+  },
+  "author": "Kevin Lambert <kevleyski@gmail.com>",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

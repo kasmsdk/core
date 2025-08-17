@@ -38,7 +38,6 @@ function WebGPUStats() {
         color="#00ff00"
         anchorX="center"
         anchorY="middle"
-        font="/fonts/monospace.woff"
       >
         WebGPU
       </Text>
