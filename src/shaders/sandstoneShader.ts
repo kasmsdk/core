@@ -58,155 +58,35 @@ var<uniform> uniforms: Uniforms;
 var texture_sampler: sampler;
 
 @group(0) @binding(2)
-var noise_texture: texture_2d<f32>;
-
-// Authentic Pyrmont sandstone color palette (1880s rustic)
-const SANDSTONE_BASE: vec3<f32> = vec3<f32>(0.82, 0.68, 0.45); // Warm golden base
-const SANDSTONE_DARK: vec3<f32> = vec3<f32>(0.58, 0.48, 0.32); // Deep weathered blocks
-const SANDSTONE_LIGHT: vec3<f32> = vec3<f32>(0.92, 0.82, 0.62); // Light weathered surface
-const SANDSTONE_MORTAR: vec3<f32> = vec3<f32>(0.72, 0.62, 0.48); // Mortar joints
-const SANDSTONE_STAIN: vec3<f32> = vec3<f32>(0.68, 0.52, 0.35); // Age staining
-
-// Noise functions for procedural texture generation
-fn hash(p: vec2<f32>) -> f32 {
-  let h = dot(p, vec2<f32>(127.1, 311.7));
-  return fract(sin(h) * 43758.5453123);
-}
-
-fn noise(p: vec2<f32>) -> f32 {
-  let i = floor(p);
-  let f = fract(p);
-  
-  let a = hash(i);
-  let b = hash(i + vec2<f32>(1.0, 0.0));
-  let c = hash(i + vec2<f32>(0.0, 1.0));
-  let d = hash(i + vec2<f32>(1.0, 1.0));
-  
-  let u = f * f * (3.0 - 2.0 * f);
-  
-  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-}
-
-fn fbm(p: vec2<f32>) -> f32 {
-  var value = 0.0;
-  var amplitude = 0.5;
-  var frequency = 1.0;
-  
-  for (var i = 0; i < 6; i++) {
-    value += amplitude * noise(p * frequency);
-    amplitude *= 0.5;
-    frequency *= 2.0;
-  }
-  
-  return value;
-}
-
-// Authentic Pyrmont sandstone block pattern
-fn sandstoneBlocks(uv: vec2<f32>) -> f32 {
-  // Create realistic block pattern with mortar joints
-  let block_size = vec2<f32>(0.3, 0.15); // Typical sandstone block proportions
-  let block_uv = uv / block_size;
-  let block_id = floor(block_uv);
-  let block_local = fract(block_uv);
-  
-  // Mortar joint width
-  let mortar_width = 0.08;
-  let mortar_x = smoothstep(0.0, mortar_width, block_local.x) * smoothstep(1.0, 1.0 - mortar_width, block_local.x);
-  let mortar_y = smoothstep(0.0, mortar_width, block_local.y) * smoothstep(1.0, 1.0 - mortar_width, block_local.y);
-  
-  return mortar_x * mortar_y;
-}
-
-// Weathering and age patterns specific to 1880s Pyrmont stone
-fn weatheringPattern(uv: vec2<f32>, world_pos: vec3<f32>) -> f32 {
-  // Surface weathering from 140+ years of exposure
-  let age_weathering = fbm(uv * 6.0 + world_pos.xz * 0.08);
-  
-  // Rain streaking patterns (vertical emphasis)
-  let rain_streaks = fbm(vec2<f32>(uv.x * 3.0, uv.y * 12.0));
-  
-  // Wind erosion (horizontal patterns)
-  let wind_erosion = fbm(vec2<f32>(uv.x * 15.0, uv.y * 4.0));
-  
-  return mix(age_weathering, mix(rain_streaks, wind_erosion, 0.4), 0.6);
-}
-
-// Iron oxide staining typical of Pyrmont sandstone
-fn ironStaining(uv: vec2<f32>, world_pos: vec3<f32>) -> f32 {
-  // Iron-rich mineral deposits create characteristic staining
-  let iron_deposits = fbm(uv * 8.0 + world_pos.xz * 0.03);
-  
-  // Vertical streaking from water runoff
-  let vertical_stains = fbm(vec2<f32>(uv.x * 4.0, uv.y * 0.8));
-  
-  // Concentrated staining near mortar joints
-  let joint_staining = 1.0 - sandstoneBlocks(uv);
-  
-  return max(0.0, iron_deposits - 0.3) * (0.4 + 0.6 * vertical_stains) * (0.7 + 0.3 * joint_staining);
-}
-
-// Surface roughness for realistic lighting
-fn surfaceRoughness(uv: vec2<f32>) -> f32 {
-  let detail_scale = 32.0;
-  let fine_detail = fbm(uv * detail_scale) * 0.1;
-  let medium_detail = fbm(uv * detail_scale * 0.5) * 0.2;
-  
-  return fine_detail + medium_detail;
-}
+var metallic_texture: texture_2d<f32>;
 
 @fragment
 fn fs_main(input: FragmentInput) -> @location(0) vec4<f32> {
   let uv = input.uv;
   let world_pos = input.world_position;
   let normal = normalize(input.normal);
-  
-  // Generate authentic Pyrmont sandstone texture layers
-  let blocks = sandstoneBlocks(uv);
-  let weathering = weatheringPattern(uv, world_pos);
-  let iron_stain = ironStaining(uv, world_pos);
-  let roughness = surfaceRoughness(uv);
-  
-  // Base sandstone color - start with authentic golden tone
-  var base_color = SANDSTONE_BASE;
-  
-  // Apply block structure - mortar joints are darker
-  base_color = mix(base_color, SANDSTONE_MORTAR, (1.0 - blocks) * 0.4);
-  
-  // Apply weathering - creates lighter weathered areas
-  base_color = mix(base_color, SANDSTONE_LIGHT, weathering * 0.3);
-  
-  // Apply age staining - darker weathered areas
-  base_color = mix(base_color, SANDSTONE_STAIN, weathering * 0.2);
-  
-  // Apply iron oxide staining - characteristic rust-colored streaks
-  base_color = mix(base_color, SANDSTONE_STAIN, iron_stain * 0.5);
-  
+
+  // Sample metallic texture for base color
+  var base_color = textureSample(metallic_texture, texture_sampler, uv).rgb;
+
   // Lighting calculation
   let light_dir = normalize(uniforms.light_position - world_pos);
   let view_dir = normalize(-world_pos); // Assuming camera at origin
   let half_dir = normalize(light_dir + view_dir);
-  
-  // Modify normal with surface roughness
-  let perturbed_normal = normalize(normal + vec3<f32>(roughness * 2.0 - 1.0, 0.0, roughness * 2.0 - 1.0) * 0.1);
-  
+
   // Diffuse lighting
-  let diffuse = max(0.0, dot(perturbed_normal, light_dir));
-  
-  // Specular lighting (subtle for sandstone)
-  let specular = pow(max(0.0, dot(perturbed_normal, half_dir)), 16.0) * 0.1;
-  
-  // Ambient occlusion approximation - based on block structure and weathering
-  let ao = 1.0 - ((1.0 - blocks) * 0.15 + weathering * 0.1);
-  
+  let diffuse = max(0.0, dot(normal, light_dir));
+
+  // Specular lighting (stronger for metallic)
+  let specular = pow(max(0.0, dot(normal, half_dir)), 64.0) * 0.5;
+
+  // Ambient lighting
+  let ambient = 0.4;
+
   // Final color composition
-  let ambient = 0.3;
-  let final_color = base_color * (ambient * ao + diffuse * 0.8) + vec3<f32>(specular);
-  
-  // Add subtle subsurface scattering effect
-  let subsurface = pow(max(0.0, dot(-light_dir, perturbed_normal)), 2.0) * 0.1;
-  let sss_color = SANDSTONE_LIGHT * subsurface;
-  
-  return vec4<f32>(final_color + sss_color, 1.0);
+  let final_color = base_color * (ambient + diffuse * 0.7) + vec3<f32>(specular);
+
+  return vec4<f32>(final_color, 1.0);
 }
 `;
 
@@ -247,7 +127,7 @@ export class SandstoneWebGPUMaterial {
   private device: GPUDevice;
   private pipeline: GPURenderPipeline | null = null;
   private uniformBuffer: GPUBuffer | null = null;
-  private noiseTexture: GPUTexture | null = null;
+  private metallicTexture: GPUTexture | null = null;
   private bindGroup: GPUBindGroup | null = null;
 
   constructor(device: GPUDevice) {
@@ -270,8 +150,19 @@ export class SandstoneWebGPUMaterial {
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
-    // Generate noise texture
-    await this.generateNoiseTexture();
+    // Load metallic.png as the main texture
+    const response = await fetch('./src/assets/textures/metallic.png');
+    const imageBitmap = await createImageBitmap(await response.blob());
+    this.metallicTexture = this.device.createTexture({
+      size: [imageBitmap.width, imageBitmap.height, 1],
+      format: 'rgba8unorm',
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+    this.device.queue.copyExternalImageToTexture(
+      { source: imageBitmap },
+      { texture: this.metallicTexture },
+      [imageBitmap.width, imageBitmap.height]
+    );
 
     // Create bind group layout
     const bindGroupLayout = this.device.createBindGroupLayout({
@@ -309,7 +200,7 @@ export class SandstoneWebGPUMaterial {
       entries: [
         { binding: 0, resource: { buffer: this.uniformBuffer } },
         { binding: 1, resource: sampler },
-        { binding: 2, resource: this.noiseTexture!.createView() },
+        { binding: 2, resource: this.metallicTexture.createView() },
       ],
     });
 
@@ -344,59 +235,6 @@ export class SandstoneWebGPUMaterial {
     });
   }
 
-  private async generateNoiseTexture(): Promise<void> {
-    const size = 256;
-    
-    // Create compute shader for noise generation
-    const computeShaderModule = this.device.createShaderModule({
-      code: sandstoneComputeShader,
-    });
-
-    // Create storage buffer for noise data
-    const noiseBuffer = this.device.createBuffer({
-      size: size * size * 4, // f32 array
-      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-    });
-
-    // Create compute pipeline
-    const computePipeline = this.device.createComputePipeline({
-      layout: 'auto',
-      compute: {
-        module: computeShaderModule,
-        entryPoint: 'cs_main',
-      },
-    });
-
-    // Create bind group for compute
-    const computeBindGroup = this.device.createBindGroup({
-      layout: computePipeline.getBindGroupLayout(0),
-      entries: [{ binding: 0, resource: { buffer: noiseBuffer } }],
-    });
-
-    // Run compute shader
-    const commandEncoder = this.device.createCommandEncoder();
-    const computePass = commandEncoder.beginComputePass();
-    computePass.setPipeline(computePipeline);
-    computePass.setBindGroup(0, computeBindGroup);
-    computePass.dispatchWorkgroups(Math.ceil(size / 8), Math.ceil(size / 8));
-    computePass.end();
-
-    // Create texture
-    this.noiseTexture = this.device.createTexture({
-      size: [size, size, 1],
-      format: 'r32float',
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-    });
-
-    // Copy buffer to texture
-    commandEncoder.copyBufferToTexture(
-      { buffer: noiseBuffer, bytesPerRow: size * 4 },
-      { texture: this.noiseTexture },
-      [size, size, 1]
-    );
-
-    this.device.queue.submit([commandEncoder.finish()]);
-  }
 
   updateUniforms(viewProjMatrix: Float32Array, modelMatrix: Float32Array, time: number, lightPosition: Float32Array): void {
     if (!this.uniformBuffer) return;
@@ -429,22 +267,22 @@ export const sandstoneThemeProperties = {
   '--sandstone-dark': '#A68B59',      // Darker ochre
   '--sandstone-iron': '#BF7340',      // Iron oxide staining
   '--sandstone-shadow': '#8C7853',    // Deep shadow
-  
+
   // Accent colors derived from sandstone
   '--sandstone-accent': '#D4A574',    // Warm accent
   '--sandstone-highlight': '#F5E8C8', // Highlight
   '--sandstone-muted': '#B8A082',     // Muted tone
-  
+
   // Functional colors
   '--sandstone-text': '#4A3F2A',      // Dark brown text
   '--sandstone-text-light': '#6B5D42', // Lighter text
   '--sandstone-text-muted': '#8C7853', // Muted text
-  
+
   // Interactive states
   '--sandstone-hover': '#E6C999',     // Hover state
   '--sandstone-active': '#CC9966',    // Active state
   '--sandstone-focus': '#D4A574',     // Focus state
-  
+
   // Surface variations
   '--sandstone-surface-1': '#F0E4C1', // Lightest surface
   '--sandstone-surface-2': '#E8D7B3', // Light surface

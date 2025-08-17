@@ -100,16 +100,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
       <nav className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h2 className="sidebar-title">
-            <span className="sidebar-icon">🚀</span>
             Kasm SDK
           </h2>
-          <button
-            className="sidebar-close"
-            onClick={() => setIsOpen(false)}
-            aria-label="Close navigation menu"
-          >
-            ✕
-          </button>
+          <small>Open Source Community</small>
         </div>
         {appContext !== 'main' && (
           <div className="sidebar-back-main">

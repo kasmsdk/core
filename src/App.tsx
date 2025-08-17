@@ -4,6 +4,9 @@ import Kasm from './components/Kasm';
 import Tech from './components/Tech';
 import About from './components/About';
 import Sidebar from './components/Sidebar';
+import Bangaz from './components/Bangaz';
+import Emanator from './components/Emanator';
+import Arpy from './components/Arpy';
 import './App.css';
 
 function App() {
@@ -82,10 +85,10 @@ function App() {
           appContext={getSidebarContext()}
         />
         <div className={`app-content ${isStandaloneMode ? 'standalone-mode' : ''}`}>
-          {currentApp === 'bangaz' && <div>Bangaz drum machine module.</div>}
-          {currentApp === 'arpy' && <div>Arpy arpeggiator module.</div>}
+          {currentApp === 'bangaz' && <Bangaz />}
+          {currentApp === 'arpy' && <Arpy />}
           {currentApp === 'kasm' && <Kasm />}
-          {currentApp === 'emanator' && <div>Emanator editor module.</div>}
+          {currentApp === 'emanator' && <Emanator />}
           {currentApp === 'tech' && <Tech />}
           {currentApp === 'about' && <About />}
         </div>
