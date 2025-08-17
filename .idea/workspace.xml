@@ -5,15 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="Kams SDK Baseline">
+      <change afterPath="$PROJECT_DIR$/components/MidiSelector.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Sidebar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.app.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arpy" beforeDir="false" afterPath="$PROJECT_DIR$/arpy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arpy/Arpy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/arpy/Arpy.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arpy/Arpy.tsx.orig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bangaz" beforeDir="false" afterPath="$PROJECT_DIR$/bangaz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bangaz/Bangaz.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/bangaz/Bangaz.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bangaz/Bangaz.tsx.orig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emanator" beforeDir="false" afterPath="$PROJECT_DIR$/emanator" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emanator/Emanator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/emanator/Emanator.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emanator/Emanator.tsx.orig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/emanator/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/emanator/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
     </list>
-    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="">
-      <change beforePath="$PROJECT_DIR$/arpy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bangaz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/emanator" beforeDir="false" />
-    </list>
+    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,26 +39,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHELLCHECK.PATH": "/Users/klambert/Library/Application Support/JetBrains/WebStorm2025.1/plugins/Shell Script/shellcheck",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/klambert/workspace/github_kevleyski/kasmsdk-core/src/assets",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build:static.executor": "Run",
-    "npm.deploy.executor": "Run",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "/Users/klambert/workspace/github_kevleyski/kasmsdk-core/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/klambert/Library/Application Support/JetBrains/WebStorm2025.1/plugins/Shell Script/shellcheck&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/klambert/workspace/github_kevleyski/kasmsdk-core/src/assets&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build:static.executor&quot;: &quot;Run&quot;,
+    &quot;npm.deploy.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;diff.external&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/klambert/workspace/github_kasmsdk/core/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/assets" />
