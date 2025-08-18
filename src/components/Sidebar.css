@@ -272,12 +272,12 @@
 .nav-link:hover {
   background: var(--sandstone-surface-2);
   background-image: var(--sandstone-texture-fine);
-  border-left-color: var(--sandstone-accent);
+  border-left-color: black;
   transform: translateX(4px);
 }
 
 .nav-link.active {
-  background: var(--sandstone-gradient-accent);
+  background: var(--sandstone-iron);
   border-left-color: var(--sandstone-iron);
   color: var(--sandstone-light);
   box-shadow: inset 0 0 20px rgba(191, 115, 64, 0.2);
@@ -358,7 +358,7 @@
 
 /* Sunken Paragraph Style */
 .sunken-paragraph {
-  background: url('../assets/textures/metallic.png');
+  background: linear-gradient(rgba(34,34,34,0.2), rgba(34,34,34,0.2)), url('../assets/textures/metallic.png');
   background-size: cover;
   background-repeat: repeat;
   background-position: center;

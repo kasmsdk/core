@@ -107,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
           <div className="sidebar-back-main">
             <button
               className="nav-link"
-              style={{ width: '100%', marginBottom: '1em', background: '#ffe4b5', color: '#3D3426', fontWeight: 'bold' }}
+              style={{ width: '100%', marginBottom: '1em', background: '#ffe4b5', color: '#3D3426', fontWeight: 'bold', borderRadius: 0 }}
               onClick={handleBackToMain}
             >
               ← Back to Main
