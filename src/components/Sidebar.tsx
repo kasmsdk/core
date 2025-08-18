@@ -15,11 +15,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
     switch (appContext) {
       case 'kasm':
         return [
-          { id: 'kasm_emanator', label: 'Kasm Emanator', icon: '🎹', description: 'Melodic pattern generator' },
-          { id: 'kasm_emanator_trans', label: 'Kasm Rust Emanator MIDI Transformation', icon: '🎹', description: 'Ableton Live ClipView transformation' },
-          { id: 'emanator', label: 'Kasm Rust Emanator Ableton MIDI Generative', icon: '🎹', description: 'Ableton Live ClipView generative' },
+          { id: 'emanator', label: 'Kasm Emanator', icon: '🎹', description: 'Melodic pattern generator' },
+          { id: 'emanator_trans', label: 'Kasm Rust Emanator MIDI Transformation', icon: '🎹', description: 'Ableton Live ClipView transformation' },
+          { id: 'emanator_gen', label: 'Kasm Rust Emanator Ableton MIDI Generative', icon: '🎹', description: 'Ableton Live ClipView generative' },
           { id: 'triggaz', label: 'Kasm Triggaz', icon: '🎹', description: 'Triggers MIDI note/cc pattern detection editor tool' },
           { id: 'bangaz', label: 'Kasm Bangaz', icon: '🎹', description: 'Ableton Drum Rack drum machine' },
+          { id: 'kasm_lfo', label: 'Kasm LFO', icon: '🎹', description: 'Algorithmic LFO generator' },
           { id: 'kasm_lfo', label: 'Kasm LFO', icon: '🎹', description: 'Algorithmic LFO generator' },
           { id: 'arpy', label: 'Kasm Arpy', icon: '🎹', description: 'Arpeggiator sequencer based on keys held' },
           { id: 'kasm_canvas', label: 'Kasm Canvas', icon: '🎹', description: 'Visualizers for Kasm devices' },
