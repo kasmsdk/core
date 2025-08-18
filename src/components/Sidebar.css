@@ -238,6 +238,18 @@
 }
 
 .nav-item {
+  /* Button-like drop shadow inspired by b.png */
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.28), /* outer shadow for depth */
+    inset 0 1px 2px rgba(0,0,0,0.12), /* subtle inner shadow */
+    0 0.5px 0 rgba(255,255,255,0.12); /* highlight for tactile effect */
+  border-radius: 8px;
+  background: #222; /* dark background for button look */
+  border: 1.5px solid #444;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.nav-item {
   margin: 0;
 }
 
@@ -246,7 +258,7 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 10px 16px;
   border: none;
   background: transparent;
   color: var(--sandstone-text);
@@ -255,17 +267,19 @@
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
   position: relative;
+  margin-bottom: 8px; /* Adds vertical spacing between links */
+  border-radius: 6px; /* Optional: gives a button-like rounded edge */
 }
 
 .nav-link:hover {
   background: var(--sandstone-surface-2);
   background-image: var(--sandstone-texture-fine);
-  border-left-color: var(--sandstone-accent);
+  border-left-color: black;
   transform: translateX(4px);
 }
 
 .nav-link.active {
-  background: var(--sandstone-gradient-accent);
+  background: var(--sandstone-iron);
   border-left-color: var(--sandstone-iron);
   color: var(--sandstone-light);
   box-shadow: inset 0 0 20px rgba(191, 115, 64, 0.2);
@@ -342,6 +356,26 @@
   text-transform: uppercase;
   letter-spacing: 0.3px;
   box-shadow: var(--sandstone-shadow-sm);
+}
+
+/* Sunken Paragraph Style */
+.sunken-paragraph {
+  background: linear-gradient(rgba(34,34,34,0.2), rgba(34,34,34,0.2)), url('../assets/textures/metallic.png');
+  background-size: cover;
+  background-repeat: repeat;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow:
+    inset 2px 4px 12px rgba(0,0,0,0.45), /* deep inner shadow for sunken effect */
+    inset -2px -4px 8px rgba(255,255,255,0.08), /* subtle highlight for realism */
+    0 1px 2px rgba(0,0,0,0.10); /* soft outer shadow for separation */
+  border: 1.5px solid #444;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  color: var(--sandstone-base, #eaeaea);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
 }
 
 /* Responsive Design */

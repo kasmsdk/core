@@ -6,8 +6,10 @@ export default function Kasm({ onNavigate }: KasmProps) {
   return (
     <div className="kasm-landing-container">
       <h1>Kasm SDK</h1>
-      <p>
-        The Kasm SDK is a modern toolkit for building interactive, musical, and generative web applications using WebMIDI, WebGPU, and more. Explore demonstration instruments below:
+      <p className="sunken-paragraph">
+        The Kasm SDK main intention is interoperability between Web Browsers and DAWs, in particular to make head way
+          for Augment Reality and Virtual Reality instruments more achievable by utilising cross platform
+          technologies such as WebAssembly, WebXR, WebGL/WebGPU, WebMIDI and OSC (Open Sound Control)
       </p>
       <div className="kasm-demo-buttons">
         <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
@@ -21,7 +23,6 @@ export default function Kasm({ onNavigate }: KasmProps) {
         </button>
       </div>
       <div className="kasm-tech-note">
-        <small>Want to see tech demos? Use the sidebar to explore WebMIDI and WebGPU modules.</small>
       </div>
 
       <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
