@@ -15,13 +15,15 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
     switch (appContext) {
       case 'kasm':
         return [
-          { id: 'all-instruments', label: 'All Instruments', icon: '🎹', description: 'View all available instruments' },
-          { id: 'oscillators', label: 'Oscillators', icon: '🎹', description: 'Basic waveform generators' },
-          { id: 'synthesizers', label: 'Synthesizers', icon: '🎹', description: 'Complex multi-oscillator synths' },
-          { id: 'effects', label: 'Effects', icon: '🎹', description: 'Audio processing effects' },
-          { id: 'sequencers', label: 'Sequencers', icon: '📊', description: 'Pattern and sequence generators' },
-          { id: 'midi-devices', label: 'MIDI Devices', icon: '🔌', description: 'Connected MIDI controllers' },
-          { id: 'presets', label: 'Presets', icon: '💾', description: 'Saved instrument configurations' },
+          { id: 'kasm_emanator', label: 'Kasm Emanator', icon: '🎹', description: 'Melodic pattern generator' },
+          { id: 'kasm_emanator_trans', label: 'Kasm Rust Emanator MIDI Transformation', icon: '🎹', description: 'Ableton Live ClipView transformation' },
+          { id: 'emanator', label: 'Kasm Rust Emanator Ableton MIDI Generative', icon: '🎹', description: 'Ableton Live ClipView generative' },
+          { id: 'triggaz', label: 'Kasm Triggaz', icon: '🎹', description: 'Triggers MIDI note/cc pattern detection editor tool' },
+          { id: 'bangaz', label: 'Kasm Bangaz', icon: '🎹', description: 'Ableton Drum Rack drum machine' },
+          { id: 'kasm_lfo', label: 'Kasm LFO', icon: '🎹', description: 'Algorithmic LFO generator' },
+          { id: 'arpy', label: 'Kasm Arpy', icon: '🎹', description: 'Arpeggiator sequencer based on keys held' },
+          { id: 'kasm_canvas', label: 'Kasm Canvas', icon: '🎹', description: 'Visualizers for Kasm devices' },
+          { id: 'kasm_jog', label: 'Kasm Jog', icon: '🎹', description: 'Motion video support for Kasm Canvas' },
         ];
       case 'tech':
         return [
@@ -30,6 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
         ];
       default:
         return [
+          { id: 'kasm', label: 'Kasm SDK', icon: '🎹', description: 'Documentation for the Kasm SDK' },
           { id: 'emanator', label: 'Emanations Editor', icon: '🎹', description: 'Emanator editor tool' },
           { id: 'bangaz', label: 'Bangaz Drum Machine', icon: '🎹', description: 'Drum machine pattern editor tool' },
           { id: 'arpy', label: 'Arpy Arpeggiator Editor', icon: '🎹', description: 'Arpeggiator editor tool' },
@@ -50,13 +53,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
       switch (nextContext) {
         case 'kasm':
           nextNavItems = [
-            { id: 'all-instruments' },
+            { id: 'kasm_emanator' },
             { id: 'oscillators' },
-            { id: 'synthesizers' },
+            { id: 'kasm_lfo' },
             { id: 'effects' },
-            { id: 'sequencers' },
-            { id: 'midi-devices' },
-            { id: 'presets' }
+            { id: 'kasm_canvas' },
+            { id: 'kasm_jog' },
+            { id: 'kasm_emanator_trans' }
           ];
           break;
         case 'tech':

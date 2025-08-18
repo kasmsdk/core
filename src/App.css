@@ -767,3 +767,12 @@ button:hover::before {
   pointer-events: none;
   border-radius: inherit;
 }
+
+h1 {
+  margin-left: 86px;
+  margin-top: 5px;
+}
+
+p {
+  margin-left: 20px;
+}

@@ -11,7 +11,7 @@ import Triggaz from '../triggaz/Triggaz';
 import './App.css';
 
 function App() {
-  const [currentApp, setCurrentApp] = useState<'kasm' | 'emanator' | 'tech' | 'bangaz' | 'arpy' | 'about' | 'triggaz'>('bangaz');
+  const [currentApp, setCurrentApp] = useState<'kasm' | 'emanator' | 'tech' | 'bangaz' | 'arpy' | 'about' | 'triggaz'>('kasm');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -89,7 +89,7 @@ function App() {
           {currentApp === 'bangaz' && <Bangaz />}
           {currentApp === 'arpy' && <Arpy />}
           {currentApp === 'triggaz' && <Triggaz />}
-          {currentApp === 'kasm' && <Kasm />}
+          {currentApp === 'kasm' && <Kasm onNavigate={handleAppChange} />}
           {currentApp === 'emanator' && <Emanator />}
           {currentApp === 'tech' && <Tech />}
           {currentApp === 'about' && <About />}

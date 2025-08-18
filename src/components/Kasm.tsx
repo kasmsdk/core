@@ -1,62 +1,38 @@
-import { useState, useEffect } from 'react';
-import TechWebMIDI from './TechWebMIDI.tsx';
-import TechWebGPU from './TechWebGPU.tsx';
+interface KasmProps {
+  onNavigate: (app: string) => void;
+}
 
-type TechModule = 'webmidi' | 'webgpu';
-
-export default function Tech() {
-  const [currentModule, setCurrentModule] = useState<TechModule>('webmidi');
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const moduleParam = urlParams.get('module');
-    if (moduleParam && ['webmidi'].includes(moduleParam)) {
-      setCurrentModule(moduleParam as TechModule);
-    }
-  }, []);
-
-  const modules = [
-    { id: 'webmidi' as TechModule, name: 'WebMIDI', icon: '📡', description: 'WebMIDI' },
-    { id: 'webgpu' as TechModule, name: 'WebGPU', icon: '📡', description: 'WebGPU' },
-  ];
-
+export default function Kasm({ onNavigate }: KasmProps) {
   return (
-    <div className="tech-container">
-      <div className="tech-selector">
-        <h3>🔧 Tech Demos</h3>
-        <div className="tech-selector-list">
-          {modules.map((module) => (
-            <button
-              key={module.id}
-              className={`tech-selector-btn${currentModule === module.id ? ' active' : ''}`}
-              onClick={() => setCurrentModule(module.id)}
-            >
-              <div className="tech-selector-btn-content">
-                <span className="tech-selector-icon">{module.icon}</span>
-                <div>
-                  <div className="tech-selector-name">{module.name}</div>
-                  <div className="tech-selector-description">{module.description}</div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-        <div className="tech-selector-info">
-          Giving a home to various tech demos and experiments that might be useful to others.
-        </div>
+    <div className="kasm-landing-container">
+      <h1>Kasm SDK</h1>
+      <p>
+        The Kasm SDK is a modern toolkit for building interactive, musical, and generative web applications using WebMIDI, WebGPU, and more. Explore demonstration instruments below:
+      </p>
+      <div className="kasm-demo-buttons">
+        <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
+            🎹 Emanator
+        </button>
+        <button className="kasm-demo-btn" onClick={() => onNavigate('bangaz')}>
+            🎹 Bangaz
+        </button>
+        <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
+            🎹 Arpy
+        </button>
       </div>
-      <div className="tech-module-display">
-        {currentModule === 'webmidi' && <TechWebMIDI />}
-        {currentModule === 'webgpu' && <TechWebGPU />}
+      <div className="kasm-tech-note">
+        <small>Want to see tech demos? Use the sidebar to explore WebMIDI and WebGPU modules.</small>
       </div>
-      <div className="tech-info">
-        <h4 style={{ color: 'var(--sandstone-base)' }}>
-          {modules.find(m => m.id === currentModule)?.icon} {modules.find(m => m.id === currentModule)?.name}
-        </h4>
-        <p>
-          {currentModule === 'webmidi' && 'How TechWebMIDI works, or at least is supposed to.'}
-          {currentModule === 'webgpu' && 'How WebGPU can be used to speed instrument rendering and visualizations up.'}
-        </p>
+
+      <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <iframe
+          src="https://kasmsdk.github.io/latest/emanator.html"
+          title="Kasm Demo"
+          width="90%"
+          height="1024"
+          style={{ border: '2px solid #ccc', borderRadius: '12px', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}
+          allowFullScreen
+        />
       </div>
     </div>
   );
