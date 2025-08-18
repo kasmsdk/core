@@ -258,7 +258,7 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 10px 16px;
   border: none;
   background: transparent;
   color: var(--sandstone-text);
@@ -267,6 +267,8 @@
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
   position: relative;
+  margin-bottom: 8px; /* Adds vertical spacing between links */
+  border-radius: 6px; /* Optional: gives a button-like rounded edge */
 }
 
 .nav-link:hover {
