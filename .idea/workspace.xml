@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="(chore) UI tweaks">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emanator" beforeDir="false" afterPath="$PROJECT_DIR$/emanator" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/emanator/Emanator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/emanator/Emanator.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
     </list>
     <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -259,7 +259,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755572818731</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="(chore) UI tweaks">
+      <option name="closed" value="true" />
+      <created>1755575045496</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1755575045496</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
