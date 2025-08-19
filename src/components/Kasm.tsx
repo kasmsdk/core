@@ -1,4 +1,4 @@
-import JogCanvas from '../../components/JogCanvas';
+import JogCanvas from '../../latest/JogCanvas';
 
 interface KasmProps {
   onNavigate: (app: string) => void;

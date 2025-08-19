@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface JogCanvasProps {
+interface EmanatorCanvasProps {
     src?: string;
     title?: string;
     width?: number | string;
@@ -8,9 +8,9 @@ interface JogCanvasProps {
     style?: React.CSSProperties;
 }
 
-const JogCanvas: React.FC<JogCanvasProps> = ({
-    src = '/components/kasm_canvas_jog_obs.html',
-    title = 'Jog Canvas',
+const EmanatorCanvas: React.FC<EmanatorCanvasProps> = ({
+    src = '/latest/kasm_canvas_obs.html',
+    title = 'Emanator Canvas',
     width = 400,
     height = 300,
     style = {},
@@ -26,5 +26,5 @@ const JogCanvas: React.FC<JogCanvasProps> = ({
     );
 };
 
-export default JogCanvas;
+export default EmanatorCanvas;
 

@@ -9,7 +9,7 @@ interface ArpyCanvasProps {
 }
 
 const ArpyCanvas: React.FC<ArpyCanvasProps> = ({
-    src = '/components/kasm_canvas_arpy_obs.html',
+    src = '/latest/kasm_canvas_arpy_obs.html',
     title = 'Arpy Canvas',
     width = 400,
     height = 300,
