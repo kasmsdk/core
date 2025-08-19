@@ -1,3 +1,5 @@
+import JogCanvas from '../../components/JogCanvas';
+
 interface KasmProps {
   onNavigate: (app: string) => void;
 }
@@ -39,6 +41,13 @@ export default function Kasm({ onNavigate }: KasmProps) {
           </button>
         </div>
       </div>
+
+      {/* Featured New Components */}
+      <div style={{ margin: '2rem 0', padding: '1rem', background: '#f9f9f9', borderRadius: '8px' }}>
+        <h2 style={{ marginBottom: '1rem' }}>Featured New Component: Jog</h2>
+        <JogCanvas />
+      </div>
+
       <div className="kasm-tech-note">
       </div>
       <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
