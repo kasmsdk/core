@@ -4,43 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="Kams SDK Baseline (share WedMIDI)">
-      <change afterPath="$PROJECT_DIR$/triggaz.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="(chore) UI tweaks">
+      <change afterPath="$PROJECT_DIR$/src/assets/textures/plasticy.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/assets/textures/woody.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Sidebar.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.tsx" afterDir="false" />
     </list>
-    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="origin/main" />
+    <option name="OPTIONS">
+      <set>
+        <option value="SQUASH" />
+        <option value="NO_COMMIT" />
+      </set>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/.idea/workspace.xml">
-      <ranges>
-        <range start1="6" end1="8" start2="6" end2="9" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="9" end1="19" start2="10" end2="10" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="20" end1="20" start2="11" end2="15" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="21" end1="22" start2="16" end2="16" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="29" end1="29" start2="23" end2="43" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="41" end1="60" start2="55" end2="75" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="61" end1="62" start2="76" end2="77" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="64" end1="64" start2="79" end2="83" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="67" end1="68" start2="86" end2="87" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="100" end1="101" start2="119" end2="119" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="102" end1="102" start2="120" end2="121" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="126" end1="126" start2="145" end2="149" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="175" end1="176" start2="198" end2="247" changelist="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" />
-        <range start1="219" end1="220" start2="290" end2="292" changelist="e60e3b21-c01f-44be-8745-e98d4eb406ee" />
-      </ranges>
-    </file>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -53,35 +41,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHELLCHECK.PATH": "/Users/klambert/Library/Application Support/JetBrains/WebStorm2025.1/plugins/Shell Script/shellcheck",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/klambert/workspace/github_kasmsdk/core",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build:static.executor": "Run",
-    "npm.deploy.executor": "Run",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "diff.external",
-    "ts.external.directory.path": "/Users/klambert/workspace/github_kasmsdk/core/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/klambert/Library/Application Support/JetBrains/WebStorm2025.1/plugins/Shell Script/shellcheck&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;ui&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/klambert/workspace/github_kasmsdk/core/src/assets/textures&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build:static.executor&quot;: &quot;Run&quot;,
+    &quot;npm.deploy.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;diff.external&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/klambert/workspace/github_kasmsdk/core/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/assets/textures" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/triggaz" />
       <recent name="$PROJECT_DIR$/chimez" />
       <recent name="$PROJECT_DIR$/belfry" />
-      <recent name="$PROJECT_DIR$/src/assets" />
     </key>
   </component>
   <component name="RunManager" selected="npm.dev">
@@ -244,7 +232,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755464875152</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="(chore) UI tweaks">
+      <option name="closed" value="true" />
+      <created>1755565007909</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1755565007909</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -288,6 +284,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Kams SDK Baseline" />
-    <option name="LAST_COMMIT_MESSAGE" value="Kams SDK Baseline" />
+    <MESSAGE value="(chore) UI tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="(chore) UI tweaks" />
   </component>
 </project>
