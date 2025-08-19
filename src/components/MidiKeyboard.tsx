@@ -13,7 +13,7 @@ const KEY_NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 // Black key positions relative to white keys (piano pattern)
 const BLACK_KEY_POSITIONS = [0, 1, 3, 4, 5]; // C#, D#, F#, G#, A#
 const BLACK_KEYS = [1, 3, 6, 8, 10];
-const BLACK_KEY_NAMES = ['C#', 'D#', 'F#', 'G#', 'A#'];
+const BLACK_KEY_NAMES = ['C#', 'Eb', 'F#', 'G#', 'Bb'];
 
 const BASE_NOTE = 60; // C4
 const OCTAVES = 2;
@@ -40,6 +40,15 @@ const KEYBOARD_MAPPING: Record<string, number> = {
   ']': 18,  // F# (next octave)
   '\\': 20 // G# (next octave)
 };
+
+// Add global declaration for kasm_rust
+declare global {
+  interface Window {
+    kasm_rust?: {
+      update_canvas_data?: (pitch: number, velocity: number, isCC: boolean) => void;
+    };
+  }
+}
 
 const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
   onNoteOn,
@@ -81,21 +90,27 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
         return;
       }
       // Note keys
-      if (KEYBOARD_MAPPING.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(KEYBOARD_MAPPING, key)) {
         const note = BASE_NOTE + KEYBOARD_MAPPING[key] + octaveOffset;
         if (!activeNotes.includes(note)) {
           setActiveNotes((prev) => [...prev, note]);
           onNoteOn(note, velocity);
+          if (window.kasm_rust && typeof window.kasm_rust.update_canvas_data === 'function') {
+            window.kasm_rust.update_canvas_data(note, velocity, false);
+          }
         }
       }
     };
     const handleKeyUp = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       pressedKeysRef.current.delete(key);
-      if (KEYBOARD_MAPPING.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(KEYBOARD_MAPPING, key)) {
         const note = BASE_NOTE + KEYBOARD_MAPPING[key] + octaveOffset;
         setActiveNotes((prev) => prev.filter((n) => n !== note));
         onNoteOff(note);
+        if (window.kasm_rust && typeof window.kasm_rust.update_canvas_data === 'function') {
+          window.kasm_rust.update_canvas_data(note, 0, false);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -106,25 +121,22 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
     };
   }, [octaveOffset, velocity, activeNotes, onNoteOn, onNoteOff]);
 
-  // Helper to get note number for key index
-  const getNoteNumber = (octave: number, key: number, isBlack: boolean) => {
-    if (isBlack) {
-      return BASE_NOTE + octave * 12 + BLACK_KEYS[key];
-    } else {
-      return BASE_NOTE + octave * 12 + WHITE_KEYS[key];
-    }
-  };
-
   // Mouse/touch handlers
   const handleKeyDown = (note: number) => {
     if (!activeNotes.includes(note)) {
       setActiveNotes((prev) => [...prev, note]);
       onNoteOn(note, velocity);
+      if (window.kasm_rust && typeof window.kasm_rust.update_canvas_data === 'function') {
+        window.kasm_rust.update_canvas_data(note, velocity, false);
+      }
     }
   };
   const handleKeyUp = (note: number) => {
     setActiveNotes((prev) => prev.filter((n) => n !== note));
     onNoteOff(note);
+    if (window.kasm_rust && typeof window.kasm_rust.update_canvas_data === 'function') {
+      window.kasm_rust.update_canvas_data(note, 0, false);
+    }
   };
 
   // Render SVG keys
@@ -145,7 +157,7 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
             y={0}
             width={whiteKeyWidth}
             height={whiteKeyHeight}
-            fill={activeNotes.includes(note) || highlightedNotes.includes(note) ? '#ffeb3b' : 'white'}
+            fill={activeNotes.includes(note) || highlightedNotes.includes(note) ? 'lime' : 'white'}
             stroke="#333"
             strokeWidth={1}
             onMouseDown={() => handleKeyDown(note)}
