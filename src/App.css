@@ -91,19 +91,17 @@
 /* Base Styles with Sandstone Theme */
 body {
   font-family: 'Varela Round', Arial, Helvetica, sans-serif;
-  background: var(--sandstone-surface-1);
+  background-image: url('./assets/textures/metallic.png');
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: left top;
+  background-attachment: scroll; /* Ensure background moves with content */
+
   color: var(--sandstone-text);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
-
-  /* Use metallic.png as default background */
-  background-image: url('./assets/textures/metallic.png');
-  background-size: cover;
-  background-repeat: repeat;
-  background-position: center;
-  background-attachment: scroll; /* Ensure background moves with content */
 
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -149,6 +147,7 @@ body::after {
   flex-direction: column;
   margin-left: 280px; /* Space for sidebar */
   transition: margin-left 0.3s ease;
+  min-height: 100vh;
 }
 
 /* Standalone mode - full width with floating sidebar */
@@ -643,11 +642,6 @@ body::after {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
   }
-
-  p {
-    font-size: 0.85rem;
-    max-width: 95vw;
-  }
 }
 
 /* Accessibility - Sandstone Theme */
@@ -802,19 +796,18 @@ button:hover::before {
 }
 
 h1 {
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.1;
   max-width: 90vw;
   margin-left: 50px;
   margin-right: 0;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
   padding: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
+  margin-top: 24px;
   color: var(--sandstone-base, #333);
   background: none;
 }
@@ -823,9 +816,34 @@ p {
   font-size: var(--font-size-paragraph);
   line-height: 1.4;
   font-weight: 400;
-  max-width: 600px;
+  max-width: calc(100vw - 80px);
   margin-left: 20px;
   margin-right: auto;
   color: var(--sandstone-text-light);
   text-shadow: none;
+}
+
+.kasm-landing-container {
+  margin-left: 32px;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.sunken-paragraph {
+  background: linear-gradient(rgba(34,34,34,0.2), rgba(34,34,34,0.2)), url('./assets/textures/metallic.png');
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow:
+    inset 2px 4px 12px rgba(0,0,0,0.45), /* deep inner shadow for sunken effect */
+    inset -2px -4px 8px rgba(255,255,255,0.08), /* subtle highlight for realism */
+    0 1px 2px rgba(0,0,0,0.10); /* soft outer shadow for separation */
+  border: 1.5px solid #444;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  color: var(--sandstone-base, #eaeaea);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
 }
