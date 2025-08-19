@@ -53,6 +53,32 @@
   --sandstone-blocks:
     linear-gradient(0deg, rgba(122, 100, 66, 0.15) 0%, rgba(122, 100, 66, 0.15) 2px, transparent 2px, transparent 100%),
     linear-gradient(90deg, rgba(122, 100, 66, 0.12) 0%, rgba(122, 100, 66, 0.12) 1px, transparent 1px, transparent 100%);
+
+  /* Fluid, responsive font size scheme */
+  --font-size-base: clamp(15px, 2vw + 1vh, 20px); /* Fluid base font size */
+  --font-size-paragraph: clamp(0.85rem, 1.5vw, 1.05rem); /* Fluid paragraph font size */
+}
+
+/* Responsive font size for different devices */
+@media (max-width: 480px) and (orientation: portrait) {
+  :root {
+    --font-size-base: 15px;
+  }
+}
+@media (max-width: 768px) and (orientation: landscape) {
+  :root {
+    --font-size-base: 17px;
+  }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --font-size-base: 18px;
+  }
+}
+@media (min-width: 1025px) {
+  :root {
+    --font-size-base: 20px;
+  }
 }
 
 /* Modern CSS Reset */
@@ -65,22 +91,22 @@
 /* Base Styles with Sandstone Theme */
 body {
   font-family: 'Varela Round', Arial, Helvetica, sans-serif;
-  background: var(--sandstone-surface-1);
+  background-image: url('./assets/textures/metallic.png');
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: left top;
+  background-attachment: scroll; /* Ensure background moves with content */
+
   color: var(--sandstone-text);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
 
-  /* Use metallic.png as default background */
-  background-image: url('./assets/textures/metallic.png');
-  background-size: cover;
-  background-repeat: repeat;
-  background-position: center;
-
   font-weight: 700;
   letter-spacing: 0.03em;
   text-shadow: 1px 1px 2px rgba(40,40,40,0.25), 0 0 1px #fff;
+  font-size: var(--font-size-base);
 }
 
 body::before {
@@ -121,6 +147,7 @@ body::after {
   flex-direction: column;
   margin-left: 280px; /* Space for sidebar */
   transition: margin-left 0.3s ease;
+  min-height: 100vh;
 }
 
 /* Standalone mode - full width with floating sidebar */
@@ -629,7 +656,7 @@ body::after {
 /* High contrast mode - Enhanced for sandstone */
 @media (prefers-contrast: high) {
   :root {
-    --sandstone-text: #2A1F0F;
+    --sandstone-text: #2A1F0D;
     --sandstone-text-light: #3F2F1A;
     --sandstone-surface-1: #FFFFFF;
     --sandstone-surface-2: #F5F5F5;
@@ -769,10 +796,35 @@ button:hover::before {
 }
 
 h1 {
-  margin-left: 86px;
-  margin-top: 5px;
+  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  max-width: 90vw;
+  margin-left: 50px;
+  margin-right: 0;
+  padding: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  margin-top: 24px;
+  color: var(--sandstone-base, #333);
+  background: none;
 }
 
 p {
+  font-size: var(--font-size-paragraph);
+  line-height: 1.4;
+  font-weight: 400;
+  max-width: calc(100vw - 80px);
   margin-left: 20px;
+  margin-right: auto;
+  color: var(--sandstone-text-light);
+  text-shadow: none;
+}
+
+.kasm-landing-container {
+  margin-left: 32px;
+  min-height: 100vh;
+  background: transparent;
 }
