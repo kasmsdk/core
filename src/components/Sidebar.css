@@ -1,7 +1,35 @@
 /* Sidebar Component - Mobile-First Responsive Design */
 
 .sidebar {
-  /* Sharper font rendering */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 320px;
+  border-right: 3px solid var(--sandstone-iron);
+  box-shadow: var(--sandstone-shadow-xl);
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-content {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  background-image: url('../assets/textures/metallic.png');
+  background-size: cover;
+  background-repeat: repeat;
+  background-position: center;
+  background-attachment: scroll;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sharper font rendering */
+.sidebar {
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: unset;
   font-smooth: never;
@@ -95,16 +123,11 @@
   left: 0;
   height: 100vh;
   width: 320px;
-  background-image: url('../assets/textures/metallic.png');
-  background-size: cover;
-  background-repeat: repeat;
-  background-position: center;
   border-right: 3px solid var(--sandstone-iron);
   box-shadow: var(--sandstone-shadow-xl);
   z-index: 1000;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -120,12 +143,9 @@
   align-items: center;
   padding: 2.0rem;
   max-height: 90px;
-  background-image: url('../assets/textures/metallic.png');
-  background-size: cover;
-  background-repeat: repeat;
-  background-position: center;
   border-bottom: 2px solid var(--sandstone-accent);
   box-shadow: var(--sandstone-shadow-sm);
+  background: transparent;
 }
 
 .sidebar-title {
@@ -238,19 +258,20 @@
 }
 
 .nav-item {
-  /* Button-like drop shadow inspired by b.png */
+  background: rgba(60, 60, 60, 0.92); /* More opaque, tactile look */
+  border: 2px solid #888;
   box-shadow:
-    0 2px 8px rgba(0,0,0,0.28), /* outer shadow for depth */
-    inset 0 1px 2px rgba(0,0,0,0.12), /* subtle inner shadow */
-    0 0.5px 0 rgba(255,255,255,0.12); /* highlight for tactile effect */
-  border-radius: 8px;
-  background: #222; /* dark background for button look */
-  border: 1.5px solid #444;
-  transition: box-shadow 0.2s, border-color 0.2s;
+    0 4px 16px rgba(0,0,0,0.32), /* deeper outer shadow for raised effect */
+    0 1.5px 0 rgba(255,255,255,0.18), /* highlight for embossing */
+    inset 0 2px 8px rgba(255,255,255,0.10), /* inner shadow for punched out look */
+    inset 0 -2px 8px rgba(0,0,0,0.18); /* bottom inner shadow for depth */
+  border-radius: 10px;
+  margin-bottom: 20px; /* Increased spacing for visible metallic background */
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
 }
 
-.nav-item {
-  margin: 0;
+.nav-item:last-child {
+  margin-bottom: 0; /* Prevent extra space after last item */
 }
 
 .nav-link {
@@ -258,31 +279,33 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border: none;
   background: transparent;
-  color: var(--sandstone-text);
+  color: var(--sandstone-base);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.18);
   text-align: left;
   cursor: pointer;
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
+  border-radius: 8px;
   position: relative;
   margin-bottom: 8px; /* Adds vertical spacing between links */
-  border-radius: 6px; /* Optional: gives a button-like rounded edge */
 }
 
-.nav-link:hover {
-  background: var(--sandstone-surface-2);
-  background-image: var(--sandstone-texture-fine);
-  border-left-color: black;
-  transform: translateX(4px);
+.nav-link:hover, .nav-link:focus {
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 2px 8px rgba(191, 115, 64, 0.18), 0 0.5px 0 rgba(255,255,255,0.18);
+  border-left-color: var(--sandstone-accent);
+  outline: none;
 }
 
 .nav-link.active {
-  background: var(--sandstone-iron);
+  background: rgba(255,255,255,0.18);
+  color: var(--sandstone-iron);
+  box-shadow: 0 0 20px rgba(191, 115, 64, 0.22), inset 0 2px 8px rgba(255,255,255,0.12);
   border-left-color: var(--sandstone-iron);
-  color: var(--sandstone-light);
-  box-shadow: inset 0 0 20px rgba(191, 115, 64, 0.2);
 }
 
 .nav-link.active .nav-description {

@@ -53,6 +53,32 @@
   --sandstone-blocks:
     linear-gradient(0deg, rgba(122, 100, 66, 0.15) 0%, rgba(122, 100, 66, 0.15) 2px, transparent 2px, transparent 100%),
     linear-gradient(90deg, rgba(122, 100, 66, 0.12) 0%, rgba(122, 100, 66, 0.12) 1px, transparent 1px, transparent 100%);
+
+  /* Fluid, responsive font size scheme */
+  --font-size-base: clamp(15px, 2vw + 1vh, 20px); /* Fluid base font size */
+  --font-size-paragraph: clamp(0.85rem, 1.5vw, 1.05rem); /* Fluid paragraph font size */
+}
+
+/* Responsive font size for different devices */
+@media (max-width: 480px) and (orientation: portrait) {
+  :root {
+    --font-size-base: 15px;
+  }
+}
+@media (max-width: 768px) and (orientation: landscape) {
+  :root {
+    --font-size-base: 17px;
+  }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --font-size-base: 18px;
+  }
+}
+@media (min-width: 1025px) {
+  :root {
+    --font-size-base: 20px;
+  }
 }
 
 /* Modern CSS Reset */
@@ -77,10 +103,12 @@ body {
   background-size: cover;
   background-repeat: repeat;
   background-position: center;
+  background-attachment: scroll; /* Ensure background moves with content */
 
   font-weight: 700;
   letter-spacing: 0.03em;
   text-shadow: 1px 1px 2px rgba(40,40,40,0.25), 0 0 1px #fff;
+  font-size: var(--font-size-base);
 }
 
 body::before {
@@ -615,6 +643,11 @@ body::after {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
   }
+
+  p {
+    font-size: 0.85rem;
+    max-width: 95vw;
+  }
 }
 
 /* Accessibility - Sandstone Theme */
@@ -629,7 +662,7 @@ body::after {
 /* High contrast mode - Enhanced for sandstone */
 @media (prefers-contrast: high) {
   :root {
-    --sandstone-text: #2A1F0F;
+    --sandstone-text: #2A1F0D;
     --sandstone-text-light: #3F2F1A;
     --sandstone-surface-1: #FFFFFF;
     --sandstone-surface-2: #F5F5F5;
@@ -774,5 +807,12 @@ h1 {
 }
 
 p {
+  font-size: var(--font-size-paragraph);
+  line-height: 1.4;
+  font-weight: 400;
+  max-width: 600px;
   margin-left: 20px;
+  margin-right: auto;
+  color: var(--sandstone-text-light);
+  text-shadow: none;
 }

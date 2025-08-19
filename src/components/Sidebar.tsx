@@ -98,40 +98,42 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
       </button>
       {isOpen && <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />}
       <nav className={`sidebar${isOpen ? ' open' : ''}`}>
-        <div className="sidebar-header">
-          <h2 className="sidebar-title">
-            Kasm SDK
-          </h2>
-        </div>
-        {appContext !== 'main' && (
-          <div className="sidebar-back-main">
-            <button
-              className="nav-link"
-              style={{ width: '100%', marginBottom: '1em', background: '#ffe4b5', color: '#3D3426', fontWeight: 'bold', borderRadius: 0 }}
-              onClick={handleBackToMain}
-            >
-              ← Back to Main
-            </button>
+        <div className="sidebar-content">
+          <div className="sidebar-header">
+            <h2 className="sidebar-title">
+              Kasm SDK
+            </h2>
           </div>
-        )}
-        <div className="sidebar-nav">
-          <ul className="nav-list">
-            {navigationItems.map((item) => (
-              <li key={item.id} className="nav-item">
-                <button
-                  className={`nav-link ${currentApp === item.id ? 'active' : ''}`}
-                  onClick={() => handleItemClick(item.id)}
-                  aria-current={currentApp === item.id ? 'page' : undefined}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  <div className="nav-content">
-                    <span className="nav-label">{item.label}</span>
-                    <span className="nav-description">{item.description}</span>
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
+          {appContext !== 'main' && (
+            <div className="sidebar-back-main">
+              <button
+                className="nav-link"
+                style={{ width: '100%', marginBottom: '1em', background: '#ffe4b5', color: '#3D3426', fontWeight: 'bold', borderRadius: 0 }}
+                onClick={handleBackToMain}
+              >
+                ← Back to Main
+              </button>
+            </div>
+          )}
+          <div className="sidebar-nav">
+            <ul className="nav-list">
+              {navigationItems.map((item) => (
+                <li key={item.id} className="nav-item">
+                  <button
+                    className={`nav-link ${currentApp === item.id ? 'active' : ''}`}
+                    onClick={() => handleItemClick(item.id)}
+                    aria-current={currentApp === item.id ? 'page' : undefined}
+                  >
+                    <span className="nav-icon">{item.icon}</span>
+                    <div className="nav-content">
+                      <span className="nav-label">{item.label}</span>
+                      <span className="nav-description">{item.description}</span>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </nav>
     </>
