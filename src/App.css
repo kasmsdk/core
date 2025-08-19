@@ -25,6 +25,7 @@
   --sandstone-surface-3: #B8A082;
   --sandstone-surface-4: #C7B200;
   --sandstone-surface-5: #FFD600;
+  --sandstone-link: #FFF6B0;
 
   /* Gradients */
   --sandstone-gradient-primary: linear-gradient(135deg, var(--sandstone-light) 0%, var(--sandstone-base) 50%, var(--sandstone-dark) 100%);
@@ -755,7 +756,7 @@ h1 {
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
-  margin-top: 24px;
+  margin-top: 28px;
   color: var(--sandstone-focus, #333);
   background: none;
   text-shadow: -1px 2px 0 rgba(50,50,20,0.95);
@@ -767,7 +768,7 @@ h1 {
   background: transparent;
 }
 
-.sunken-paragraph {
+p {
   background: linear-gradient(rgba(34,34,34,0.2), rgba(34,34,34,0.2)), url('./assets/textures/metallic.png');
   background-repeat: repeat;
   background-size: auto;
@@ -853,4 +854,33 @@ h1 {
   justify-content: center;
   gap: 1em;
   flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-left: 1em;
+  padding-right: 1em;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .kasm-demo-btn {
+    min-width: 4em;
+    min-height: 4em;
+    width: 3em;
+    height: 3em;
+    font-size: 0.7em;
+    margin: 0 0.5em;
+  }
+  .kasm-demo-buttons {
+    gap: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+}
+
+ul {
+  margin-left: 25px;
+}
+
+a {
+  color: var(--sandstone-link, #333);
 }

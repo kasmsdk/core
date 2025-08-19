@@ -9,10 +9,11 @@
 
   color-scheme: light dark;
   color: var(--sandstone-base, #fff600);
-  background-color: var(--sandstone-surface-1, #6A6762);
+  background-color: var(--sandstone-surface-2, black);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: contain;
 }
