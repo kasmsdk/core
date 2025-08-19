@@ -1,9 +1,10 @@
 import React from 'react';
-const LatestDemo: React.FC = () => {
+
+const LatestDemoArpy: React.FC = () => {
   return (
     <div style={{ marginTop: '2rem', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <iframe
-        src="https://kasmsdk.github.io/latest/emanator.html"
+        src="https://kasmsdk.github.io/latest/arpy.html"
         title="Kasm Demo"
         width="90%"
         height="1024"
@@ -14,4 +15,4 @@ const LatestDemo: React.FC = () => {
   );
 };
 
-export default LatestDemo;
+export default LatestDemoArpy;

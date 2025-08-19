@@ -11,8 +11,8 @@ interface EmanatorCanvasProps {
 const EmanatorCanvas: React.FC<EmanatorCanvasProps> = ({
     src = '/latest/kasm_canvas_obs.html',
     title = 'Emanator Canvas',
-    width = 400,
-    height = 300,
+    width = 150,
+    height = 150,
     style = {},
 }) => {
     return (

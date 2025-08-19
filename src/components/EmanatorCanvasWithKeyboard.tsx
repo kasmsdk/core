@@ -1,7 +1,6 @@
- theimport React from 'react';
+import React from 'react';
 import EmanatorCanvas from '../../latest/EmanatorCanvas';
 import MidiKeyboard from './MidiKeyboard';
-import { setEmanatorAndSendMiddleC } from '../utils/emanatorUtils';
 
 const EmanatorCanvasWithKeyboard: React.FC = () => {
   // Handler for note on

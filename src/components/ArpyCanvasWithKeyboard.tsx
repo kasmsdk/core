@@ -1,4 +1,4 @@
-op import React from 'react';
+import React from 'react';
 import ArpyCanvas from '../../latest/ArpyCanvas';
 import MidiKeyboard from './MidiKeyboard';
 
