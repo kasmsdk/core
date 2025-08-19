@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 interface ArpyCanvasProps {
     src?: string;
@@ -6,17 +6,28 @@ interface ArpyCanvasProps {
     width?: number | string;
     height?: number | string;
     style?: React.CSSProperties;
+    midiData?: { note: number; velocity: number; isCC: boolean } | null;
 }
 
 const ArpyCanvas: React.FC<ArpyCanvasProps> = ({
     src = '/latest/kasm_canvas_arpy_obs.html',
     title = 'Arpy Canvas',
-    width = 400,
-    height = 300,
+    width = 150,
+    height = 150,
     style = {},
+    midiData,
 }) => {
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    useEffect(() => {
+        if (midiData && iframeRef.current && iframeRef.current.contentWindow) {
+            iframeRef.current.contentWindow.postMessage({ type: 'MIDI_DATA', ...midiData }, '*');
+        }
+    }, [midiData]);
+
     return (
         <iframe
+            ref={iframeRef}
             src={src}
             title={title}
             width={width}
@@ -27,4 +38,3 @@ const ArpyCanvas: React.FC<ArpyCanvasProps> = ({
 };
 
 export default ArpyCanvas;
-
