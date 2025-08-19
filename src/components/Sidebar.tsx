@@ -14,28 +14,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
   const getNavigationItems = () => {
     switch (appContext) {
       case 'kasm':
-        return [
-          { id: 'emanator', label: 'Kasm Emanator', icon: '🎹', description: 'Melodic pattern generator' },
-          { id: 'emanator', label: 'Kasm Rust Emanator MIDI Transformation', icon: '🎹', description: 'Ableton Live ClipView transformation' },
-          { id: 'emanator', label: 'Kasm Rust Emanator Ableton MIDI Generative', icon: '🎹', description: 'Ableton Live ClipView generative' },
-          { id: 'triggaz', label: 'Kasm Triggaz', icon: '🎹', description: 'Triggers MIDI note/cc pattern detection editor tool' },
-          { id: 'bangaz', label: 'Kasm Bangaz', icon: '🎹', description: 'Ableton Drum Rack drum machine' },
-          { id: 'kasm_lfo', label: 'Kasm LFO', icon: '🎹', description: 'Algorithmic LFO generator' },
-          { id: 'arpy', label: 'Kasm Arpy', icon: '🎹', description: 'Arpeggiator sequencer based on keys held' },
-          { id: 'kasm_canvas', label: 'Kasm Canvas', icon: '🎹', description: 'Visualizers for Kasm devices' },
-          { id: 'kasm_jog', label: 'Kasm Jog', icon: '🎹', description: 'Motion video support for Kasm Canvas' },
-        ];
-      case 'tech':
-        return [
-          { id: 'webmidi', label: 'TechWebMIDI', icon: '🎥', description: 'Everything TechWebMIDI' },
-          { id: 'webgpu', label: 'WebGPU', icon: '🎮', description: 'Using GPU compute shaders with music' },
-        ];
       default:
         return [
           { id: 'kasm', label: 'Kasm SDK', icon: '🎹', description: 'Documentation for the Kasm SDK' },
-          { id: 'emanator', label: 'Emanations Editor', icon: '🎹', description: 'Emanator editor tool' },
-          { id: 'bangaz', label: 'Bangaz Drum Machine', icon: '🎹', description: 'Drum machine pattern editor tool' },
-          { id: 'arpy', label: 'Arpy Arpeggiator Editor', icon: '🎹', description: 'Arpeggiator editor tool' },
+          { id: 'emanator', label: 'Emanator Editor', icon: '🎹', description: 'Emanator editor tool' },
+          { id: 'bangaz', label: 'Bangaz Drums', icon: '🎹', description: 'Drum machine pattern editor tool' },
+          { id: 'arpy', label: 'Arpy Editor', icon: '🎹', description: 'Arpeggiator editor tool' },
           { id: 'triggaz', label: 'Triggers Editor', icon: '🎹', description: 'Triggers MIDI note/cc pattern detection editor tool' },
         ];
     }
