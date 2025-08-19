@@ -6,22 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="234c2f2e-f969-49a3-bd4c-de1f16c56ff8" name="Changes" comment="(chore) UI tweaks">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arpy" beforeDir="false" afterPath="$PROJECT_DIR$/arpy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arpy/Arpy.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/arpy/Arpy.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bangaz" beforeDir="false" afterPath="$PROJECT_DIR$/bangaz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bangaz/Bangaz.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/bangaz/Bangaz.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/belfry" beforeDir="false" afterPath="$PROJECT_DIR$/belfry" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/belfry/Belfry.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/belfry/Belfry.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chimez" beforeDir="false" afterPath="$PROJECT_DIR$/chimez" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chimez/Chimez.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/chimez/Chimez.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/emanator" beforeDir="false" afterPath="$PROJECT_DIR$/emanator" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/emanator/Emanator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/emanator/Emanator.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Kasm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Kasm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/triggaz" beforeDir="false" afterPath="$PROJECT_DIR$/triggaz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/triggaz/Triggaz.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/triggaz/Triggaz.tsx" afterDir="false" />
     </list>
     <list id="e60e3b21-c01f-44be-8745-e98d4eb406ee" name="NOT_FOR_CHECKIN" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -44,7 +30,7 @@
         <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/emanator" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="ProjectColorInfo">{
@@ -65,7 +51,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SHELLCHECK.PATH": "/Users/klambert/Library/Application Support/JetBrains/WebStorm2025.1/plugins/Shell Script/shellcheck",
-    "git-widget-placeholder": "ui",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/klambert/workspace/github_kasmsdk/core/src/assets/textures",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -265,7 +251,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755571104246</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="(chore) UI tweaks">
+      <option name="closed" value="true" />
+      <created>1755572818731</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1755572818731</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

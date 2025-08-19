@@ -854,6 +854,27 @@ p {
   justify-content: center;
   gap: 1em;
   flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-left: 1em;
+  padding-right: 1em;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .kasm-demo-btn {
+    min-width: 4em;
+    min-height: 4em;
+    width: 3em;
+    height: 3em;
+    font-size: 0.7em;
+    margin: 0 0.5em;
+  }
+  .kasm-demo-buttons {
+    gap: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
 }
 
 ul {
