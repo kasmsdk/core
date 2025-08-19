@@ -35,7 +35,7 @@
   height: 100%;
   width: 100%;
   overflow-y: auto;
-  background-image: url('../assets/textures/metallic.png');
+  background-image: url('../assets/textures/woody.png');
   background-size: auto; /* Use natural image size for crisp texture */
   background-repeat: repeat; /* Tile the texture for seamless metal look */
   background-position: center;
@@ -159,7 +159,6 @@
   align-items: center;
   padding: 2.0rem;
   max-height: 90px;
-  border-bottom: 2px solid var(--sandstone-accent);
   box-shadow: var(--sandstone-shadow-sm);
   background: transparent;
 }
@@ -167,12 +166,11 @@
 .sidebar-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--sandstone-base);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.12), 0 0 0.5px #fff600;
+  color: #ddd;
+  text-shadow: 0px 0px 3px rgba(0,0,0), 0 0 0.5px #fff600;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-  display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-left: 50px;
@@ -264,7 +262,6 @@
 /* Navigation Section */
 .sidebar-nav {
   flex: 1;
-  padding: 1rem 0;
 }
 
 .nav-list {
@@ -274,19 +271,35 @@
 }
 
 .nav-item {
-  background: rgba(60, 60, 60, 0.92); /* More opaque, tactile look */
-  border: 2px solid #888;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 4.5em;
+  min-width: 6.5em;
+  min-height: 6.5em;
+  padding: 0;
+  margin: 0.75em 1em;
+  font-size: 0.8em;
+  font-weight: 900;
+  color: #eaeaea;
+  background:
+          radial-gradient(circle at 60% 40%, #999 60%, #999 100%),
+          url('../assets/textures/plasticy.png'); /* worn plastic texture overlay */
+  background-blend-mode: multiply;
+  background-size: cover, 120px 120px;
+  background-repeat: no-repeat, repeat;
+  border: 3.5px solid #222;
+  border-radius: 0.6em;
   box-shadow:
-    0 4px 16px rgba(0,0,0,0.32), /* deeper outer shadow for raised effect */
-    0 1.5px 0 rgba(255,255,255,0.18), /* highlight for embossing */
-    inset 0 2px 8px rgba(255,255,255,0.10), /* inner shadow for punched out look */
-    inset 0 -2px 8px rgba(0,0,0,0.18); /* bottom inner shadow for depth */
-  border-radius: 10px;
-  margin-bottom: 20px; /* Increased spacing for visible metallic background */
-  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
-  max-width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+          0 4px 16px rgba(0,0,0,0.2), /* softer outer shadow for raised effect */
+          0 1px 0 #aaa inset, /* subtle inner highlight for bevel */
+          0 0 0 4px #555 inset; /* dark inner edge for depth */
+  text-shadow: 0 1px 0 #222;
+  transition: box-shadow 0.2s, background 0.2s, transform 0.1s;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  filter: blur(0.2px) contrast(0.98); /* slight wear effect */
 }
 
 .nav-item:last-child {
@@ -297,7 +310,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  width: 100%;
+  width: 98%;
+  max-height: 6em;
   padding: 12px 20px;
   border: none;
   background: transparent;
@@ -306,25 +320,21 @@
   text-shadow: 0 1px 1px rgba(40,40,40,0.18), 0 0.5px 0 #fff;
   text-align: left;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border-left: 4px solid transparent;
-  border-radius: 8px;
   position: relative;
-  margin-bottom: 8px; /* Adds vertical spacing between links */
 }
 
 .nav-link:hover, .nav-link:focus {
-  background: rgba(255,255,255,0.12);
-  box-shadow: 0 2px 8px rgba(191, 115, 64, 0.18), 0 0.5px 0 rgba(255,255,255,0.18);
-  border-left-color: var(--sandstone-accent);
-  outline: none;
+  background:
+          radial-gradient(circle at 60% 40%, #999 60%, #888 100%),
+          url('../assets/textures/plasticy.png');
+  background-blend-mode: multiply;
+  background-size: cover, 120px 120px;
+  background-repeat: no-repeat, repeat;
 }
 
 .nav-link.active {
-  background: rgba(255,255,255,0.18);
-  color: var(--sandstone-iron);
-  box-shadow: 0 0 20px rgba(191, 115, 64, 0.22), inset 0 2px 8px rgba(255,255,255,0.12);
-  border-left-color: var(--sandstone-iron);
+  background:
+          radial-gradient(circle at 12% 50%, #eb0a2e 6%, rgba(101, 93, 90, 0.42) 14%);
 }
 
 .nav-link.active .nav-description {
@@ -593,4 +603,18 @@
     min-width: 44px;
     min-height: 44px;
   }
+}
+
+.nav-link-back {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 98%;
+  max-height: 6em;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
 }

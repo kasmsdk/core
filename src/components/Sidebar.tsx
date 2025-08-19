@@ -100,15 +100,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
       <nav className={`sidebar${isOpen ? ' open' : ''}`}>
         <div className="sidebar-content">
           <div className="sidebar-header">
-            <h2 className="sidebar-title">
-              Kasm SDK
-            </h2>
           </div>
           {appContext !== 'main' && (
             <div className="sidebar-back-main">
               <button
-                className="nav-link"
-                style={{ width: '100%', marginBottom: '1em', background: '#ffe4b5', color: '#3D3426', fontWeight: 'bold', borderRadius: 0 }}
+                className="nav-link-back"
+                style={{ width: '100%', marginBottom: '1em', color: '#ffffff', fontWeight: 'bold', borderRadius: 0 }}
                 onClick={handleBackToMain}
               >
                 ← Back to Main

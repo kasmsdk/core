@@ -9,7 +9,7 @@
   --sandstone-base: #fff600;
   --sandstone-light: #FFF6B0;
   --sandstone-dark: #C7B200;
-  --sandstone-iron: #6A6762;
+  --sandstone-iron: #1e1c1b;
   --sandstone-shadow: #4A4844;
   --sandstone-accent: #FFD600;
   --sandstone-highlight: #FFF6B0;
@@ -846,4 +846,63 @@ p {
   font-size: 1.05rem;
   line-height: 1.7;
   font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+.kasm-demo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5em;
+  height: 4.5em;
+  min-width: 6.5em;
+  min-height: 6.5em;
+  padding: 0;
+  margin: 0.75em 1em;
+  font-size: 0.8em;
+  font-weight: 900;
+  color: #eaeaea;
+  background:
+    radial-gradient(circle at 60% 40%, #888 60%, #999 100%),
+    url('./assets/textures/plasticy.png'); /* worn plastic texture overlay */
+  background-blend-mode: multiply;
+  background-size: cover, 120px 120px;
+  background-repeat: no-repeat, repeat;
+  border: 3.5px solid #222;
+  border-radius: 0.6em;
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.2), /* softer outer shadow for raised effect */
+    0 1px 0 #888 inset, /* subtle inner highlight for bevel */
+    0 0 0 4px #555 inset; /* dark inner edge for depth */
+  text-shadow: 0 1px 0 #222;
+  transition: box-shadow 0.2s, background 0.2s, transform 0.1s;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  filter: blur(0.2px) contrast(0.98); /* slight wear effect */
+}
+.kasm-demo-btn:hover {
+  background:
+    radial-gradient(circle at 60% 40%, #999 60%, #888 100%),
+    url('./assets/textures/plasticy.png');
+  background-blend-mode: multiply;
+  background-size: cover, 120px 120px;
+  background-repeat: no-repeat, repeat;
+  box-shadow:
+          0 4px 16px rgba(0,0,0,0.2), /* softer outer shadow for raised effect */
+    0 2px 0 #fff inset,
+    0 0 0 6px #ddd inset;
+  transform: translateY(-2px) scale(1.01);
+}
+.kasm-demo-btn:active {
+  background:
+    radial-gradient(circle at 60% 40%, #555 60%, #333 100%),
+    url('./assets/textures/plasticy.png');
+  background-blend-mode: multiply;
+  background-size: cover, 120px 120px;
+  background-repeat: no-repeat, repeat;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.18),
+    0 1px 0 #ff0 inset,
+    0 0 0 4px #222 inset;
+  transform: translateY(2px) scale(0.8);
 }
