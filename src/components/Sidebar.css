@@ -334,7 +334,8 @@
 
 .nav-link.active {
   background:
-          radial-gradient(circle at 12% 50%, #eb0a2e 6%, rgba(101, 93, 90, 0.42) 14%);
+
+          radial-gradient(circle at 11% 50%, #eb0a2e 6%, rgba(101, 93, 90, 0.42) 12%);
 }
 
 .nav-link.active .nav-description {

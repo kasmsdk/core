@@ -23,22 +23,22 @@ export default function Kasm({ onNavigate }: KasmProps) {
         certainly be better ways of doing things, but it's a start. The common goal here is ease of open patching and
         sharing of editor tools to support the many different use cases and musical genres
       </p>
-      <p className="sunken-paragraph" style={{ backgroundPosition: getRandomOffset() }}>
+      <div className="sunken-paragraph" style={{ backgroundPosition: getRandomOffset() }}>
         <div className="kasm-demo-buttons">
           <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
-            🎹 Emanator
+            🎹 <br/>Emanator
           </button>
           <button className="kasm-demo-btn" onClick={() => onNavigate('bangaz')}>
-            🎹 Bangaz
+            🎹 <br/>Bangaz
           </button>
           <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
-            🎹 Arpy
+            🎹 <br/>Arpy
           </button>
           <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
-            🎹 Triggaz
+            🎹 <br/>Triggaz
           </button>
         </div>
-      </p>
+      </div>
       <div className="kasm-tech-note">
       </div>
       <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
