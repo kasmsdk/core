@@ -11,8 +11,8 @@ interface JogCanvasProps {
 const JogCanvas: React.FC<JogCanvasProps> = ({
     src = '/latest/kasm_canvas_jog_obs.html',
     title = 'Jog Canvas',
-    width = 400,
-    height = 300,
+    width = 150,
+    height = 150,
     style = {},
 }) => {
     return (

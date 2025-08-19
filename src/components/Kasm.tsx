@@ -1,4 +1,5 @@
-import JogCanvas from '../../latest/JogCanvas';
+import NewsNewFeatures from './NewsNewFeatures';
+import LatestDemo from './LatestDemo';
 
 interface KasmProps {
   onNavigate: (app: string) => void;
@@ -42,24 +43,9 @@ export default function Kasm({ onNavigate }: KasmProps) {
         </div>
       </div>
 
-      {/* Featured New Components */}
-      <div style={{ margin: '2rem 0', padding: '1rem', background: '#f9f9f9', borderRadius: '8px' }}>
-        <h2 style={{ marginBottom: '1rem' }}>Featured New Component: Jog</h2>
-        <JogCanvas />
-      </div>
+      <NewsNewFeatures />
 
-      <div className="kasm-tech-note">
-      </div>
-      <div style={{ marginTop: '2rem', width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <iframe
-          src="https://kasmsdk.github.io/latest/emanator.html"
-          title="Kasm Demo"
-          width="90%"
-          height="1024"
-          style={{ border: '2px solid #ccc', borderRadius: '12px', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}
-          allowFullScreen
-        />
-      </div>
+      <LatestDemo />
     </div>
   );
 }
