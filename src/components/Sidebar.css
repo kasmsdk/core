@@ -20,10 +20,10 @@
   width: 100%;
   overflow-y: auto;
   background-image: url('../assets/textures/metallic.png');
-  background-size: cover;
-  background-repeat: repeat;
+  background-size: auto; /* Use natural image size for crisp texture */
+  background-repeat: repeat; /* Tile the texture for seamless metal look */
   background-position: center;
-  background-attachment: scroll;
+  background-attachment: local;
   display: flex;
   flex-direction: column;
 }
@@ -268,6 +268,9 @@
   border-radius: 10px;
   margin-bottom: 20px; /* Increased spacing for visible metallic background */
   transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .nav-item:last-child {
@@ -432,6 +435,10 @@
   .hamburger-line {
     width: 20px;
     height: 2px;
+  }
+
+  .nav-item {
+    max-width: 96%;
   }
 
   .nav-link {

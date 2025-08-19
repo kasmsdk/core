@@ -9,7 +9,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext = 'main', onFilterChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Local state, default closed
 
   const getNavigationItems = () => {
     switch (appContext) {

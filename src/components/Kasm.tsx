@@ -4,7 +4,7 @@ interface KasmProps {
 
 export default function Kasm({ onNavigate }: KasmProps) {
   return (
-    <div className="kasm-landing-container">
+    <div className="kasm-landing-container" style={{ marginLeft: '32px', transition: 'margin-left 0.3s' }}>
       <h1>Kasm SDK</h1>
       <p className="sunken-paragraph">
         The Kasm SDK main intention is interoperability between Web Browsers and DAWs, in particular to make head way
