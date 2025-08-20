@@ -7,6 +7,7 @@
     <mapping directory="$PROJECT_DIR$/belfry" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/chimez" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/emanator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lfo" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/triggaz" vcs="Git" />
   </component>
 </project>
