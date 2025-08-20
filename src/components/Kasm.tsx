@@ -37,8 +37,14 @@ export default function Kasm({ onNavigate }: KasmProps) {
           <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
             🎹 <br/>Arpy
           </button>
-          <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
+          <button className="kasm-demo-btn" onClick={() => onNavigate('triggaz')}>
             🎹 <br/>Triggaz
+          </button>
+          <button className="kasm-demo-btn" onClick={() => onNavigate('lfo')}>
+            🎹 <br/>MIDI LFO
+          </button>
+          <button className="kasm-demo-btn" onClick={() => onNavigate('looper')}>
+            🎛️ <br/>MIDI Looper
           </button>
         </div>
       </div>

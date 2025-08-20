@@ -9,17 +9,21 @@ import Emanator from '../emanator/Emanator';
 import Arpy from '../arpy/Arpy';
 import Triggaz from '../triggaz/Triggaz';
 import LFO from '../lfo/LFO';
+import Looper from './components/Looper';
+import Canvas from './components/Canvas';
+import Krumhansel from './components/Krumhansel';
+import JogCanvas from '../latest/JogCanvas';
 import './App.css';
 
 function App() {
-  const [currentApp, setCurrentApp] = useState<'kasm' | 'emanator' | 'tech' | 'bangaz' | 'arpy' | 'about' | 'triggaz' | 'lfo'>('kasm');
+  const [currentApp, setCurrentApp] = useState<'kasm' | 'emanator' | 'tech' | 'bangaz' | 'arpy' | 'about' | 'triggaz' | 'lfo' | 'looper' | 'jog' | 'canvas' | 'krumhansel'>('kasm');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const appParam = urlParams.get('app');
-    if (appParam && ['kasm', 'tech', 'about', 'bangaz', 'arpy', 'emanator', 'lfo'].includes(appParam)) {
-      setCurrentApp(appParam as 'kasm' | 'tech' | 'about' | 'bangaz' | 'arpy' | 'emanator' | 'triggaz' | 'lfo');
+    if (appParam && ['kasm', 'tech', 'about', 'bangaz', 'arpy', 'emanator', 'lfo', 'looper', 'jog', 'canvas', 'krumhansel'].includes(appParam)) {
+      setCurrentApp(appParam as typeof currentApp);
     } else if (appParam && ['webmidi', 'webgpu'].includes(appParam)) {
       setCurrentApp('tech');
     }
@@ -74,7 +78,7 @@ function App() {
   }, []);
 
   const handleAppChange = (app: string) => {
-    setCurrentApp(app as 'kasm' | 'tech' | 'about' | 'emanator' | 'bangaz' | 'arpy' | 'triggaz');
+    setCurrentApp(app as typeof currentApp);
   };
 
   return (
@@ -95,6 +99,10 @@ function App() {
           {currentApp === 'tech' && <Tech />}
           {currentApp === 'about' && <About />}
           {currentApp === 'lfo' && <LFO />}
+          {currentApp === 'looper' && <Looper />}
+          {currentApp === 'jog' && <JogCanvas />}
+          {currentApp === 'canvas' && <Canvas />}
+          {currentApp === 'krumhansel' && <Krumhansel />}
         </div>
       </div>
     </>
