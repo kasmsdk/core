@@ -16,11 +16,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentApp, onAppChange, appContext =
       case 'kasm':
       default:
         return [
-          { id: 'kasm', label: 'Kasm SDK', icon: '🎹', description: 'Documentation for the Kasm SDK' },
+          { id: 'kasm', label: 'Kasm SDK', icon: '🎹', description: 'Documentatin for the Kasm SDK' },
           { id: 'emanator', label: 'Emanator Editor', icon: '🎹', description: 'Emanator editor tool' },
-          { id: 'bangaz', label: 'Bangaz Drums', icon: '🎹', description: 'Drum machine pattern editor tool' },
-          { id: 'arpy', label: 'Arpy Editor', icon: '🎹', description: 'Arpeggiator editor tool' },
-          { id: 'triggaz', label: 'Triggers Editor', icon: '🎹', description: 'Triggers MIDI note/cc pattern detection editor tool' },
+          { id: 'bangaz', label: 'Bangaz Drums', icon: '🎹', description: 'Drum achine pattern editor tool' },
+          { id: 'arpy', label: 'Arpy Editor', icon: '🎹', description: 'Arpeggiaor editor tool' },
+          { id: 'triggaz', label: 'Triggers Editor', icon: '🎹', description: 'Tiggers MIDI note/cc pattern detection editor tool' },
+          { id: 'lfo', label: 'LFO Editor', icon: '🎹', description: 'Low Frequecy Oscillators editor' },
         ];
     }
   };

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 
-interface EmanatorCanvasProps {
+interface LFOCanvasProps {
     src?: string;
     title?: string;
     width?: number | string;
@@ -15,12 +15,12 @@ export interface UpdateCanvasDataArgs {
     cc: boolean;
 }
 
-export interface EmanatorCanvasHandle {
+export interface LFOCanvasHandle {
     callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => void;
     postHello: () => void;
 }
 
-const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
+const LFOCanvas = forwardRef<LFOCanvasHandle, LFOCanvasProps>(({
                                                                       src = '/latest/kasm_canvas_obs.html',
                                                                       title = 'LFO Canvas',
                                                                       width = 150,
@@ -61,4 +61,4 @@ const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
     );
 });
 
-export default EmanatorCanvas;
+export default LFOCanvas;

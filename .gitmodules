@@ -16,3 +16,6 @@
 [submodule "chimez"]
 	path = chimez
 	url = https://github.com/kasmsdk/chimez.git
+[submodule "lfo"]
+	path = lfo
+	url = https://github.com/kasmsdk/lfo.git

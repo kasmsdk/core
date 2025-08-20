@@ -8,6 +8,7 @@ import Bangaz from '../bangaz/Bangaz';
 import Emanator from '../emanator/Emanator';
 import Arpy from '../arpy/Arpy';
 import Triggaz from '../triggaz/Triggaz';
+import LFO from '../lfo/LFO';
 import './App.css';
 
 function App() {
@@ -93,6 +94,7 @@ function App() {
           {currentApp === 'emanator' && <Emanator />}
           {currentApp === 'tech' && <Tech />}
           {currentApp === 'about' && <About />}
+          {currentApp === 'lfo' && <LFO />}
         </div>
       </div>
     </>
