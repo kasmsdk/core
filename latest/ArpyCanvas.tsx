@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 
 interface ArpyCanvasProps {
     src?: string;
@@ -9,14 +9,24 @@ interface ArpyCanvasProps {
     midiData?: { note: number; velocity: number; isCC: boolean } | null;
 }
 
-const ArpyCanvas: React.FC<ArpyCanvasProps> = ({
-    src = '/latest/kasm_canvas_arpy_obs.html',
+export interface UpdateCanvasDataArgs {
+    pitch: number;
+    velocity: number;
+    cc: boolean;
+}
+
+export interface ArpyCanvasHandle {
+    callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => void;
+}
+
+const ArpyCanvas = forwardRef<ArpyCanvasHandle, ArpyCanvasProps>(({
+    src = '/latest/kasm_canvas_jog_obs.html',
     title = 'Arpy Canvas',
     width = 150,
     height = 150,
     style = {},
     midiData,
-}) => {
+}, ref) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
     useEffect(() => {
@@ -24,6 +34,14 @@ const ArpyCanvas: React.FC<ArpyCanvasProps> = ({
             iframeRef.current.contentWindow.postMessage({ type: 'MIDI_DATA', ...midiData }, '*');
         }
     }, [midiData]);
+
+    useImperativeHandle(ref, () => ({
+        callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => {
+            if (iframeRef.current && iframeRef.current.contentWindow) {
+                iframeRef.current.contentWindow.postMessage({ type: 'KASM', func, args }, '*');
+            }
+        }
+    }));
 
     return (
         <iframe
@@ -35,6 +53,6 @@ const ArpyCanvas: React.FC<ArpyCanvasProps> = ({
             style={{ border: '1px solid #ccc', borderRadius: '8px', ...style }}
         />
     );
-};
+});
 
 export default ArpyCanvas;
