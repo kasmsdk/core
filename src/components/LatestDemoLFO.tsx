@@ -20,7 +20,7 @@ const LatestDemo: React.FC = () => {
       onClick={() => { if (iframeRef.current) iframeRef.current.focus(); }}>
       <iframe
         ref={iframeRef}
-        src="/latest/arpy.html"
+        src="/latest/lfo.html"
         title="Kasm Demo"
         width="90%"
         height="1024"
