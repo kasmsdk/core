@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-const LatestDemo: React.FC = () => {
+const LatestDemoBangaz: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Relay keyboard events to the iframe
@@ -37,4 +37,4 @@ const LatestDemo: React.FC = () => {
   );
 };
 
-export default LatestDemo;
+export default LatestDemoBangaz;

@@ -1,5 +1,5 @@
 import React from 'react';
-import LatestDemo from "./LatestDemo.tsx";
+import LatestDemoLooper from "./LatestDemoLooper.tsx";
 
 const Looper: React.FC = () => (
     <div className="kasm-landing-container">

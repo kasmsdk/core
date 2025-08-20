@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-const LatestDemo: React.FC = () => {
+const LatestDemoLooper: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Relay keyboard events to the iframe
@@ -20,7 +20,7 @@ const LatestDemo: React.FC = () => {
       onClick={() => { if (iframeRef.current) iframeRef.current.focus(); }}>
       <iframe
         ref={iframeRef}
-        src="/latest/bangaz.html"
+        src="/latest/emanator.html"
         title="Kasm Demo"
         width="90%"
         height="1024"
@@ -37,4 +37,4 @@ const LatestDemo: React.FC = () => {
   );
 };
 
-export default LatestDemo;
+export default LatestDemoLooper;
