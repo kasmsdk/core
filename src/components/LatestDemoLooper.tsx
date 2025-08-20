@@ -22,7 +22,7 @@ const LatestDemoLooper: React.FC = () => {
         ref={iframeRef}
         src="/latest/emanator.html"
         title="Kasm Demo"
-        style={{ width: '100vw', height: '3z00vh', display: 'block', border: '2px solid #ccc', borderRadius: '12px', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}
+        style={{ width: '90vw', height: '90vh', display: 'block', border: '2px solid #ccc', borderRadius: '12px', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}
         allowFullScreen
         tabIndex={-1}
         onLoad={() => {
