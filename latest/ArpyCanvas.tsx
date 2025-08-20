@@ -21,7 +21,7 @@ export interface ArpyCanvasHandle {
 }
 
 const ArpyCanvas = forwardRef<ArpyCanvasHandle, ArpyCanvasProps>(({
-    src = '/latest/kasm_canvas_jog_obs.html',
+    src = '/latest/kasm_canvas_arpy_obs.html',
     title = 'Arpy Canvas',
     width = 150,
     height = 150,

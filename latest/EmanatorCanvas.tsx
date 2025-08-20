@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 
 interface EmanatorCanvasProps {
     src?: string;
@@ -6,17 +6,52 @@ interface EmanatorCanvasProps {
     width?: number | string;
     height?: number | string;
     style?: React.CSSProperties;
+    midiData?: { note: number; velocity: number; isCC: boolean } | null;
 }
 
-const EmanatorCanvas: React.FC<EmanatorCanvasProps> = ({
-    src = '/latest/kasm_canvas_obs.html',
-    title = 'Emanator Canvas',
-    width = 150,
-    height = 150,
-    style = {},
-}) => {
+export interface UpdateCanvasDataArgs {
+    pitch: number;
+    velocity: number;
+    cc: boolean;
+}
+
+export interface EmanatorCanvasHandle {
+    callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => void;
+    postHello: () => void;
+}
+
+const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
+                                                                      src = '/latest/kasm_canvas_obs.html',
+                                                                      title = 'Emanator Canvas',
+                                                                      width = 150,
+                                                                      height = 150,
+                                                                      style = {},
+                                                                      midiData,
+                                                                  }, ref) => {
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    useEffect(() => {
+        if (midiData && iframeRef.current && iframeRef.current.contentWindow) {
+            iframeRef.current.contentWindow.postMessage({ type: 'MIDI_DATA', ...midiData }, '*');
+        }
+    }, [midiData]);
+
+    useImperativeHandle(ref, () => ({
+        callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => {
+            if (iframeRef.current && iframeRef.current.contentWindow) {
+                iframeRef.current.contentWindow.postMessage({ type: 'KASM', func, args }, '*');
+            }
+        },
+        postHello: () => {
+            if (iframeRef.current && iframeRef.current.contentWindow && typeof (iframeRef.current.contentWindow as any).post === 'function') {
+                (iframeRef.current.contentWindow as any).post("HELLO");
+            }
+        }
+    }));
+
     return (
         <iframe
+            ref={iframeRef}
             src={src}
             title={title}
             width={width}
@@ -24,7 +59,6 @@ const EmanatorCanvas: React.FC<EmanatorCanvasProps> = ({
             style={{ border: '1px solid #ccc', borderRadius: '8px', ...style }}
         />
     );
-};
+});
 
 export default EmanatorCanvas;
-

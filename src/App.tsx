@@ -17,8 +17,8 @@ function App() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const appParam = urlParams.get('app');
-    if (appParam && ['kasm', 'tech', 'about', 'bangaz', 'arpy'].includes(appParam)) {
-      setCurrentApp(appParam as 'kasm' | 'tech' | 'about' | 'bangaz' | 'arpy' | 'emanator' | 'triggaz');
+    if (appParam && ['kasm', 'tech', 'about', 'bangaz', 'arpy', 'emanator', 'lfo'].includes(appParam)) {
+      setCurrentApp(appParam as 'kasm' | 'tech' | 'about' | 'bangaz' | 'arpy' | 'emanator' | 'triggaz' | 'lfo');
     } else if (appParam && ['webmidi', 'webgpu'].includes(appParam)) {
       setCurrentApp('tech');
     }
