@@ -17,6 +17,7 @@ export interface UpdateCanvasDataArgs {
 
 export interface ArpyCanvasHandle {
     callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => void;
+    postHello: () => void;
 }
 
 const ArpyCanvas = forwardRef<ArpyCanvasHandle, ArpyCanvasProps>(({
@@ -39,6 +40,11 @@ const ArpyCanvas = forwardRef<ArpyCanvasHandle, ArpyCanvasProps>(({
         callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => {
             if (iframeRef.current && iframeRef.current.contentWindow) {
                 iframeRef.current.contentWindow.postMessage({ type: 'KASM', func, args }, '*');
+            }
+        },
+        postHello: () => {
+            if (iframeRef.current && iframeRef.current.contentWindow && typeof iframeRef.current.contentWindow.post === 'function') {
+                iframeRef.current.contentWindow.post("HELLO");
             }
         }
     }));
