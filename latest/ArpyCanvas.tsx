@@ -43,8 +43,8 @@ const ArpyCanvas = forwardRef<ArpyCanvasHandle, ArpyCanvasProps>(({
             }
         },
         postHello: () => {
-            if (iframeRef.current && iframeRef.current.contentWindow && typeof iframeRef.current.contentWindow.post === 'function') {
-                iframeRef.current.contentWindow.post("HELLO");
+            if (iframeRef.current && iframeRef.current.contentWindow && typeof (iframeRef.current.contentWindow as any).post === 'function') {
+                (iframeRef.current.contentWindow as any).post("HELLO");
             }
         }
     }));
