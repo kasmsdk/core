@@ -103,7 +103,7 @@
 
 /* Hamburger animation when open */
 .hamburger-menu.open .hamburger-line:nth-child(1) {
-  transform: rotate(45deg) translate(6px, 6px);
+  transform: rotate(45deg) translate(4px, 3px);
 }
 
 .hamburger-menu.open .hamburger-line:nth-child(2) {
@@ -111,7 +111,7 @@
 }
 
 .hamburger-menu.open .hamburger-line:nth-child(3) {
-  transform: rotate(-45deg) translate(6px, -6px);
+  transform: rotate(-45deg) translate(6px, -5px);
 }
 
 /* Sidebar Overlay for mobile */
@@ -325,8 +325,7 @@
 
 .nav-link:hover, .nav-link:focus {
   background:
-          radial-gradient(circle at 60% 40%, #999 60%, #888 100%),
-          url('../assets/textures/plasticy.png');
+          radial-gradient(circle at 11.5% 50%, #02eb2e 6%, rgba(101, 93, 90, 0.42) 12%);
   background-blend-mode: multiply;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
@@ -335,7 +334,7 @@
 .nav-link.active {
   background:
 
-          radial-gradient(circle at 11% 50%, #eb0a2e 6%, rgba(101, 93, 90, 0.42) 12%);
+          radial-gradient(circle at 11.5% 50%, #eb0a2e 6%, rgba(101, 93, 90, 0.42) 12%);
 }
 
 .nav-link.active .nav-description {
