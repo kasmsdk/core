@@ -7,6 +7,7 @@ interface EmanatorCanvasProps {
     height?: number | string;
     style?: React.CSSProperties;
     midiData?: { note: number; velocity: number; isCC: boolean } | null;
+    inlet_5_emanator? : number;
 }
 
 export interface UpdateCanvasDataArgs {
@@ -18,6 +19,7 @@ export interface UpdateCanvasDataArgs {
 export interface EmanatorCanvasHandle {
     callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => void;
     postHello: () => void;
+    setInlets: (args?: UpdateCanvasDataArgs) => void;
 }
 
 const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
@@ -27,14 +29,31 @@ const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
                                                                       height = 150,
                                                                       style = {},
                                                                       midiData,
+                                                                      inlet_5_emanator,
                                                                   }, ref) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    // Track iframe loaded state
+    const hasLoadedRef = useRef(false);
+
+    const handleIframeLoad = () => {
+        hasLoadedRef.current = true;
+        if (typeof inlet_5_emanator === 'number' && iframeRef.current && iframeRef.current.contentWindow) {
+            // iframeRef.current.contentWindow.postMessage({ type: 'INLET_5_EMANATOR', value: inlet_5_emanator }, '*');
+        }
+    };
 
     useEffect(() => {
         if (midiData && iframeRef.current && iframeRef.current.contentWindow) {
             iframeRef.current.contentWindow.postMessage({ type: 'MIDI_DATA', ...midiData }, '*');
         }
     }, [midiData]);
+
+    useEffect(() => {
+        if (hasLoadedRef.current && typeof inlet_5_emanator === 'number' && iframeRef.current && iframeRef.current.contentWindow) {
+            // iframeRef.current.contentWindow.postMessage({ type: 'INLET_5_EMANATOR', value: inlet_5_emanator }, '*');
+        }
+    }, [inlet_5_emanator]);
 
     useImperativeHandle(ref, () => ({
         callKasmFunction: (func: string, args?: UpdateCanvasDataArgs) => {
@@ -43,10 +62,22 @@ const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
             }
         },
         postHello: () => {
-            if (iframeRef.current && iframeRef.current.contentWindow && typeof (iframeRef.current.contentWindow as any).post === 'function') {
-                (iframeRef.current.contentWindow as any).post("HELLO");
+            const win = iframeRef.current?.contentWindow;
+            if (win && typeof (win as { post?: (msg: string) => void }).post === 'function') {
+                (win as { post: (msg: string) => void }).post("ERK");
             }
-        }
+        },
+        setInlets: (args?: UpdateCanvasDataArgs) => {
+            if (iframeRef.current && iframeRef.current.contentWindow && args) {
+                iframeRef.current.contentWindow.postMessage({ type: 'INLET_0_NOTE', pitch: args.pitch }, '*');
+                iframeRef.current.contentWindow.postMessage({ type: 'INLET_2_VELOCITY', velocity: args.velocity }, '*');
+                iframeRef.current.contentWindow.postMessage({ type: 'BANG' }, '*');
+
+                // this call to kasm_rust.update_canvas_data will also shows the note played
+                iframeRef.current.contentWindow.postMessage({ type: 'KASM', func: 'update_canvas_data', args }, '*');
+            }
+        },
+
     }));
 
     return (
@@ -57,6 +88,7 @@ const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
             width={width}
             height={height}
             style={{ border: '1px solid #ccc', borderRadius: '8px', ...style }}
+            onLoad={handleIframeLoad}
         />
     );
 });
