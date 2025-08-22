@@ -9,9 +9,6 @@ interface MidiKeyboardProps {
 
 // MIDI note numbers for one octave starting at C4 (60)
 const WHITE_KEYS = [0, 2, 4, 5, 7, 9, 11];
-const KEY_NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-const BLACK_KEYS = [1, 3, 6, 8, 10];
-const BLACK_KEY_NAMES = ['C#', 'Eb', 'F#', 'G#', 'Bb'];
 const BASE_NOTE = 60; // C4
 
 const KEYBOARD_MAPPING: Record<string, number> = {
@@ -55,6 +52,7 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
   const [activeNotes, setActiveNotes] = useState<number[]>([]);
   const [velocity, setVelocity] = useState(propVelocity);
   const pressedKeysRef = useRef<Set<string>>(new Set());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setVelocity(propVelocity);
@@ -107,19 +105,35 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
     };
   }, [velocity, activeNotes, onNoteOn, onNoteOff]);
 
-  // Helper: is white key
-  const isWhite = (midi: number) => {
-    const scale = midi % 12;
-    return WHITE_KEYS.includes(scale);
-  };
-  // Helper: key name
-  const getKeyName = (midi: number) => {
-    const scale = midi % 12;
-    if (WHITE_KEYS.includes(scale)) {
-      return KEY_NAMES[WHITE_KEYS.indexOf(scale)];
-    } else {
-      return BLACK_KEY_NAMES[BLACK_KEYS.indexOf(scale)];
+  // After rendering keys, center on middle C (C4, MIDI 60)
+  useEffect(() => {
+    if (!scrollContainerRef.current) return;
+    // Find white key index for MIDI 60 (C4)
+    let c4WhiteIndex = 0;
+    let idx = 0;
+    for (let midi = 0; midi <= 127; midi++) {
+      if (WHITE_KEYS.includes(midi % 12)) {
+        if (midi === 60) {
+          c4WhiteIndex = idx;
+          break;
+        }
+        idx++;
+      }
     }
+    const c4X = c4WhiteIndex * whiteKeyWidth + whiteKeyWidth / 2;
+    const container = scrollContainerRef.current;
+    const containerWidth = container.clientWidth;
+    // Center C4
+    container.scrollLeft = Math.max(0, c4X - containerWidth / 2);
+  }, []);
+
+  const CHROMATIC_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+  // Helper: get note name with octave
+  const getNoteNameWithOctave = (midi: number) => {
+    const name = CHROMATIC_NAMES[midi % 12];
+    const octave = Math.floor(midi / 12) - 2;
+    return `${name}${octave}`;
   };
 
   // Mouse/touch handlers with velocity calculation
@@ -188,7 +202,10 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
             onTouchEnd={() => handleKeyUp(midi)}
             style={{ cursor: 'pointer' }}
           />
-          <text x={x + whiteKeyWidth / 2} y={150} textAnchor="middle" fontSize={10} fill="#666">{getKeyName(midi)}</text>
+          <text x={x + whiteKeyWidth / 2} y={150} textAnchor="middle" fontSize={10} fill="#666"
+            style={{ userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', pointerEvents: 'none' }}>
+            {getNoteNameWithOctave(midi)}
+          </text>
         </g>
       );
       whiteIndex++;
@@ -251,13 +268,16 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
           onTouchEnd={() => handleKeyUp(midi)}
           style={{ cursor: 'pointer' }}
         />
-        <text x={x + blackKeyWidth / 2} y={90} textAnchor="middle" fontSize={8} fill="#fff">{getKeyName(midi)}</text>
+        <text x={x + blackKeyWidth / 2} y={90} textAnchor="middle" fontSize={8} fill="#fff"
+          style={{ userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', pointerEvents: 'none' }}>
+          {getNoteNameWithOctave(midi)}
+        </text>
       </g>
     );
   }
   const totalWhiteKeys = whiteKeyPositions.length;
   return (
-    <div style={{ overflowX: 'auto', width: '100%', borderRadius: 8, border: '2px solid #333', background: '#f0f0f0' }}>
+    <div ref={scrollContainerRef} style={{ overflowX: 'auto', width: '100%', borderRadius: 8, border: '2px solid #333', background: '#f0f0f0' }}>
       <svg
         width={totalWhiteKeys * whiteKeyWidth}
         height={whiteKeyHeight}
