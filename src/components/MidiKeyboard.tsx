@@ -160,14 +160,17 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
   // Render all MIDI keys
   const keys = [];
   const whiteKeyWidth = 40;
-  const blackKeyWidth = 24;
+  const blackKeyWidth = 28;
   const blackKeyHeight = 100;
   const whiteKeyHeight = 160;
   let whiteIndex = 0;
+  const whiteKeyPositions: number[] = [];
   for (let midi = 0; midi <= 127; midi++) {
-    const isW = isWhite(midi);
-    const x = isW ? whiteIndex * whiteKeyWidth : (whiteIndex - 1) * whiteKeyWidth + whiteKeyWidth - blackKeyWidth / 2;
+    const scale = midi % 12;
+    const isW = WHITE_KEYS.includes(scale);
     if (isW) {
+      const x = whiteIndex * whiteKeyWidth;
+      whiteKeyPositions.push(x);
       keys.push(
         <g key={`w${midi}`}>
           <rect
@@ -189,30 +192,70 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
         </g>
       );
       whiteIndex++;
-    } else {
-      keys.push(
-        <g key={`b${midi}`}>
-          <rect
-            x={x}
-            y={0}
-            width={blackKeyWidth}
-            height={blackKeyHeight}
-            fill={activeNotes.includes(midi) || highlightedNotes.includes(midi) ? '#fbc02d' : '#333'}
-            stroke="#000"
-            strokeWidth={1}
-            onMouseDown={e => handleKeyDown(midi, e)}
-            onMouseUp={() => handleKeyUp(midi)}
-            onMouseLeave={() => handleKeyUp(midi)}
-            onTouchStart={e => handleKeyDown(midi, e)}
-            onTouchEnd={() => handleKeyUp(midi)}
-            style={{ cursor: 'pointer' }}
-          />
-          <text x={x + blackKeyWidth / 2} y={90} textAnchor="middle" fontSize={8} fill="#fff">{getKeyName(midi)}</text>
-        </g>
-      );
     }
   }
-  const totalWhiteKeys = whiteIndex;
+  // Now render black keys with correct offsets
+  whiteIndex = 0;
+  for (let midi = 0; midi <= 127; midi++) {
+    const scale = midi % 12;
+    if (WHITE_KEYS.includes(scale)) {
+      whiteIndex++;
+      continue;
+    }
+    // Find which black key it is
+    let offset = 0;
+    let x = 0;
+    switch (scale) {
+      case 1: // C#
+        // Between C (whiteIndex-1) and D (whiteIndex), closer to D
+        offset = 0.9;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 3: // D#
+        // Between D and E, closer to E
+        offset = 1.1;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 6: // F#
+        // Between F and G, closer to G
+        offset = 0.9;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 8: // G#
+        // Between G and A, closer to A
+        offset = 1.0;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 10: // A#
+        // Between A and B, centered
+        offset = 1.1;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      default:
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth - blackKeyWidth / 2;
+    }
+    keys.push(
+      <g key={`b${midi}`}>
+        <rect
+          x={x}
+          y={0}
+          width={blackKeyWidth}
+          height={blackKeyHeight}
+          fill={activeNotes.includes(midi) || highlightedNotes.includes(midi) ? '#fbc02d' : '#333'}
+          stroke="#000"
+          strokeWidth={1}
+          onMouseDown={e => handleKeyDown(midi, e)}
+          onMouseUp={() => handleKeyUp(midi)}
+          onMouseLeave={() => handleKeyUp(midi)}
+          onTouchStart={e => handleKeyDown(midi, e)}
+          onTouchEnd={() => handleKeyUp(midi)}
+          style={{ cursor: 'pointer' }}
+        />
+        <text x={x + blackKeyWidth / 2} y={90} textAnchor="middle" fontSize={8} fill="#fff">{getKeyName(midi)}</text>
+      </g>
+    );
+  }
+  const totalWhiteKeys = whiteKeyPositions.length;
   return (
     <div style={{ overflowX: 'auto', width: '100%', borderRadius: 8, border: '2px solid #333', background: '#f0f0f0' }}>
       <svg
