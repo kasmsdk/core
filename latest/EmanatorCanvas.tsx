@@ -39,7 +39,7 @@ const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
     const handleIframeLoad = () => {
         hasLoadedRef.current = true;
         if (typeof inlet_5_emanator === 'number' && iframeRef.current && iframeRef.current.contentWindow) {
-            // iframeRef.current.contentWindow.postMessage({ type: 'INLET_5_EMANATOR', value: inlet_5_emanator }, '*');
+            iframeRef.current.contentWindow.postMessage({ type: 'INLET_5_EMANATOR', value: inlet_5_emanator }, '*');
         }
     };
 
@@ -51,7 +51,7 @@ const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
 
     useEffect(() => {
         if (hasLoadedRef.current && typeof inlet_5_emanator === 'number' && iframeRef.current && iframeRef.current.contentWindow) {
-            // iframeRef.current.contentWindow.postMessage({ type: 'INLET_5_EMANATOR', value: inlet_5_emanator }, '*');
+            iframeRef.current.contentWindow.postMessage({ type: 'INLET_5_EMANATOR', value: inlet_5_emanator }, '*');
         }
     }, [inlet_5_emanator]);
 
@@ -63,18 +63,18 @@ const EmanatorCanvas = forwardRef<EmanatorCanvasHandle, EmanatorCanvasProps>(({
         },
         postHello: () => {
             const win = iframeRef.current?.contentWindow;
-            if (win && typeof (win as { post?: (msg: string) => void }).post === 'function') {
-                (win as { post: (msg: string) => void }).post("ERK");
+            if (win && typeof (win as any).post === 'function') {
+                (win as any).post("Hello, World!");
             }
         },
         setInlets: (args?: UpdateCanvasDataArgs) => {
             if (iframeRef.current && iframeRef.current.contentWindow && args) {
-                iframeRef.current.contentWindow.postMessage({ type: 'INLET_0_NOTE', pitch: args.pitch }, '*');
-                iframeRef.current.contentWindow.postMessage({ type: 'INLET_2_VELOCITY', velocity: args.velocity }, '*');
+                iframeRef.current.contentWindow.postMessage({ type: 'INLET_0_NOTE', value: args.pitch }, '*');
+                iframeRef.current.contentWindow.postMessage({ type: 'INLET_2_VELOCITY', value: args.velocity }, '*');
                 iframeRef.current.contentWindow.postMessage({ type: 'BANG' }, '*');
 
-                // this call to kasm_rust.update_canvas_data will also shows the note played
-                iframeRef.current.contentWindow.postMessage({ type: 'KASM', func: 'update_canvas_data', args }, '*');
+                // uncomment this call to kasm_rust.update_canvas_data will also shows the note played
+                // iframeRef.current.contentWindow.postMessage({ type: 'KASM', func: 'update_canvas_data', args }, '*');
             }
         },
 
