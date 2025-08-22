@@ -9,14 +9,7 @@ interface MidiKeyboardProps {
 
 // MIDI note numbers for one octave starting at C4 (60)
 const WHITE_KEYS = [0, 2, 4, 5, 7, 9, 11];
-const KEY_NAMES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-// Black key positions relative to white keys (piano pattern)
-const BLACK_KEY_POSITIONS = [0, 1, 3, 4, 5]; // C#, D#, F#, G#, A#
-const BLACK_KEYS = [1, 3, 6, 8, 10];
-const BLACK_KEY_NAMES = ['C#', 'Eb', 'F#', 'G#', 'Bb'];
-
 const BASE_NOTE = 60; // C4
-const OCTAVES = 2;
 
 const KEYBOARD_MAPPING: Record<string, number> = {
   'a': 0,   // C
@@ -57,9 +50,9 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
   velocity: propVelocity = 100,
 }) => {
   const [activeNotes, setActiveNotes] = useState<number[]>([]);
-  const [octaveOffset, setOctaveOffset] = useState(0); // in semitones
   const [velocity, setVelocity] = useState(propVelocity);
   const pressedKeysRef = useRef<Set<string>>(new Set());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setVelocity(propVelocity);
@@ -73,25 +66,16 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
       pressedKeysRef.current.add(key);
       // Octave control
       if (key === 'z') {
-        setOctaveOffset((prev) => Math.max(prev - 12, -48));
-        return;
-      }
-      if (key === 'x') {
-        setOctaveOffset((prev) => Math.min(prev + 12, 48));
-        return;
-      }
-      // Velocity control
-      if (key === 'c') {
         setVelocity((prev) => Math.max(prev - 10, 1));
         return;
       }
-      if (key === 'v') {
+      if (key === 'x') {
         setVelocity((prev) => Math.min(prev + 10, 127));
         return;
       }
       // Note keys
       if (Object.prototype.hasOwnProperty.call(KEYBOARD_MAPPING, key)) {
-        const note = BASE_NOTE + KEYBOARD_MAPPING[key] + octaveOffset;
+        const note = BASE_NOTE + KEYBOARD_MAPPING[key];
         if (!activeNotes.includes(note)) {
           setActiveNotes((prev) => [...prev, note]);
           onNoteOn(note, velocity);
@@ -105,7 +89,7 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
       const key = event.key.toLowerCase();
       pressedKeysRef.current.delete(key);
       if (Object.prototype.hasOwnProperty.call(KEYBOARD_MAPPING, key)) {
-        const note = BASE_NOTE + KEYBOARD_MAPPING[key] + octaveOffset;
+        const note = BASE_NOTE + KEYBOARD_MAPPING[key];
         setActiveNotes((prev) => prev.filter((n) => n !== note));
         onNoteOff(note);
         if (window.kasm_rust && typeof window.kasm_rust.update_canvas_data === 'function') {
@@ -119,15 +103,63 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [octaveOffset, velocity, activeNotes, onNoteOn, onNoteOff]);
+  }, [velocity, activeNotes, onNoteOn, onNoteOff]);
 
-  // Mouse/touch handlers
-  const handleKeyDown = (note: number) => {
+  // After rendering keys, center on middle C (C4, MIDI 60)
+  useEffect(() => {
+    if (!scrollContainerRef.current) return;
+    // Find white key index for MIDI 60 (C4)
+    let c4WhiteIndex = 0;
+    let idx = 0;
+    for (let midi = 0; midi <= 127; midi++) {
+      if (WHITE_KEYS.includes(midi % 12)) {
+        if (midi === 60) {
+          c4WhiteIndex = idx;
+          break;
+        }
+        idx++;
+      }
+    }
+    const c4X = c4WhiteIndex * whiteKeyWidth + whiteKeyWidth / 2;
+    const container = scrollContainerRef.current;
+    const containerWidth = container.clientWidth;
+    // Center C4
+    container.scrollLeft = Math.max(0, c4X - containerWidth / 2);
+  }, []);
+
+  const CHROMATIC_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+  // Helper: get note name with octave
+  const getNoteNameWithOctave = (midi: number) => {
+    const name = CHROMATIC_NAMES[midi % 12];
+    const octave = Math.floor(midi / 12) - 2;
+    return `${name}${octave}`;
+  };
+
+  // Mouse/touch handlers with velocity calculation
+  const handleKeyDown = (note: number, e?: React.MouseEvent | React.TouchEvent) => {
+    let v = velocity;
+    if (e) {
+      // Get bounding rect and vertical offset
+      const target = e.target as SVGRectElement;
+      const rect = target.getBoundingClientRect();
+      let y: number;
+      if ('touches' in e && e.touches.length > 0) {
+        y = e.touches[0].clientY - rect.top;
+      } else if ('clientY' in e) {
+        y = e.clientY - rect.top;
+      } else {
+        y = rect.height / 2;
+      }
+      // Map y to velocity (top=10, bottom=127)
+      v = Math.round(10 + (y / rect.height) * (127 - 10));
+      v = Math.max(10, Math.min(127, v));
+    }
     if (!activeNotes.includes(note)) {
       setActiveNotes((prev) => [...prev, note]);
-      onNoteOn(note, velocity);
+      onNoteOn(note, v);
       if (window.kasm_rust && typeof window.kasm_rust.update_canvas_data === 'function') {
-        window.kasm_rust.update_canvas_data(note, velocity, false);
+        window.kasm_rust.update_canvas_data(note, v, false);
       }
     }
   };
@@ -139,72 +171,121 @@ const MidiKeyboard: React.FC<MidiKeyboardProps> = ({
     }
   };
 
-  // Render SVG keys
+  // Render all MIDI keys
   const keys = [];
   const whiteKeyWidth = 40;
-  const blackKeyWidth = 24;
+  const blackKeyWidth = 28;
   const blackKeyHeight = 100;
   const whiteKeyHeight = 160;
-  for (let octave = 0; octave < OCTAVES; octave++) {
-    // White keys
-    for (let i = 0; i < WHITE_KEYS.length; i++) {
-      const note = BASE_NOTE + octave * 12 + WHITE_KEYS[i];
-      const x = (octave * 7 + i) * whiteKeyWidth;
+  let whiteIndex = 0;
+  const whiteKeyPositions: number[] = [];
+  for (let midi = 0; midi <= 127; midi++) {
+    const scale = midi % 12;
+    const isW = WHITE_KEYS.includes(scale);
+    if (isW) {
+      const x = whiteIndex * whiteKeyWidth;
+      whiteKeyPositions.push(x);
       keys.push(
-        <g key={`w${octave}-${i}`}>
+        <g key={`w${midi}`}>
           <rect
             x={x}
             y={0}
             width={whiteKeyWidth}
             height={whiteKeyHeight}
-            fill={activeNotes.includes(note) || highlightedNotes.includes(note) ? 'lime' : 'white'}
+            fill={activeNotes.includes(midi) || highlightedNotes.includes(midi) ? 'lime' : 'white'}
             stroke="#333"
             strokeWidth={1}
-            onMouseDown={() => handleKeyDown(note)}
-            onMouseUp={() => handleKeyUp(note)}
-            onMouseLeave={() => handleKeyUp(note)}
-            onTouchStart={() => handleKeyDown(note)}
-            onTouchEnd={() => handleKeyUp(note)}
+            onMouseDown={e => handleKeyDown(midi, e)}
+            onMouseUp={() => handleKeyUp(midi)}
+            onMouseLeave={() => handleKeyUp(midi)}
+            onTouchStart={e => handleKeyDown(midi, e)}
+            onTouchEnd={() => handleKeyUp(midi)}
             style={{ cursor: 'pointer' }}
           />
-          <text x={x + whiteKeyWidth / 2} y={150} textAnchor="middle" fontSize={14} fill="#666">{KEY_NAMES[i]}</text>
+          <text x={x + whiteKeyWidth / 2} y={150} textAnchor="middle" fontSize={10} fill="#666"
+            style={{ userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', pointerEvents: 'none' }}>
+            {getNoteNameWithOctave(midi)}
+          </text>
         </g>
       );
-    }
-    // Black keys (grouped 2-3)
-    for (let i = 0; i < BLACK_KEY_POSITIONS.length; i++) {
-      // Position black keys between white keys
-      // C# between C and D, D# between D and E, F# between F and G, G# between G and A, A# between A and B
-      const pos = BLACK_KEY_POSITIONS[i];
-      // Skip E-F and B-C (no black key)
-      const x = (octave * 7 + pos) * whiteKeyWidth + whiteKeyWidth - blackKeyWidth / 2;
-      const note = BASE_NOTE + octave * 12 + BLACK_KEYS[i];
-      keys.push(
-        <g key={`b${octave}-${i}`}>
-          <rect
-            x={x}
-            y={0}
-            width={blackKeyWidth}
-            height={blackKeyHeight}
-            fill={activeNotes.includes(note) || highlightedNotes.includes(note) ? '#fbc02d' : '#333'}
-            stroke="#000"
-            strokeWidth={1}
-            onMouseDown={() => handleKeyDown(note)}
-            onMouseUp={() => handleKeyUp(note)}
-            onMouseLeave={() => handleKeyUp(note)}
-            onTouchStart={() => handleKeyDown(note)}
-            onTouchEnd={() => handleKeyUp(note)}
-            style={{ cursor: 'pointer' }}
-          />
-          <text x={x + blackKeyWidth / 2} y={90} textAnchor="middle" fontSize={10} fill="#fff">{BLACK_KEY_NAMES[i]}</text>
-        </g>
-      );
+      whiteIndex++;
     }
   }
+  // Now render black keys with correct offsets
+  whiteIndex = 0;
+  for (let midi = 0; midi <= 127; midi++) {
+    const scale = midi % 12;
+    if (WHITE_KEYS.includes(scale)) {
+      whiteIndex++;
+      continue;
+    }
+    // Find which black key it is
+    let offset = 0;
+    let x = 0;
+    switch (scale) {
+      case 1: // C#
+        // Between C (whiteIndex-1) and D (whiteIndex), closer to D
+        offset = 0.9;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 3: // D#
+        // Between D and E, closer to E
+        offset = 1.1;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 6: // F#
+        // Between F and G, closer to G
+        offset = 0.9;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 8: // G#
+        // Between G and A, closer to A
+        offset = 1.0;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      case 10: // A#
+        // Between A and B, centered
+        offset = 1.1;
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth * offset - blackKeyWidth / 2;
+        break;
+      default:
+        x = whiteKeyPositions[whiteIndex - 1] + whiteKeyWidth - blackKeyWidth / 2;
+    }
+    keys.push(
+      <g key={`b${midi}`}>
+        <rect
+          x={x}
+          y={0}
+          width={blackKeyWidth}
+          height={blackKeyHeight}
+          fill={activeNotes.includes(midi) || highlightedNotes.includes(midi) ? '#fbc02d' : '#333'}
+          stroke="#000"
+          strokeWidth={1}
+          onMouseDown={e => handleKeyDown(midi, e)}
+          onMouseUp={() => handleKeyUp(midi)}
+          onMouseLeave={() => handleKeyUp(midi)}
+          onTouchStart={e => handleKeyDown(midi, e)}
+          onTouchEnd={() => handleKeyUp(midi)}
+          style={{ cursor: 'pointer' }}
+        />
+        <text x={x + blackKeyWidth / 2} y={90} textAnchor="middle" fontSize={8} fill="#fff"
+          style={{ userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', pointerEvents: 'none' }}>
+          {getNoteNameWithOctave(midi)}
+        </text>
+      </g>
+    );
+  }
+  const totalWhiteKeys = whiteKeyPositions.length;
   return (
-    <svg width={OCTAVES * 7 * whiteKeyWidth} height={whiteKeyHeight} style={{ userSelect: 'none', display: 'block', background: '#f0f0f0', borderRadius: 8, border: '2px solid #333' }}>
-      {keys}
-    </svg>
+    <div ref={scrollContainerRef} style={{ overflowX: 'auto', width: '100%', borderRadius: 8, border: '2px solid #333', background: '#f0f0f0' }}>
+      <svg
+        width={totalWhiteKeys * whiteKeyWidth}
+        height={whiteKeyHeight}
+        style={{ userSelect: 'none', display: 'block' }}
+      >
+        {keys}
+      </svg>
+    </div>
   );
 };
 
