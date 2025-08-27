@@ -29,7 +29,7 @@ function App() {
     }
   }, []);
 
-  const isStandaloneMode = ['kasm', 'emanator', 'bangaz', 'arpy', 'triggaz'].includes(currentApp);
+  const isStandaloneMode = ['kasm', 'emanator', 'bangaz', 'arpy', 'triggaz', 'lfo'].includes(currentApp);
 
   const getSidebarContext = (): 'main' | 'kasm' | 'tech' => {
     if (currentApp === 'kasm') return 'kasm';
