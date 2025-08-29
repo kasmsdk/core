@@ -25,7 +25,9 @@ type DocPage =
   | 'triggaz'
   | 'canvas'
   | 'rulez'
-  | 'krumhansel';
+  | 'krumhansel'
+  | 'lfo'
+  | 'looper';
 
 type ActiveSection = 'whatsnew' | DocPage;
 
