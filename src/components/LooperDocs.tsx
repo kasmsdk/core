@@ -5,83 +5,44 @@ const LooperDocs: React.FC = () => {
     <div>
       <h1>Looper Documentation</h1>
       <p>
-        The Looper engine in the Kasm SDK is used to detect unrealistic MIDI
-        patterns that a human could not play on certain instruments.
-      </p>
-      <p>
-        This documentation will explain how to define and apply rules to filter
-        or modify MIDI data.
-      </p>
-
-      <h2>How the Looper Engine Works</h2>
-      <p>
-        The Looper engine allows you to define a set of rules that are applied to
-        incoming MIDI data. Each rule can inspect the MIDI data and decide to
-        either allow it, block it, or modify it. This is useful for enforcing
-        constraints that mimic the physical limitations of real instruments.
-      </p>
-      <p>
-        For example, a "Hand Drums" rule might limit the number of simultaneous
-        notes to two, since a percussionist only has two hands. A "Keyboard"
-        rule might prevent notes from being played that are impossibly far
-        apart.
+        The Looper engine in the Kasm SDK records and processes MIDI note events
+        in real time, simulating the physical and timing constraints of real
+        instruments. It uses a tape buffer to store note events with timestamps,
+        supports pattern detection, tape delay, feedback loops, and automatic
+        pruning of old events.
       </p>
 
-      <h2>How to Use the Looper Engine</h2>
-      <p>
-        You can add and remove rules from a global registry. When MIDI data is
-        sent, the <code>apply_rules_chain</code> function is called to process
-        the data through all active rules.
-      </p>
-      <pre>
-        <code>
-          {`
-// Rust example of using the Looper engine
-use kasm_sdk::Looper::{add_rule, remove_rule, apply_rules_chain, Looper, LooperType, NoteData, MidiEventType};
-
-fn setup_rules() {
-    // Add a rule to simulate a 6-string guitar
-    let guitar_rule = Looper {
-        rule_type: LooperType::Guitar6String,
-    };
-    add_rule(guitar_rule);
-}
-
-fn process_midi_notes(notes: Vec<NoteData>) -> Vec<NoteData> {
-    // Apply all active rules to the incoming notes
-    let filtered_notes = apply_rules_chain(notes);
-    return filtered_notes;
-}
-`}
-        </code>
-      </pre>
-
-      <h2>Available Looper</h2>
+      <h2>Core Features</h2>
+        <p>
       <ul>
         <li>
-          <strong>EncoderDialsAndFaders:</strong> Limits the rate of change for
-          CC messages to simulate physical knobs and faders.
+          <b>Tape Recording:</b> Captures MIDI notes with timing for playback and
+          analysis.
         </li>
         <li>
-          <strong>Guitar6String:</strong> Enforces the physical limitations of a
-          6-string guitar.
+          <b>Pattern Detection:</b> Identifies and records repeating note patterns
+          with time offsets.
         </li>
         <li>
-          <strong>HandDrums:</strong> Simulates the limitations of a two-handed
-          percussionist.
+          <b>Tape Delay & Feedback:</b> Adjustable delay and feedback loops for
+          creative looping effects.
         </li>
         <li>
-          <strong>Keyboard:</strong> Enforces realistic hand spans for keyboard
-          playing.
+          <b>Pruning:</b> Automatically removes old note events to prevent
+          overflow and maintain performance.
         </li>
         <li>
-          <strong>Bowed:</strong> Simulates the characteristics of bowed string
-          instruments like violins.
+          <b>Instrument Realism:</b> Applies rules to enforce physical
+          constraints of real instruments.
         </li>
+        <li>Adjust tape delay and feedback loops for creative looping.</li>
+        <li>Wipe tape and prune events to reset or optimize performance.</li>
         <li>
-          <strong>Stringed:</strong> General rules for stringed instruments.
+          Customize rule parameters (e.g., capo offset, hand span) for each
+          instrument.
         </li>
       </ul>
+        </p>
     </div>
   );
 };

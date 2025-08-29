@@ -5,83 +5,68 @@ const LFODocs: React.FC = () => {
     <div>
       <h1>LFO Documentation</h1>
       <p>
-        The LFO engine in the Kasm SDK is used to detect unrealistic MIDI
-        patterns that a human could not play on certain instruments.
-      </p>
-      <p>
-        This documentation will explain how to define and apply rules to filter
-        or modify MIDI data.
+        The LFO (Low-Frequency Oscillator) engine in the Kasm SDK generates
+        continuous MIDI CC messages for real-time modulation in Ableton Live or
+        any MIDI-compatible software. LFOs are tempo-synced and can be controlled
+        live via the Max for Live UI.
       </p>
 
-      <h2>How the LFO Engine Works</h2>
-      <p>
-        The LFO engine allows you to define a set of rules that are applied to
-        incoming MIDI data. Each rule can inspect the MIDI data and decide to
-        either allow it, block it, or modify it. This is useful for enforcing
-        constraints that mimic the physical limitations of real instruments.
-      </p>
-      <p>
-        For example, a "Hand Drums" rule might limit the number of simultaneous
-        notes to two, since a percussionist only has two hands. A "Keyboard"
-        rule might prevent notes from being played that are impossibly far
-        apart.
-      </p>
-
-      <h2>How to Use the LFO Engine</h2>
-      <p>
-        You can add and remove rules from a global registry. When MIDI data is
-        sent, the <code>apply_rules_chain</code> function is called to process
-        the data through all active rules.
-      </p>
-      <pre>
-        <code>
-          {`
-// Rust example of using the LFO engine
-use kasm_sdk::LFO::{add_rule, remove_rule, apply_rules_chain, LFO, LFOType, NoteData, MidiEventType};
-
-fn setup_rules() {
-    // Add a rule to simulate a 6-string guitar
-    let guitar_rule = LFO {
-        rule_type: LFOType::Guitar6String,
-    };
-    add_rule(guitar_rule);
-}
-
-fn process_midi_notes(notes: Vec<NoteData>) -> Vec<NoteData> {
-    // Apply all active rules to the incoming notes
-    let filtered_notes = apply_rules_chain(notes);
-    return filtered_notes;
-}
-`}
-        </code>
-      </pre>
-
-      <h2>Available LFO</h2>
+      <h2>Supported Waveforms</h2>
+        <p>
       <ul>
         <li>
-          <strong>EncoderDialsAndFaders:</strong> Limits the rate of change for
-          CC messages to simulate physical knobs and faders.
+          <b>Sine Wave</b>: Classic smooth modulation.
+          <br />
+          <b>Controls:</b> Speed (enc1), Phase Offset (enc2)
         </li>
         <li>
-          <strong>Guitar6String:</strong> Enforces the physical limitations of a
-          6-string guitar.
+          <b>Sawtooth Wave</b>: Linear ramp up or down.
+          <br />
+          <b>Controls:</b> Speed (enc1), Direction (enc2: 0–63 up, 64–127 down)
         </li>
         <li>
-          <strong>HandDrums:</strong> Simulates the limitations of a two-handed
-          percussionist.
+          <b>Square Wave</b>: On/off modulation with pulse width.
+          <br />
+          <b>Controls:</b> Speed (enc1), Pulse Width (enc2: 1–99%)
         </li>
         <li>
-          <strong>Keyboard:</strong> Enforces realistic hand spans for keyboard
-          playing.
+          <b>Triangle Wave</b>: Symmetrical or asymmetrical triangle shape.
+          <br />
+          <b>Controls:</b> Speed (enc1), Symmetry (enc2: 0–127, 64 = perfect
+          triangle)
         </li>
         <li>
-          <strong>Bowed:</strong> Simulates the characteristics of bowed string
-          instruments like violins.
-        </li>
-        <li>
-          <strong>Stringed:</strong> General rules for stringed instruments.
+          <b>Motown Fadeout</b>: Gradually fades out modulation for smooth
+          transitions.
+          <br />
+          <b>Controls:</b> Fadeout length in bars (enc2), Fadeout steps (enc1)
         </li>
       </ul>
+        </p>
+
+      <h2>General Features</h2>
+        <p>
+      <ul>
+        <li>
+          All LFOs are synchronized to Ableton Live's transport and tempo for
+          rhythmic effects.
+        </li>
+        <li>Parameters are mapped to encoder controls for live tweaking.</li>
+        <li>
+          Each LFO sends MIDI CC messages to modulate parameters in Ableton or
+          other MIDI-compatible software.
+        </li>
+      </ul>
+        </p>
+
+      <h2>Usage</h2>
+      <p>
+        Select the desired LFO waveform and assign a MIDI CC number to modulate.
+        Adjust the encoders in the Max for Live UI to control speed, shape, and
+        other parameters in real time. The LFO engine will continuously send MIDI
+        CC messages based on your settings, synchronized to the current tempo and
+        transport.
+      </p>
     </div>
   );
 };

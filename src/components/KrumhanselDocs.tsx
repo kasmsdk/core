@@ -32,7 +32,6 @@ const KrumhanselDocs: React.FC = () => {
         You can feed MIDI notes to the Krumhansel engine using the{" "}
         <code>kasm_krumhansl_detect_key</code> function. You can then retrieve
         the detected key and chord using their respective getter functions.
-      </p>
       <pre>
         <code>
           {`
@@ -53,6 +52,7 @@ fn process_midi_note(note: i32, velocity: i32) {
 `}
         </code>
       </pre>
+      </p>
     </div>
   );
 };

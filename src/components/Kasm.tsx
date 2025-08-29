@@ -79,8 +79,6 @@ export default function Kasm({ onNavigate }: KasmProps) {
       </p>
       <div style={{ backgroundPosition: getRandomOffset() }}>
         <nav>
-          Editors:
-
           <div className="kasm-demo-buttons">
             <div className="kasm-demo-buttons-group">
               {/* What's new button */}
@@ -88,49 +86,49 @@ export default function Kasm({ onNavigate }: KasmProps) {
                 className={`kasm-demo-btn${activeSection === 'whatsnew' ? ' active' : ''}`}
                 onClick={() => setActiveSection('whatsnew')}
               >
-                📰 <br />What's new
+                📰 <br />What's<br/>New
               </button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
                 🎹 <br/>Emanator
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('emanator')}>Emanator Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('emanator')}>📖 <br/>Emanator Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('bangaz')}>
                 🎹 <br/>Bangaz
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('bangaz')}>Bangaz Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('bangaz')}>📖 <br/>Bangaz Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
                 🎹 <br/>Arpy
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('arpy')}>Arpy Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('arpy')}>📖 <br/>Arpy Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('triggaz')}>
                 🎹 <br/>Triggaz
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('triggaz')}>Triggaz Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('triggaz')}>📖 <br/>Triggaz Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('lfo')}>
                 🎹 <br/>MIDI LFO
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('lfo')}>LFO Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('lfo')}>📖 <br/>LFO Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('looper')}>
-                🎛️ <br/>MIDI Looper
+                🎹 <br/>MIDI Looper
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('looper')}>Looper Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('looper')}>📖 <br/>Looper Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('canvas')}>Canvas Docs</button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>Rulez Docs</button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('krumhansel')}>Krumhansel Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('canvas')}>📖 <br/>Canvas Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>📖 <br/>Rulez Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('krumhansel')}>📖 <br/>Krumhansel Docs</button>
             </div>
           </div>
         </nav>

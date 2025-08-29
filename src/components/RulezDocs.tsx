@@ -8,10 +8,6 @@ const RulezDocs: React.FC = () => {
         The Rulez engine in the Kasm SDK is used to detect unrealistic MIDI
         patterns that a human could not play on certain instruments.
       </p>
-      <p>
-        This documentation will explain how to define and apply rules to filter
-        or modify MIDI data.
-      </p>
 
       <h2>How the Rulez Engine Works</h2>
       <p>
@@ -32,7 +28,6 @@ const RulezDocs: React.FC = () => {
         You can add and remove rules from a global registry. When MIDI data is
         sent, the <code>apply_rules_chain</code> function is called to process
         the data through all active rules.
-      </p>
       <pre>
         <code>
           {`
@@ -55,8 +50,10 @@ fn process_midi_notes(notes: Vec<NoteData>) -> Vec<NoteData> {
 `}
         </code>
       </pre>
+      </p>
 
-      <h2>Available Rulez</h2>
+      <h2>Rulez Examples</h2>
+        <p>
       <ul>
         <li>
           <strong>EncoderDialsAndFaders:</strong> Limits the rate of change for
@@ -82,7 +79,9 @@ fn process_midi_notes(notes: Vec<NoteData>) -> Vec<NoteData> {
           <strong>Stringed:</strong> General rules for stringed instruments.
         </li>
       </ul>
+        </p>
     </div>
+
   );
 };
 

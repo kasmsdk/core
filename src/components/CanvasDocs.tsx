@@ -21,8 +21,9 @@ const CanvasDocs: React.FC = () => {
         API and is controlled from your Rust code. When you send MIDI data to
         the canvas, it creates animated "glows" that represent the notes and CC
         messages.
-      </p>
-      <p>
+
+          <br/>
+          <br/>
         The canvas displays MIDI notes as squares and CC messages as circles.
         The color of the glow is determined by the note's pitch, and the size is
         determined by its velocity. The position of the glow is determined by
@@ -35,7 +36,6 @@ const CanvasDocs: React.FC = () => {
         To use the canvas, you first need to initialize it with a specific width
         and height. Then, you can send MIDI data to it using the{" "}
         <code>update_canvas_data</code> function.
-      </p>
       <pre>
         <code>
           {`
@@ -61,6 +61,15 @@ fn visualize_cc_message(cc_number: i32, value: i32) {
 `}
         </code>
       </pre>
+      </p>
+        <h2>Example Canvas Visualizers</h2>
+        <p>
+            <ul>
+            <li>Emanator - shows notes and CC data as squares and circles in an live animation.</li>
+            <li>Arpy - show held notes and how they are being played out in the sequence.</li>
+            <li>Jog - shows motion video behind the apreggiator visualizer</li>
+            </ul>
+        </p>
     </div>
   );
 };
