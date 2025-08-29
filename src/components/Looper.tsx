@@ -18,7 +18,7 @@ const Looper: React.FC = () => (
                     document.body.removeChild(link);
                 }}
             >
-                ⬇️<br/>Kasm Looper.amxd
+                ⬇️<br/>Looper .amxd
             </button>
         </div>
       <LatestDemoLooper />

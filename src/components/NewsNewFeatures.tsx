@@ -29,7 +29,23 @@ const NewsNewFeatures: React.FC = () => {
     return (
         <p>
             New Component in v1.14!<br/>Jog - video jogger canvas kasm_canvas_jog.rs<br/>
-            <JogCanvas ref={jogCanvasRef} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', margin: '16px 0' }}>
+                <JogCanvas ref={jogCanvasRef} />
+                <button
+                    className="kasm-demo-btn"
+                    title="Download Jog as Ableton Live 12.2 M4L device"
+                    onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = '/latest/Kasm%20Jog.amxd';
+                        link.download = 'Kasm Jog.amxd';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }}
+                >
+                    ⬇️<br/>Kasm Jog.amxd
+                </button>
+            </div>
         </p>
     );
 };

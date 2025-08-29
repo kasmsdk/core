@@ -8,7 +8,7 @@ const Canvas: React.FC = () => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
             <button
                 className="kasm-demo-btn"
-                title="Download as Ableton Live 12.2 M4L device"
+                title="Download Kasm Canvas as Ableton Live 12.2 M4L device"
                 onClick={() => {
                     const link = document.createElement('a');
                     link.href = '/latest/Kasm%20Canvas.amxd';
@@ -18,7 +18,7 @@ const Canvas: React.FC = () => (
                     document.body.removeChild(link);
                 }}
             >
-                ⬇️<br/>Kasm Canvas.amxd
+                ⬇️<br/>Canvas .amxd
             </button>
         </div>
       <LatestDemo />
