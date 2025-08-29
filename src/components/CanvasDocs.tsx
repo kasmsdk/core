@@ -3,7 +3,7 @@ import React from "react";
 const CanvasDocs: React.FC = () => {
   return (
     <div>
-      <h1>Canvas Documentation</h1>
+      <h2>Canvas</h2>
       <p>
         The Canvas mechanism in the Kasm SDK is used to create visualizers for
         MIDI data. It provides a way to draw and animate graphics in response to

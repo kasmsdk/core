@@ -3,7 +3,7 @@ import React from "react";
 const ArpyDocs: React.FC = () => {
   return (
     <div>
-      <h1>Arpy Documentation</h1>
+      <h2>Arpy</h2>
       <p>
         Arpy is the arpeggiator engine in the Kasm SDK. It provides a powerful
         and flexible way to create complex arpeggios and sequences.

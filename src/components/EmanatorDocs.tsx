@@ -3,7 +3,7 @@ import React from "react";
 const EmanatorDocs: React.FC = () => {
   return (
     <div>
-      <h1>Emanator Documentation</h1>
+      <h2>Emanator</h2>
       <p>
         Emanators are a core feature of the Kasm SDK. They are responsible for
         generating and transforming MIDI data in various ways.

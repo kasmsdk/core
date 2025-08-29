@@ -3,7 +3,7 @@ import React from "react";
 const TriggazDocs: React.FC = () => {
   return (
     <div>
-      <h1>Triggaz Documentation</h1>
+      <h2>Triggaz</h2>
       <p>
         Triggaz is the MIDI pattern detection engine in the Kasm SDK. It can
         analyze incoming MIDI data to identify melodic and rhythmic patterns.

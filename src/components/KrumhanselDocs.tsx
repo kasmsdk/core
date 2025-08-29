@@ -3,7 +3,7 @@ import React from "react";
 const KrumhanselDocs: React.FC = () => {
   return (
     <div>
-      <h1>Krumhansel Documentation</h1>
+      <h2>Scale Key and Chored Detection</h2>
       <p>
         The Krumhansel mechanism in the Kasm SDK is used to detect the scale,
         key, and chords being played in real-time.

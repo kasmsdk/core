@@ -3,7 +3,7 @@ import React from "react";
 const LooperDocs: React.FC = () => {
   return (
     <div>
-      <h1>Looper Documentation</h1>
+      <h2>Looper</h2>
       <p>
         The Looper engine in the Kasm SDK records and processes MIDI note events
         in real time, simulating the physical and timing constraints of real

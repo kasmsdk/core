@@ -3,7 +3,7 @@ import React from "react";
 const RulezDocs: React.FC = () => {
   return (
     <div>
-      <h1>Rulez Documentation</h1>
+      <h2>Rulez</h2>
       <p>
         The Rulez engine in the Kasm SDK is used to detect unrealistic MIDI
         patterns that a human could not play on certain instruments.

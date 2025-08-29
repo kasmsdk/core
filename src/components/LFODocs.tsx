@@ -3,7 +3,7 @@ import React from "react";
 const LFODocs: React.FC = () => {
   return (
     <div>
-      <h1>LFO Documentation</h1>
+      <h2>LFO</h2>
       <p>
         The LFO (Low-Frequency Oscillator) engine in the Kasm SDK generates
         continuous MIDI CC messages for real-time modulation in Ableton Live or

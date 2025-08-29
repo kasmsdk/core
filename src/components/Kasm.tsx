@@ -10,6 +10,7 @@ import LooperDocs from './LooperDocs';
 import CanvasDocs from './CanvasDocs';
 import RulezDocs from './RulezDocs';
 import KrumhanselDocs from './KrumhanselDocs';
+import './Kasm.css';
 
 interface KasmProps {
   onNavigate: (app: string) => void;
@@ -93,43 +94,41 @@ export default function Kasm({ onNavigate }: KasmProps) {
               <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
                 🎹 <br/>Emanator
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('emanator')}>📖 <br/>Emanator Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('emanator')}>📖 <br/>Emanator<br/>Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('bangaz')}>
                 🎹 <br/>Bangaz
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('bangaz')}>📖 <br/>Bangaz Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('bangaz')}>📖 <br/>Bangaz<br/>Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
                 🎹 <br/>Arpy
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('arpy')}>📖 <br/>Arpy Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('arpy')}>📖 <br/>Arpy<br/>Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('triggaz')}>
                 🎹 <br/>Triggaz
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('triggaz')}>📖 <br/>Triggaz Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('triggaz')}>📖 <br/>Triggaz<br/>Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('lfo')}>
                 🎹 <br/>MIDI LFO
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('lfo')}>📖 <br/>LFO Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('lfo')}>📖 <br/>LFO<br/>Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('looper')}>
                 🎹 <br/>MIDI Looper
               </button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('looper')}>📖 <br/>Looper Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('looper')}>📖 <br/>Looper<br/>Docs</button>
             </div>
-            <div className="kasm-demo-buttons-group">
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('canvas')}>📖 <br/>Canvas Docs</button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>📖 <br/>Rulez Docs</button>
-              <button className="kasm-demo-btn" onClick={() => setActiveSection('krumhansel')}>📖 <br/>Krumhansel Docs</button>
-            </div>
+            <button className="kasm-demo-btn" onClick={() => setActiveSection('canvas')}>📖 <br/>Canvas<br/>Docs</button>
+            <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>📖 <br/>Rulez<br/>Docs</button>
+            <button className="kasm-demo-btn" onClick={() => setActiveSection('krumhansel')}>📖 <br/>Key/Chord<br/>Docs</button>
           </div>
         </nav>
       </div>
@@ -138,7 +137,6 @@ export default function Kasm({ onNavigate }: KasmProps) {
       {activeSection === 'whatsnew' && <NewsNewFeatures />}
 
       <div className="kasm-docs-section">
-        <hr />
         {/* Show doc page only if activeSection is a docPage */}
         {activeSection !== 'whatsnew' && renderDocPage(activeSection as DocPage)}
       </div>
