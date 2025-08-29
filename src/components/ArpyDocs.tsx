@@ -8,10 +8,6 @@ const ArpyDocs: React.FC = () => {
         Arpy is the arpeggiator engine in the Kasm SDK. It provides a powerful
         and flexible way to create complex arpeggios and sequences.
       </p>
-      <p>
-        This documentation will cover the different arpeggiator modes, how to
-        use them, and how to create custom arpeggios.
-      </p>
 
       <h2>How to Use Arpy</h2>
       <p>

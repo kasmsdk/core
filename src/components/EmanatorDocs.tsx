@@ -8,10 +8,6 @@ const EmanatorDocs: React.FC = () => {
         Emanators are a core feature of the Kasm SDK. They are responsible for
         generating and transforming MIDI data in various ways.
       </p>
-      <p>
-        This documentation will cover the different types of emanators
-        available, how to use them, and how to create your own.
-      </p>
 
       <h2>How to Use Emanators</h2>
       <p>

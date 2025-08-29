@@ -9,10 +9,6 @@ const CanvasDocs: React.FC = () => {
         MIDI data. It provides a way to draw and animate graphics in response to
         MIDI events.
       </p>
-      <p>
-        This documentation will explain how to use the Canvas to create your own
-        custom visualizers.
-      </p>
 
       <h2>How the Canvas Works</h2>
       <p>

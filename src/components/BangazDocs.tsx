@@ -8,10 +8,6 @@ const BangazDocs: React.FC = () => {
         Bangaz is the drum pattern generator in the Kasm SDK. It allows you to
         create and play a variety of drum beats and rhythms.
       </p>
-      <p>
-        This documentation will cover the different drum kits, how to create
-        patterns, and how to integrate Bangaz into your projects.
-      </p>
 
       <h2>How to Use Bangaz</h2>
       <p>

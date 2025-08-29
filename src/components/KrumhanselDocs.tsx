@@ -8,10 +8,6 @@ const KrumhanselDocs: React.FC = () => {
         The Krumhansel mechanism in the Kasm SDK is used to detect the scale,
         key, and chords being played in real-time.
       </p>
-      <p>
-        This documentation will explain how the Krumhansel algorithm works and
-        how you can use it to get harmonic information from a MIDI stream.
-      </p>
 
       <h2>How the Krumhansel Algorithm Works</h2>
       <p>
