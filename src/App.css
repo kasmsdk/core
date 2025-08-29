@@ -1,5 +1,5 @@
 /* Import Varela Round font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
 
 /* Pyrmont Sandstone Theme - Complete Site Redesign */
 
@@ -7,30 +7,43 @@
 :root {
   /* Sandstone theme colors from image */
   --sandstone-base: #fefefe;
-  --sandstone-light: #FFF6B0;
-  --sandstone-dark: #C7B200;
+  --sandstone-light: #fff6b0;
+  --sandstone-dark: #c7b200;
   --sandstone-iron: #1e1c1b;
-  --sandstone-shadow: #4A4844;
-  --sandstone-accent: #FFD600;
-  --sandstone-highlight: #FFF6B0;
-  --sandstone-muted: #B8A082;
+  --sandstone-shadow: #4a4844;
+  --sandstone-accent: #ffd600;
+  --sandstone-highlight: #fff6b0;
+  --sandstone-muted: #b8a082;
   --sandstone-text: var(--sandstone-base);
   --sandstone-text-light: #ffff99;
   --sandstone-text-muted: #fffec0;
-  --sandstone-hover: #FFF6B0;
-  --sandstone-active: #FFD600;
-  --sandstone-focus: #FFE12A;
-  --sandstone-surface-1: #6A6762;
-  --sandstone-surface-2: #4A4844;
-  --sandstone-surface-3: #B8A082;
-  --sandstone-surface-4: #C7B200;
-  --sandstone-surface-5: #FFD600;
-  --sandstone-link: #FFF6B0;
+  --sandstone-hover: #fff6b0;
+  --sandstone-active: #ffd600;
+  --sandstone-focus: #ffe12a;
+  --sandstone-surface-1: #6a6762;
+  --sandstone-surface-2: #4a4844;
+  --sandstone-surface-3: #b8a082;
+  --sandstone-surface-4: #c7b200;
+  --sandstone-surface-5: #ffd600;
+  --sandstone-link: #fff6b0;
 
   /* Gradients */
-  --sandstone-gradient-primary: linear-gradient(135deg, var(--sandstone-light) 0%, var(--sandstone-base) 50%, var(--sandstone-dark) 100%);
-  --sandstone-gradient-accent: linear-gradient(135deg, var(--sandstone-accent) 0%, var(--sandstone-iron) 100%);
-  --sandstone-gradient-surface: linear-gradient(180deg, var(--sandstone-surface-1) 0%, var(--sandstone-surface-3) 100%);
+  --sandstone-gradient-primary: linear-gradient(
+    135deg,
+    var(--sandstone-light) 0%,
+    var(--sandstone-base) 50%,
+    var(--sandstone-dark) 100%
+  );
+  --sandstone-gradient-accent: linear-gradient(
+    135deg,
+    var(--sandstone-accent) 0%,
+    var(--sandstone-iron) 100%
+  );
+  --sandstone-gradient-surface: linear-gradient(
+    180deg,
+    var(--sandstone-surface-1) 0%,
+    var(--sandstone-surface-3) 100%
+  );
 
   /* Shadows with sandstone tones */
   --sandstone-shadow-sm: 0 2px 4px rgba(140, 120, 83, 0.1);
@@ -39,25 +52,66 @@
   --sandstone-shadow-xl: 0 16px 32px rgba(140, 120, 83, 0.25);
 
   /* Authentic Pyrmont sandstone texture patterns - 1880s block structure */
-  --sandstone-texture-fine:
-    radial-gradient(ellipse at 25% 75%, rgba(174, 132, 89, 0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 75% 25%, rgba(148, 122, 81, 0.06) 0%, transparent 35%),
-    radial-gradient(circle at 50% 50%, rgba(209, 173, 115, 0.04) 0%, transparent 30%),
+  --sandstone-texture-fine: radial-gradient(
+      ellipse at 25% 75%,
+      rgba(174, 132, 89, 0.08) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 75% 25%,
+      rgba(148, 122, 81, 0.06) 0%,
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(209, 173, 115, 0.04) 0%,
+      transparent 30%
+    ),
     linear-gradient(0deg, rgba(122, 100, 66, 0.02) 0%, transparent 100%);
 
-  --sandstone-texture-coarse:
-    repeating-linear-gradient(0deg, transparent 0px, transparent 8px, rgba(122, 100, 66, 0.04) 8px, rgba(122, 100, 66, 0.04) 12px),
-    repeating-linear-gradient(90deg, transparent 0px, transparent 15px, rgba(184, 158, 122, 0.03) 15px, rgba(184, 158, 122, 0.03) 18px),
-    radial-gradient(ellipse at 30% 70%, rgba(174, 132, 89, 0.05) 0%, transparent 50%);
+  --sandstone-texture-coarse: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(122, 100, 66, 0.04) 8px,
+      rgba(122, 100, 66, 0.04) 12px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 15px,
+      rgba(184, 158, 122, 0.03) 15px,
+      rgba(184, 158, 122, 0.03) 18px
+    ),
+    radial-gradient(
+      ellipse at 30% 70%,
+      rgba(174, 132, 89, 0.05) 0%,
+      transparent 50%
+    );
 
   /* Authentic stone block pattern */
-  --sandstone-blocks:
-    linear-gradient(0deg, rgba(122, 100, 66, 0.15) 0%, rgba(122, 100, 66, 0.15) 2px, transparent 2px, transparent 100%),
-    linear-gradient(90deg, rgba(122, 100, 66, 0.12) 0%, rgba(122, 100, 66, 0.12) 1px, transparent 1px, transparent 100%);
+  --sandstone-blocks: linear-gradient(
+      0deg,
+      rgba(122, 100, 66, 0.15) 0%,
+      rgba(122, 100, 66, 0.15) 2px,
+      transparent 2px,
+      transparent 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(122, 100, 66, 0.12) 0%,
+      rgba(122, 100, 66, 0.12) 1px,
+      transparent 1px,
+      transparent 100%
+    );
 
   /* Fluid, responsive font size scheme */
   --font-size-base: clamp(15px, 2vw + 1vh, 20px); /* Fluid base font size */
-  --font-size-paragraph: clamp(0.85rem, 1.5vw, 1.05rem); /* Fluid paragraph font size */
+  --font-size-paragraph: clamp(
+    0.85rem,
+    1.5vw,
+    1.05rem
+  ); /* Fluid paragraph font size */
 }
 
 /* Responsive font size for different devices */
@@ -153,7 +207,7 @@
   font-size: 1.75rem;
   font-weight: 800;
   color: var(--sandstone-base);
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.45), 0 0 2px #fff600;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -323,7 +377,7 @@
 .session-info h3 {
   margin: 0 0 0.75rem 0;
   color: var(--sandstone-base);
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.45), 0 0 2px #fff600;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.45), 0 0 2px #fff600;
   font-size: 1.2rem;
   font-weight: 700;
 }
@@ -384,8 +438,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* AR Section - Sandstone Theme */
@@ -605,10 +663,10 @@
 /* High contrast mode - Enhanced for sandstone */
 @media (prefers-contrast: high) {
   :root {
-    --sandstone-text: #2A1F0D;
-    --sandstone-text-light: #3F2F1A;
-    --sandstone-surface-1: #FFFFFF;
-    --sandstone-surface-2: #F5F5F5;
+    --sandstone-text: #2a1f0d;
+    --sandstone-text-light: #3f2f1a;
+    --sandstone-surface-1: #ffffff;
+    --sandstone-surface-2: #f5f5f5;
   }
 }
 
@@ -677,13 +735,18 @@ button {
 }
 
 button::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -698,24 +761,34 @@ button:hover::before {
 }
 
 .loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, var(--sandstone-highlight), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--sandstone-highlight),
+    transparent
+  );
   animation: loading-shimmer 2s infinite;
 }
 
 @keyframes loading-shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 /* Sandstone-specific animations */
 @keyframes sandstone-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: var(--sandstone-shadow-md);
   }
   50% {
@@ -733,7 +806,7 @@ button:hover::before {
 }
 
 .sandstone-texture::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -759,7 +832,7 @@ h1 {
   margin-top: 28px;
   color: var(--sandstone-focus, #333);
   background: none;
-  text-shadow: -1px 2px 0 rgba(50,50,20,0.95);
+  text-shadow: -1px 2px 0 rgba(50, 50, 20, 0.95);
 }
 
 .kasm-landing-container {
@@ -769,15 +842,16 @@ h1 {
 }
 
 p {
-  background: linear-gradient(rgba(34,34,34,0.2), rgba(34,34,34,0.2)), url('./assets/textures/metallic.png');
+  background: linear-gradient(rgba(34, 34, 34, 0.2), rgba(34, 34, 34, 0.2)),
+    url("./assets/textures/metallic.png");
   background-repeat: repeat;
   background-size: auto;
   background-position: center;
   border-radius: 12px;
-  box-shadow:
-    inset 2px 4px 12px rgba(0,0,0,0.35), /* deep inner shadow for sunken effect */
-    inset -2px -4px 8px rgba(255,255,255,0.08), /* subtle highlight for realism */
-    0 1px 2px rgba(0,0,0,0.10); /* soft outer shadow for separation */
+  box-shadow: inset 2px 4px 12px rgba(0, 0, 0, 0.35),
+    /* deep inner shadow for sunken effect */ inset -2px -4px 8px
+      rgba(255, 255, 255, 0.08),
+    /* subtle highlight for realism */ 0 1px 2px rgba(0, 0, 0, 0.1); /* soft outer shadow for separation */
   border: 1.5px solid #444;
   padding: 1.25rem 1.5rem;
   margin: 1.5rem 0;
@@ -785,7 +859,7 @@ p {
   color: var(--sandstone-base, #eaeaea);
   font-size: 1.05rem;
   line-height: 1.7;
-  text-shadow: -1px 1px 0 rgba(20,20,20,0.95);
+  text-shadow: -1px 1px 0 rgba(20, 20, 20, 0.95);
 }
 
 .kasm-demo-btn {
@@ -801,18 +875,16 @@ p {
   font-size: 0.8em;
   font-weight: 900;
   color: #eaeaea;
-  background:
-    radial-gradient(circle at 60% 40%, #888 60%, #999 100%),
-    url('./assets/textures/plasticy.png'); /* worn plastic texture overlay */
+  background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%),
+    url("./assets/textures/plasticy.png"); /* worn plastic texture overlay */
   background-blend-mode: multiply;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
   border: 3.5px solid #222;
   border-radius: 0.6em;
-  box-shadow:
-    0 4px 16px rgba(0,0,0,0.2), /* softer outer shadow for raised effect */
-    0 1px 0 #888 inset, /* subtle inner highlight for bevel */
-    0 0 0 4px #555 inset; /* dark inner edge for depth */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
+    /* softer outer shadow for raised effect */ 0 1px 0 #888 inset,
+    /* subtle inner highlight for bevel */ 0 0 0 4px #555 inset; /* dark inner edge for depth */
   text-shadow: 0 1px 0 #222;
   transition: box-shadow 0.2s, background 0.2s, transform 0.1s;
   cursor: pointer;
@@ -821,28 +893,23 @@ p {
   filter: blur(0.2px) contrast(0.98); /* slight wear effect */
 }
 .kasm-demo-btn:hover {
-  background:
-    radial-gradient(circle at 60% 40%, #999 60%, #888 100%),
-    url('./assets/textures/plasticy.png');
+  background: radial-gradient(circle at 60% 40%, #999 60%, #888 100%),
+    url("./assets/textures/plasticy.png");
   background-blend-mode: multiply;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
-  box-shadow:
-          0 4px 16px rgba(0,0,0,0.2), /* softer outer shadow for raised effect */
-    0 2px 0 #fff inset,
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
+    /* softer outer shadow for raised effect */ 0 2px 0 #fff inset,
     0 0 0 6px #ddd inset;
   transform: translateY(-2px) scale(1.01);
 }
 .kasm-demo-btn:active {
-  background:
-    radial-gradient(circle at 60% 40%, #555 60%, #333 100%),
-    url('./assets/textures/plasticy.png');
+  background: radial-gradient(circle at 60% 40%, #555 60%, #333 100%),
+    url("./assets/textures/plasticy.png");
   background-blend-mode: multiply;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,0.18),
-    0 1px 0 #ff0 inset,
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), 0 1px 0 #ff0 inset,
     0 0 0 4px #222 inset;
   transform: translateY(2px) scale(0.8);
 }
@@ -883,4 +950,71 @@ ul {
 
 a {
   color: var(--sandstone-link, #333);
+}
+
+/* Docs Page Styles */
+.docs-container {
+  padding: 2rem;
+  background: var(--sandstone-surface-1);
+  background-image: var(--sandstone-texture-coarse);
+  color: var(--sandstone-text);
+}
+
+.docs-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.docs-nav button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--sandstone-muted);
+  border-radius: 8px;
+  background: var(--sandstone-surface-2);
+  color: var(--sandstone-text);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.docs-nav button:hover {
+  background: var(--sandstone-hover);
+  border-color: var(--sandstone-accent);
+}
+
+.docs-nav button.active {
+  background: var(--sandstone-gradient-accent);
+  border-color: var(--sandstone-iron);
+  color: var(--sandstone-light);
+}
+
+.docs-content h1,
+.docs-content h2,
+.docs-content h3 {
+  color: var(--sandstone-base);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.docs-content pre {
+  background: var(--sandstone-iron);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  color: var(--sandstone-text-light);
+}
+
+.docs-content code {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.docs-content ul {
+  list-style-type: disc;
+  padding-left: 2rem;
+}
+
+.docs-content li {
+  margin-bottom: 0.5rem;
 }
