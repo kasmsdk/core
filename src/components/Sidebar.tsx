@@ -57,12 +57,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             icon: "🎹",
             description: "Low Frequecy Oscillators editor",
           },
-          {
-            id: "docs",
-            label: "Docs",
-            icon: "📚",
-            description: "Kasm SDK Documentation",
-          },
         ];
     }
   };

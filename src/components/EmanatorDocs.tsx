@@ -18,7 +18,6 @@ const EmanatorDocs: React.FC = () => {
         Emanators are executed using the <code>execute_emanator</code> function
         in your Rust code. You provide the index of the emanator you want to
         use, along with various MIDI and control parameters.
-      </p>
       <pre>
         <code>
           {`
@@ -42,6 +41,7 @@ fn play_midi_note(note: i32, velocity: i32) {
 `}
         </code>
       </pre>
+      </p>
 
       <h2>Emanator Categories</h2>
       <p>Emanators are organized into the following categories:</p>
@@ -50,7 +50,6 @@ fn play_midi_note(note: i32, velocity: i32) {
       <p>
         Harmonic emanators focus on generating harmonic content, such as chord
         progressions and harmonic series.
-      </p>
       <ul>
         <li>
           <strong>Chord Progression:</strong> Classic chord progressions with
@@ -67,11 +66,11 @@ fn play_midi_note(note: i32, velocity: i32) {
           extensions and rhythmic variations.
         </li>
       </ul>
+      </p>
 
       <h3>Rhythmic Emanators</h3>
       <p>
         Rhythmic emanators focus on generating rhythmic and percussive patterns.
-      </p>
       <ul>
         <li>
           <strong>Morse Code:</strong> Morse code patterns with rhythmic timing.
@@ -123,12 +122,12 @@ fn play_midi_note(note: i32, velocity: i32) {
           <strong>Afro-Cuban 6/8 bell:</strong> Afro-Cuban 6/8 bell.
         </li>
       </ul>
+      </p>
 
       <h3>Melodic Emanators</h3>
       <p>
         Melodic emanators focus on generating simple melodic patterns and
         sequences.
-      </p>
       <ul>
         <li>
           <strong>Phone Ringtone:</strong> Classic phone ringtone melody with
@@ -147,12 +146,12 @@ fn play_midi_note(note: i32, velocity: i32) {
           rhythmic variations.
         </li>
       </ul>
+      </p>
 
       <h3>Progression Emanators</h3>
       <p>
         Progression emanators generate musical progressions, including classic
         cadences and more complex harmonic sequences.
-      </p>
       <ul>
         <li>
           <strong>Circle of Fifths:</strong> Circle of Fifths progression with
@@ -186,12 +185,12 @@ fn play_midi_note(note: i32, velocity: i32) {
           <strong>Augmented Sixth:</strong> Augmented sixth progression.
         </li>
       </ul>
+      </p>
 
       <h3>Responsorial Chant Emanators</h3>
       <p>
         Responsorial chant emanators generate call and response patterns
         inspired by Gregorian chant and other responsorial traditions.
-      </p>
       <ul>
         <li>
           <strong>Chant Dorian Call-Response:</strong> Call and response in
@@ -212,9 +211,10 @@ fn play_midi_note(note: i32, velocity: i32) {
           <strong>Chant Antiphonal:</strong> Antiphonal (alternating) chant.
         </li>
       </ul>
+      </p>
 
       <h3>Spatial Emanators</h3>
-      <p>Spatial emanators focus on creating spatial and panning effects.</p>
+      <p>Spatial emanators focus on creating spatial and panning effects.
       <ul>
         <li>
           <strong>Harmonic Resonance:</strong> Harmonic series with spatial
@@ -230,12 +230,11 @@ fn play_midi_note(note: i32, velocity: i32) {
           <strong>3D Positioning:</strong> Simulated 3D spatial positioning.
         </li>
       </ul>
-
+      </p>
       <h3>Mathematical Emanators</h3>
       <p>
         Mathematical emanators use algorithmic and mathematical patterns to
         generate MIDI.
-      </p>
       <ul>
         <li>
           <strong>Fibonacci Spiral:</strong> Fibonacci timing with golden ratio
@@ -254,9 +253,10 @@ fn play_midi_note(note: i32, velocity: i32) {
           chaos theory.
         </li>
       </ul>
+      </p>
 
       <h3>Experimental Emanators</h3>
-      <p>Experimental emanators explore chaotic and unconventional patterns.</p>
+      <p>Experimental emanators explore chaotic and unconventional patterns.
       <ul>
         <li>
           <strong>Multidimensional Markov:</strong> Multi-dimensional Markov
@@ -313,6 +313,7 @@ fn play_midi_note(note: i32, velocity: i32) {
           patterns.
         </li>
       </ul>
+      </p>
     </div>
   );
 };

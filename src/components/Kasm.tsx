@@ -1,9 +1,32 @@
+import { useState } from 'react';
 import NewsNewFeatures from './NewsNewFeatures';
 import LatestDemo from './LatestDemo';
+import EmanatorDocs from './EmanatorDocs';
+import ArpyDocs from './ArpyDocs';
+import BangazDocs from './BangazDocs';
+import TriggazDocs from './TriggazDocs';
+import LFODocs from './LFODocs';
+import LooperDocs from './LooperDocs';
+import CanvasDocs from './CanvasDocs';
+import RulezDocs from './RulezDocs';
+import KrumhanselDocs from './KrumhanselDocs';
 
 interface KasmProps {
   onNavigate: (app: string) => void;
 }
+
+// Add type for active section
+
+type DocPage =
+  | 'emanator'
+  | 'arpy'
+  | 'bangaz'
+  | 'triggaz'
+  | 'canvas'
+  | 'rulez'
+  | 'krumhansel';
+
+type ActiveSection = 'whatsnew' | DocPage;
 
 export default function Kasm({ onNavigate }: KasmProps) {
   // Helper to generate a random offset for the background texture
@@ -11,6 +34,34 @@ export default function Kasm({ onNavigate }: KasmProps) {
     const x = Math.floor(Math.random() * 200); // px
     const y = Math.floor(Math.random() * 200); // px
     return `${x}px ${y}px`;
+  }
+
+  // Use activeSection state instead of docPage
+  const [activeSection, setActiveSection] = useState<ActiveSection>('whatsnew');
+
+  function renderDocPage(page: DocPage) {
+    switch (page) {
+      case 'emanator':
+        return <EmanatorDocs />;
+      case 'arpy':
+        return <ArpyDocs />;
+      case 'bangaz':
+        return <BangazDocs />;
+      case 'triggaz':
+        return <TriggazDocs />;
+      case 'canvas':
+        return <CanvasDocs />;
+      case 'rulez':
+        return <RulezDocs />;
+      case 'krumhansel':
+        return <KrumhanselDocs />;
+      case 'lfo':
+        return <LFODocs />;
+      case 'looper':
+        return <LooperDocs />;
+      default:
+        return <EmanatorDocs />;
+    }
   }
 
   return (
@@ -27,29 +78,72 @@ export default function Kasm({ onNavigate }: KasmProps) {
         sharing of editor tools to support the many different use cases and musical genres
       </p>
       <div style={{ backgroundPosition: getRandomOffset() }}>
-        <div className="kasm-demo-buttons">
-          <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
-            🎹 <br/>Emanator
-          </button>
-          <button className="kasm-demo-btn" onClick={() => onNavigate('bangaz')}>
-            🎹 <br/>Bangaz
-          </button>
-          <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
-            🎹 <br/>Arpy
-          </button>
-          <button className="kasm-demo-btn" onClick={() => onNavigate('triggaz')}>
-            🎹 <br/>Triggaz
-          </button>
-          <button className="kasm-demo-btn" onClick={() => onNavigate('lfo')}>
-            🎹 <br/>MIDI LFO
-          </button>
-          <button className="kasm-demo-btn" onClick={() => onNavigate('looper')}>
-            🎛️ <br/>MIDI Looper
-          </button>
-        </div>
+        <nav>
+          Editors:
+
+          <div className="kasm-demo-buttons">
+            <div className="kasm-demo-buttons-group">
+              {/* What's new button */}
+              <button
+                className={`kasm-demo-btn${activeSection === 'whatsnew' ? ' active' : ''}`}
+                onClick={() => setActiveSection('whatsnew')}
+              >
+                📰 <br />What's new
+              </button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
+                🎹 <br/>Emanator
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('emanator')}>Emanator Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('bangaz')}>
+                🎹 <br/>Bangaz
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('bangaz')}>Bangaz Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('arpy')}>
+                🎹 <br/>Arpy
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('arpy')}>Arpy Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('triggaz')}>
+                🎹 <br/>Triggaz
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('triggaz')}>Triggaz Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('lfo')}>
+                🎹 <br/>MIDI LFO
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('lfo')}>LFO Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('looper')}>
+                🎛️ <br/>MIDI Looper
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('looper')}>Looper Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('canvas')}>Canvas Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>Rulez Docs</button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('krumhansel')}>Krumhansel Docs</button>
+            </div>
+          </div>
+        </nav>
       </div>
 
-      <NewsNewFeatures />
+      {/* Show NewsNewFeatures only if activeSection is 'whatsnew' */}
+      {activeSection === 'whatsnew' && <NewsNewFeatures />}
+
+      <div className="kasm-docs-section">
+        <hr />
+        {/* Show doc page only if activeSection is a docPage */}
+        {activeSection !== 'whatsnew' && renderDocPage(activeSection as DocPage)}
+      </div>
 
       <LatestDemo />
     </div>

@@ -45,7 +45,7 @@ fn setup_drum_machine() {
       </pre>
 
       <h2>Drum Kits</h2>
-      <p>Bangaz supports several drum kit layouts:</p>
+      <p>Bangaz supports several drum kit layouts:
       <ul>
         <li>
           <strong>Ableton Drum Rack:</strong> The default layout for Ableton's
@@ -63,12 +63,12 @@ fn setup_drum_machine() {
           <strong>Shuffle:</strong> A randomized drum kit layout.
         </li>
       </ul>
+      </p>
 
       <h2>Drum Patterns</h2>
       <p>
         Bangaz includes a variety of built-in drum patterns, from simple to
         complex:
-      </p>
       <ul>
         <li>Four-to-the-floor kick</li>
         <li>Kick and snare backbeat</li>
@@ -77,6 +77,7 @@ fn setup_drum_machine() {
         <li>Polyrhythmic patterns with toms and percussion</li>
         <li>And many more, accessible through the emanator system.</li>
       </ul>
+      </p>
     </div>
   );
 };

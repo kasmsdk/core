@@ -17,7 +17,6 @@ import Looper from "./components/Looper";
 import Canvas from "./components/Canvas";
 import Krumhansel from "./components/Krumhansel";
 import JogCanvas from "../latest/JogCanvas";
-import Docs from "./components/Docs";
 import "./App.css";
 
 function App() {
@@ -34,7 +33,6 @@ function App() {
     | "jog"
     | "canvas"
     | "krumhansel"
-    | "docs"
   >("kasm");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -55,7 +53,6 @@ function App() {
         "jog",
         "canvas",
         "krumhansel",
-        "docs",
       ].includes(appParam)
     ) {
       setCurrentApp(appParam as typeof currentApp);
@@ -162,7 +159,6 @@ function App() {
           {currentApp === "jog" && <JogCanvas />}
           {currentApp === "canvas" && <Canvas />}
           {currentApp === "krumhansel" && <Krumhansel />}
-          {currentApp === "docs" && <Docs />}
         </div>
       </div>
     </>
