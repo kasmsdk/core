@@ -81,7 +81,7 @@ export default function Kasm({ onNavigate }: KasmProps) {
         sharing of editor tools to support the many different use cases and musical genres
       </p>
       <div style={{ backgroundPosition: getRandomOffset() }}>
-        <nav>
+        <div className="kasmnav">
           <div className="kasm-demo-buttons">
             <div className="kasm-demo-buttons-group">
               {/* What's new button */}
@@ -91,6 +91,7 @@ export default function Kasm({ onNavigate }: KasmProps) {
               >
                 📰 <br />What's<br/>New
               </button>
+              <button className="kasm-demo-btn" onClick={() => window.open('/latest/docs/index.html', '_blank')}>📖 <br/>Kasm Rust<br/>Crate</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
@@ -132,7 +133,7 @@ export default function Kasm({ onNavigate }: KasmProps) {
             <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>📖 <br/>Rulez<br/>Docs</button>
             <button className="kasm-demo-btn" onClick={() => setActiveSection('krumhansel')}>📖 <br/>Key/Chord<br/>Docs</button>
           </div>
-        </nav>
+        </div>
       </div>
 
       {/* Show NewsNewFeatures only if activeSection is 'whatsnew' */}

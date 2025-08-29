@@ -1,15 +1,19 @@
 /* Responsive navigation for Kasm component */
-nav {
+.kasmnav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
   width: 100%;
-  border: none !important;
+  margin: 0;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
 }
 
 .kasm-demo-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   gap: 0.5rem;
-  width: 100%;
   border: none !important;
 }
 
@@ -33,10 +37,20 @@ nav {
 }
 
 @media (max-width: 600px) {
+  .kasmnav {
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
   .kasm-demo-buttons {
     flex-direction: column;
     align-items: stretch;
-    overflow-x: auto;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
   }
   .kasm-demo-buttons-group {
     flex-direction: row;
@@ -50,6 +64,9 @@ nav {
     max-height: 80px;
     aspect-ratio: 1/1;
     font-size: 0.95rem;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 }
 
