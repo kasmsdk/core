@@ -91,7 +91,7 @@ export default function Kasm({ onNavigate }: KasmProps) {
               >
                 📰 <br />What's<br/>New
               </button>
-              <button className="kasm-demo-btn" onClick={() => window.open('/latest/docs/index.html', '_blank')}>📖 <br/>Kasm Rust<br/>Crate</button>
+              <button className="kasm-demo-btn" onClick={() => window.open('/latest/kasm_ableton_rust/index.html', '_blank')}>📖 <br/>Kasm Rust<br/>Crate</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('emanator')}>
