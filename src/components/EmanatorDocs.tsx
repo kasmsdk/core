@@ -17,30 +17,174 @@ const EmanatorDocs: React.FC = () => {
       <pre>
         <code>
           {`
-// Rust example of executing an emanator
-use kasm_sdk::emanators::{execute_emanator};
+/// Morse Code repeater with rhythmic patterns
+pub fn rhythmic_morse_code(
+    note: i32,
+    offset: i32,
+    velocity: i32,
+    enc1_velocity_offset: i32,
+    enc2_intensity: i32,
+    _time_step: i32,
+    _time_bar: i32,
+) -> i32 {
+    let root_note = (note + offset).max(0).min(127);
+    let base_velocity = (velocity + (enc1_velocity_offset / 10)).max(30).min(127);
+    let intensity_factor = enc2_intensity.max(1).min(127) as f32 / 32.0;
 
-fn play_midi_note(note: i32, velocity: i32) {
-    // Execute the first emanator in the registry
-    let transformed_note = execute_emanator(
-        0,       // Emanator index
-        note,    // Inlet 0: MIDI note
-        0,       // Inlet 1: Semitone offset
-        velocity,// Inlet 2: Velocity
-        64,      // Inlet 3: Encoder 1
-        64,      // Inlet 4: Encoder 2
-        0,       // Time step
-        0        // Time bar
-    );
-    // The transformed_note can then be sent as MIDI output
+    // Morse code patterns for different notes
+    let morse_alphabet = [
+        ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---",
+        "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-",
+        "..-", "...-", ".--", "-..-", "-.--", "--..",
+    ];
+
+    let morse_index = ((root_note + enc1_velocity_offset) as usize) % morse_alphabet.len();
+    let morse_pattern = morse_alphabet[morse_index];
+
+    let dot_duration = (120.0 * intensity_factor) as i32;
+    let dash_duration = (360.0 * intensity_factor) as i32;
+    let element_gap = (120.0 * intensity_factor) as i32;
+
+    let mut current_delay = 0;
+    let total_elements = morse_pattern.len();
+    
+    for (i, morse_char) in morse_pattern.chars().enumerate() {
+        let pan_angle = (i as f32 / total_elements as f32) * 2.0 * std::f32::consts::PI;
+        let pan_position = ((pan_angle.cos() + 1.0) * 63.5) as i32;
+
+        let (duration, pitch_offset) = match morse_char {
+            '.' => (dot_duration, 0),
+            '-' => (dash_duration, 12),
+            _ => continue,
+        };
+
+        let morse_note = (root_note + pitch_offset).max(0).min(127);
+        let morse_velocity = (base_velocity as f32 * (0.8 + 0.4 * intensity_factor)) as i32;
+
+        send_note(
+            morse_note,
+            morse_velocity.max(30).min(127),
+            current_delay,
+            duration,
+            pan_position,
+        );
+
+        current_delay += duration + element_gap;
+    }
+
+    root_note
+}
+`}
+
+        </code>
+      </pre>
+      </p>
+<p><pre><code>
+  {`/// Simple first-order Markov chain with basic note transitions
+pub fn rhythmic_markov_chain(
+    note: i32,
+    offset: i32,
+    velocity: i32,
+    enc1_intensity: i32,
+    enc2_complexity: i32,
+    _time_step: i32,
+    _time_bar: i32,
+) -> i32 {
+    let root_note = (note + offset).max(0).min(127);
+    let intensity_factor = (enc1_intensity.max(50).min(127) as f64 + 50.0) / 127.0;
+    let complexity_factor = (enc2_complexity.max(40).min(127) as f64 + 40.0) / 127.0;
+
+    // Simple first-order Markov transition matrix
+    let transition_matrix = [
+        [0.3, 0.2, 0.2, 0.1, 0.1, 0.05, 0.03, 0.02],
+        [0.2, 0.1, 0.3, 0.2, 0.1, 0.05, 0.03, 0.02],
+        [0.15, 0.2, 0.2, 0.2, 0.15, 0.05, 0.03, 0.02],
+        [0.1, 0.15, 0.2, 0.2, 0.2, 0.1, 0.03, 0.02],
+        [0.2, 0.1, 0.15, 0.15, 0.2, 0.15, 0.03, 0.02],
+        [0.15, 0.1, 0.1, 0.15, 0.2, 0.2, 0.08, 0.02],
+        [0.3, 0.15, 0.1, 0.1, 0.15, 0.15, 0.03, 0.02],
+        [0.4, 0.2, 0.15, 0.1, 0.1, 0.03, 0.01, 0.01],
+    ];
+
+    let intervals = [0, 2, 4, 5, 7, 9, 11, 12];
+    let sequence_length = (12.0 + complexity_factor * 8.0) as usize;
+    let mut current_state = 0;
+
+    for step in 0..sequence_length {
+        let note_interval = intervals[current_state];
+        let sequence_note = (root_note + note_interval).max(0).min(127);
+
+        let base_delay = (step as f64 * 400.0 * intensity_factor) as i32;
+        let ripple_delay = ((step as f64 * 0.3).sin() * 100.0) as i32;
+        let final_delay = base_delay + ripple_delay;
+
+        let base_velocity = (velocity as f64 * (0.8 + 0.2 * intensity_factor)) as i32;
+        let velocity_variation = ((step as f64 * 0.7).sin() * 15.0) as i32;
+        let sequence_velocity = (base_velocity + velocity_variation).max(40).min(100);
+
+        let duration = (500.0 + (step as f64 * 0.2).cos() * 200.0) as i32;
+        let final_duration = duration.max(300);
+
+        let pan_position = ((step as f64 * 0.1).sin() * 30.0 + 64.0) as i32;
+
+        send_note(
+            sequence_note,
+            sequence_velocity,
+            final_delay,
+            final_duration,
+            pan_position,
+        );
+
+        // Determine next state using Markov probabilities
+        let random_value = ((step * 17 + current_state * 23) % 1000) as f64 / 1000.0;
+        let mut cumulative_prob = 0.0;
+        let mut next_state = 0;
+
+        for (state, &prob) in transition_matrix[current_state].iter().enumerate() {
+            cumulative_prob += prob;
+            if random_value <= cumulative_prob {
+                next_state = state;
+                break;
+            }
+        }
+        current_state = next_state;
+    }
+
+    root_note
 }
 `}
         </code>
       </pre>
       </p>
 
+      <p>The emanator.rs contains a simple registry, to add your new emanators to it simply adda short description and you added functions, e.g.<pre><code>
+  {`
+  pub fn get_emanator_infos() -> Vec<EmanatorInfo> {
+      vec![
+          EmanatorInfo {
+              emanator_idx: MAX4LIVE_UI_EMANATORS_OFFSET_RHYTHMIC,
+              name: "Morse Code",
+              description: "Morse code patterns with rhythmic timing",
+              category: EmanatorCategory::Rhythmic,
+              complexity: 4,
+              function: rhythmic_morse_code,
+          },
+          EmanatorInfo {
+            emanator_idx: MAX4LIVE_UI_EMANATORS_OFFSET_RHYTHMIC + 1,
+              name: "Markov Chain",
+              description: "Markov chain-based rhythmic patterns",
+              category: EmanatorCategory::Rhythmic,
+              complexity: 5,
+              function: rhythmic_markov_chain,
+          }, 
+          ...
+`}
+        </code>
+      </pre>
+      </p>
+
       <h2>Emanator Categories</h2>
-      <p>Emanators are organized into the following categories:</p>
+      <p>The Kasm SDK comes with a few example Emanators for some ideas to get you started, they are organized into the following categories:</p>
 
       <h3>Harmonic Emanators</h3>
       <p>

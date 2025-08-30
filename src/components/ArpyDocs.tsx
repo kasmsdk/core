@@ -15,7 +15,6 @@ const ArpyDocs: React.FC = () => {
         active, incoming MIDI note-on messages add notes to the arpeggiator's
         chord, and note-off messages remove them. The arpeggiator then generates
         a sequence based on the currently held notes and the selected mode.
-      </p>
       <pre>
         <code>
           {`
@@ -43,9 +42,10 @@ fn play_arpeggio() {
 `}
         </code>
       </pre>
+      </p>
 
       <h2>Arpeggiator Modes</h2>
-      <p>Arpy includes a wide variety of arpeggiator modes:</p>
+      <p>Arpy includes a wide variety of arpeggiator modes:<br/>
       <ul>
         <li>Up</li>
         <li>Down</li>
@@ -74,45 +74,9 @@ fn play_arpeggio() {
         <li>ThumbUpDown</li>
         <li>PinkyUp</li>
         <li>PinkyUpDown</li>
-        <li>CycleThirds</li>
-        <li>SkipOneUp</li>
-        <li>SkipOneDown</li>
-        <li>OuterToInner</li>
-        <li>InnerToOuter</li>
-        <li>ReverseFlow</li>
-        <li>StaggeredUp</li>
-        <li>StaggeredDown</li>
-        <li>Bounce</li>
-        <li>RandomSkip</li>
-        <li>ChordPulse</li>
-        <li>OctaveJumpUp</li>
-        <li>OctaveJumpDown</li>
-        <li>SpiralUp</li>
-        <li>SpiralDown</li>
-        <li>DoubleBackUp</li>
-        <li>DoubleBackDown</li>
-        <li>MirrorUp</li>
-        <li>MirrorDown</li>
-        <li>RandomMirror</li>
-        <li>ZigZagUp</li>
-        <li>ZigZagDown</li>
-        <li>ZigZagUpDown</li>
-        <li>ZigZagDownUp</li>
-        <li>SpiralIn</li>
-        <li>SpiralOut</li>
-        <li>SpiralInOut</li>
-        <li>SpiralOutIn</li>
-        <li>PinkyDown</li>
-        <li>PinkyDownUp</li>
-        <li>ThumbDown</li>
-        <li>ThumbDownUp</li>
-        <li>RandomOctave</li>
-        <li>RandomCycle</li>
-        <li>RandomCycleOctave</li>
-        <li>MonoBassline</li>
-        <li>ArcadeTrills</li>
-        <li>BouncingFunk</li>
+        ...
       </ul>
+      </p>
     </div>
   );
 };
