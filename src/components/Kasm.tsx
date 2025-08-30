@@ -9,6 +9,7 @@ import LooperDocs from './LooperDocs';
 import CanvasDocs from './CanvasDocs';
 import RulezDocs from './RulezDocs';
 import KrumhanselDocs from './KrumhanselDocs';
+import KasmBuyButton from './KasmBuyButton';
 
 interface KasmProps {
   onNavigate: (app: string) => void;
@@ -68,6 +69,8 @@ export default function Kasm({ onNavigate }: KasmProps) {
   return (
     <div className="kasm-landing-container">
       <h1>Kasm SDK</h1>
+      <KasmBuyButton />
+
       <p style={{ backgroundPosition: getRandomOffset() }}>
         The main intention is interoperability between Web Browsers and DAWs using open standards, in particular to make
         head way for Augmented Reality glasses and Virtual Reality headset based instruments. The aim is to achieve this
