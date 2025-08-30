@@ -69,7 +69,6 @@ export default function Kasm({ onNavigate }: KasmProps) {
   return (
     <div className="kasm-landing-container">
       <h1>Kasm SDK</h1>
-      <KasmBuyButton />
 
       <p style={{ backgroundPosition: getRandomOffset() }}>
         The main intention is interoperability between Web Browsers and DAWs using open standards, in particular to make

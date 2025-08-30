@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import KasmBuyButton from "./KasmBuyButton.tsx";
 const LatestDemo: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -33,6 +34,7 @@ const LatestDemo: React.FC = () => {
           }
         }}
       />
+      <KasmBuyButton />
     </div>
   );
 };
