@@ -7,7 +7,7 @@ const Krumhansel: React.FC = () => (
     <p>Key/chord detection</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
             <button
-                className="kasm-demo-btn"
+                className="kasm-demo-btn-download"
                 title="Download as Ableton Live 12.2 M4L device"
                 onClick={() => {
                     const link = document.createElement('a');

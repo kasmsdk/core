@@ -7,7 +7,7 @@ const Looper: React.FC = () => (
     <p>MIDI Tape looping with counterpoint harmonizer</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
             <button
-                className="kasm-demo-btn"
+                className="kasm-demo-btn-download"
                 title="Download Looper as Ableton Live 12.2 M4L device"
                 onClick={() => {
                     const link = document.createElement('a');

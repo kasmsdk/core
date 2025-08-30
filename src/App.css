@@ -745,6 +745,40 @@
   border: 3.5px solid #0f0;
 }
 
+.kasm-demo-btn-download {
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  top: 0px;
+  right: 140px;
+  min-width: 120px;
+  max-width: 120px;
+  height: 120px;
+  margin: 0.5em 0.5em 0.5em 0;
+  aspect-ratio: 1/1;
+  padding: 0.5em;
+  font-size: 1em;
+  font-weight: 900;
+  color: #eaeaea;
+  background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%), url("./assets/textures/plasticy.png");
+  background-blend-mode: multiply;
+  background-size: cover, 120px 120px;
+  background-repeat: no-repeat, repeat;
+  border: 3.5px solid #222;
+  border-radius: 0.6em;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 0 #888 inset, 0 0 0 4px #555 inset;
+  text-shadow: 0 1px 0 #222;
+  transition: box-shadow 0.2s, background 0.2s, transform 0.1s;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  filter: blur(0.2px) contrast(0.98);
+}
+.kasm-demo-btn-download:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 0 #ff0 inset, 0 0 0 4px #ff0 inset;
+  border: 3.5px solid #ff0;
+}
+
 
 @media (max-width: 900px) {
   .kasm-demo-btn {
