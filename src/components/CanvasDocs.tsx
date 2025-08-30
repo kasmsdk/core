@@ -35,24 +35,55 @@ const CanvasDocs: React.FC = () => {
       <pre>
         <code>
           {`
-// Rust example of using the Canvas
-use kasm_sdk::canvas::{init_kasm_canvas, update_canvas_data};
+fn render_frame() {
+    let window = match web_sys::window() {
+        Some(w) => w,
+        None => return,
+    };
 
-fn initialize_visualizer() {
-    // Initialize the canvas with a size of 300x200 pixels
-    init_kasm_canvas(300, 200);
-}
+    let document = match window.document() {
+        Some(d) => d,
+        None => return,
+    };
 
-fn visualize_midi_note(note: i32, velocity: i32) {
-    // Send a note-on message to the canvas
-    // The 'is_cc' parameter is false for MIDI notes
-    update_canvas_data(note, velocity, false);
-}
+    let canvas = match document.get_element_by_id("kasmHTMLCanvas") {
+        Some(c) => match c.dyn_into::<HtmlCanvasElement>() {
+            Ok(canvas) => canvas,
+            Err(_) => return,
+        },
+        None => return,
+    };
 
-fn visualize_cc_message(cc_number: i32, value: i32) {
-    // Send a CC message to the canvas
-    // The 'is_cc' parameter is true for CC messages
-    update_canvas_data(cc_number, value, true);
+    let context = match canvas.get_context("2d") {
+        Ok(Some(ctx)) => match ctx.dyn_into::<CanvasRenderingContext2d>() {
+            Ok(context) => context,
+            Err(_) => return,
+        },
+        _ => return,
+    };
+
+    let width = *CANVAS_WIDTH.lock().unwrap() as f64;
+    let height = *CANVAS_HEIGHT.lock().unwrap() as f64;
+    let min_dim = width.min(height);
+
+    // Clear canvas
+    context.clear_rect(0.0, 0.0, width, height);
+
+    let centre_x = width / 2.0;
+    let centre_y = height / 2.0;
+
+    // Draw circle
+    context.set_fill_style_str("#444");
+    context.begin_path();
+    let _ = context.arc(centre_x, centre_y, min_dim * 0.20, 0.0, 2.0 * std::f64::consts::PI);
+    context.fill();
+
+    // Draw text
+    context.set_fill_style_str("#aaa");
+    context.set_font("10px Arial");
+    context.set_text_align("center");
+    let _ = context.fill_text("Kasm", centre_x, centre_y + 3.0);
+    context.set_text_align("start"); // Reset
 }
 `}
         </code>
