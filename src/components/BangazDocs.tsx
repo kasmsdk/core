@@ -10,7 +10,7 @@ const BangazDocs: React.FC = () => {
         create and play a variety of drum beats and rhythms.
       </p>
 
-      <h2>How to Use Bangaz</h2>
+      <h2>How to create your own Bangaz drum patterns</h2>
       <p>
         The Bangaz drum machine is controlled by selecting a drum pattern. Once
         a pattern is selected, the drum machine will start playing in sync with

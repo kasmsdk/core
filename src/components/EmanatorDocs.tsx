@@ -10,7 +10,7 @@ const EmanatorDocs: React.FC = () => {
         generating and transforming MIDI data in various ways.
       </p>
 
-      <h2>How to Use Emanators</h2>
+      <h2>How to add your own Emanators</h2>
       <p>
         Emanators are executed using the <code>execute_emanator</code> function
         in your Rust code. You provide the index of the emanator you want to

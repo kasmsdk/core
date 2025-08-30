@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import NewsNewFeatures from './NewsNewFeatures';
-import LatestDemo from './LatestDemo';
 import EmanatorDocs from './EmanatorDocs';
 import ArpyDocs from './ArpyDocs';
 import BangazDocs from './BangazDocs';
