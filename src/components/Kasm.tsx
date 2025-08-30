@@ -9,7 +9,6 @@ import LooperDocs from './LooperDocs';
 import CanvasDocs from './CanvasDocs';
 import RulezDocs from './RulezDocs';
 import KrumhanselDocs from './KrumhanselDocs';
-import KasmBuyButton from './KasmBuyButton';
 
 interface KasmProps {
   onNavigate: (app: string) => void;
