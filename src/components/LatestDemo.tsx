@@ -25,7 +25,7 @@ const LatestDemo: React.FC = () => {
         title="Kasm Demo"
         width="90%"
         height="1024"
-        style={{ width: '90vw', height: '90vh', display: 'block', border: '2px solid #ccc', borderRadius: '12px', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}
+        style={{ width: '90vw', height: '90vh',  minHeight:'2750px', display: 'block', border: '2px solid #ccc', borderRadius: '12px', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' }}
         allowFullScreen
         tabIndex={-1}
         onLoad={() => {
