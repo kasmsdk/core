@@ -68,6 +68,9 @@ function App() {
     "arpy",
     "triggaz",
     "lfo",
+    "looper",
+    "jog",
+    "canvas",
   ].includes(currentApp);
 
   const getSidebarContext = (): "main" | "kasm" | "tech" => {

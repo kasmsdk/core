@@ -651,6 +651,102 @@
   }
 }
 
+/* Make kasmnav and kasm-demo-buttons flow horizontally and wrap */
+.kasmnav {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.kasm-demo-buttons-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-right: 0.2vw;
+  border-right: 8.5px solid rgba(0,0,0, 0.2);
+}
+
+.kasm-demo-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 0.5em;
+  border: none !important;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.kasm-demo-btn {
+  display: flex;
+  flex: 1 1 120px;
+  min-width: 80px;
+  max-width: 80px;
+  height: 120px;
+  margin: 0.5em 0.5em 0.5em 0;
+  aspect-ratio: 1/1;
+  padding: 0.5em;
+  font-size: 1em;
+  font-weight: 900;
+  color: #eaeaea;
+  background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%), url("./assets/textures/plasticy.png");
+  background-blend-mode: multiply;
+  background-size: cover, 120px 120px;
+  background-repeat: no-repeat, repeat;
+  border: 3.5px solid #222;
+  border-radius: 0.6em;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 0 #888 inset, 0 0 0 4px #555 inset;
+  text-shadow: 0 1px 0 #222;
+  transition: box-shadow 0.2s, background 0.2s, transform 0.1s;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  filter: blur(0.2px) contrast(0.98);
+}
+
+@media (max-width: 900px) {
+  .kasm-demo-btn {
+    flex: 1 1 90px;
+    min-width: 60px;
+    max-width: 120px;
+    height: 90px;
+    font-size: 0.95em;
+  }
+}
+
+@media (max-width: 600px) {
+  .kasm-demo-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .kasm-demo-btn {
+    flex: 1 1 60px;
+    min-width: 40px;
+    max-width: 80px;
+    height: 60px;
+    font-size: 0.85em;
+    margin: 0.25em;
+  }
+}
+
+@media (max-width: 400px) {
+  .kasm-demo-btn {
+    flex: 1 1 40px;
+    min-width: 30px;
+    max-width: 60px;
+    height: 40px;
+    font-size: 0.8em;
+    margin: 0.15em;
+  }
+}
+
 /* Accessibility - Sandstone Theme */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -863,16 +959,17 @@ p {
 }
 
 .kasm-demo-btn {
-  display: inline-flex;
-  align-items: center;
+  display: flex;
   justify-content: center;
-  width: 4.5em;
-  height: 4.5em;
-  min-width: 6.5em;
-  min-height: 6.5em;
-  padding: 0;
-  margin: 0 1em;
-  font-size: 0.8em;
+  align-items: center;
+  flex: 1 1 120px;
+  min-width: 120px;
+  max-width: 120px;
+  height: 120px;
+  margin: 0.5em 0.5em 0.5em 0;
+  aspect-ratio: 1/1;
+  padding: 0.5em;
+  font-size: 1em;
   font-weight: 900;
   color: #eaeaea;
   background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%),
@@ -892,65 +989,40 @@ p {
   user-select: none;
   filter: blur(0.2px) contrast(0.98); /* slight wear effect */
 }
-.kasm-demo-btn:hover {
-  background: radial-gradient(circle at 60% 40%, #999 60%, #888 100%),
-    url("./assets/textures/plasticy.png");
-  background-blend-mode: multiply;
-  background-size: cover, 120px 120px;
-  background-repeat: no-repeat, repeat;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2),
-    /* softer outer shadow for raised effect */ 0 2px 0 #fff inset,
-    0 0 0 6px #ddd inset;
-  transform: translateY(-2px) scale(1.01);
-}
-.kasm-demo-btn:active {
-  background: radial-gradient(circle at 60% 40%, #555 60%, #333 100%),
-    url("./assets/textures/plasticy.png");
-  background-blend-mode: multiply;
-  background-size: cover, 120px 120px;
-  background-repeat: no-repeat, repeat;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18), 0 1px 0 #ff0 inset,
-    0 0 0 4px #222 inset;
-  transform: translateY(2px) scale(0.8);
-}
 
-.kasm-demo-buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 1em;
-  flex-wrap: nowrap;
-  max-width: 100%;
-  overflow-x: auto;
-  padding-left: 1em;
-  padding-right: 1em;
-  box-sizing: border-box;
+@media (max-width: 900px) {
+  .kasm-demo-btn {
+    flex: 1 1 90px;
+    min-width: 90px;
+    max-width: 90px;
+    height: 90px;
+    font-size: 0.8em;
+  }
 }
 
 @media (max-width: 600px) {
-  .kasm-demo-btn {
-    min-width: 4em;
-    min-height: 4em;
-    width: 3em;
-    height: 3em;
-    font-size: 0.7em;
-    margin: 0 0.5em;
-  }
   .kasm-demo-buttons {
-    gap: 0.5em;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .kasm-demo-btn {
+    flex: 1 1 60px;
+    min-width: 60px;
+    max-width: 60px;
+    height: 60px;
+    font-size: 0.5em;
   }
 }
 
-ul {
-  margin-left: 35px;
-  margin-top: 10px;
-}
-
-a {
-  color: var(--sandstone-link, #333);
+@media (max-width: 400px) {
+  .kasm-demo-btn {
+    flex: 1 1 40px;
+    min-width: 40px;
+    max-width: 40px;
+    height: 40px;
+    font-size: 0.8em;
+    margin: 0.15em;
+  }
 }
 
 /* Docs Page Styles */

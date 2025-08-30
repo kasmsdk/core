@@ -57,6 +57,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             icon: "🎹",
             description: "Low Frequecy Oscillators editor",
           },
+          {
+            id: "looper",
+            label: "MIDI Looper",
+            icon: "🎹",
+            description: "Tape style looper with harmonizer",
+          },
         ];
     }
   };
