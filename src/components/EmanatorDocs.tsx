@@ -1,4 +1,5 @@
 import React from "react";
+import LatestDemo from "./LatestDemo.tsx";
 
 const EmanatorDocs: React.FC = () => {
   return (
@@ -454,6 +455,7 @@ pub fn rhythmic_markov_chain(
         </li>
       </ul>
       </p>
+      <LatestDemo/>
     </div>
   );
 };

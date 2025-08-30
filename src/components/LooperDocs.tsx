@@ -1,4 +1,5 @@
 import React from "react";
+import LatestDemoLooper from "./LatestDemoLooper.tsx";
 
 const LooperDocs: React.FC = () => {
   return (
@@ -43,6 +44,7 @@ const LooperDocs: React.FC = () => {
         </li>
       </ul>
         </p>
+      <LatestDemoLooper/>
     </div>
   );
 };

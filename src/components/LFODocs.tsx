@@ -1,4 +1,5 @@
 import React from "react";
+import LatestDemoLFO from "./LatestDemoLFO.tsx";
 
 const LFODocs: React.FC = () => {
   return (
@@ -67,6 +68,7 @@ const LFODocs: React.FC = () => {
         CC messages based on your settings, synchronized to the current tempo and
         transport.
       </p>
+      <LatestDemoLFO/>
     </div>
   );
 };

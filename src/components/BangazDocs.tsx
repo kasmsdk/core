@@ -1,4 +1,5 @@
 import React from "react";
+import LatestDemoBangaz from "./LatestDemoBangaz.tsx";
 
 const BangazDocs: React.FC = () => {
   return (
@@ -304,26 +305,127 @@ pub fn kasm_emanator_bangaz_1(
 
     get_drum_note(DrumType::ClosedHH)
 }
+        `}
 
+    </code>
+</pre>
+</p>
+    <p><pre><code>
+
+{`pub fn kasm_emanator_bangaz_54(
+        _inlet_0_note: i32,
+        _inlet_1_semitone: i32,
+        velocity: i32,
+        _enc1: i32,
+        enc2: i32,
+        step: i32,
+        bar: i32,
+        ) -> i32 {
+        use std::f32::consts::PI;
+
+        // Ambient dub techno - sparse and atmospheric
+        let phi = (1.0 + 5.0_f32.sqrt()) / 2.0;
+        let ambient_cycle = (bar as f32 * 0.05 * phi).sin();
+
+        let base_vel = velocity + (ambient_cycle * 15.0) as i32;
+        let dub_pan = (step as f32 * phi * 0.02 + bar as f32 * 0.01).sin();
+        let pan = 64 + (dub_pan * 35.0) as i32;
+        let cc1_dub = 64.0 + (step as f32 * PI / 32.0).sin() * (enc2 as f32 * 0.6);
+
+        // Sparse kick pattern with mathematical spacing
+        if step % 8 == 0 || (step % 32 == 20 && ambient_cycle > 0.5) {
+        send_note(get_drum_note(DrumType::Kick), base_vel + 10, 0, 100, pan);
+        send_note(1, cc1_dub as i32, 0, 1, 0); // Modwheel CC1
+    }
+
+        // Dub snare with reverb-like spacing
+        if step % 16 == 8 || (step % 64 == 40 && ambient_cycle < -0.3) {
+        send_note(
+        get_drum_note(DrumType::Snare),
+        base_vel + 5,
+        0,
+        100,
+        128 - pan,
+        );
+        send_note(
+        get_drum_note(DrumType::SideStick),
+        base_vel - 20,
+        0,
+        100,
+        pan + 25,
+        );
+    }
+
+        // Ambient percussion using prime numbers
+        let ambient_primes = [11, 13, 17, 19, 23, 29, 31];
+        for (i, &prime) in ambient_primes.iter().enumerate() {
+        if step % prime == (prime / 4) && ambient_cycle > (i as f32 * 0.2 - 0.6) {
+        let perc_types = [
+        DrumType::HiWoodBlock,
+        DrumType::LowWoodBlock,
+        DrumType::Claves,
+        DrumType::RideBell,
+        DrumType::Cowbell,
+        DrumType::Tambourine,
+        DrumType::OpenTriangle,
+        ];
+        let perc_idx = i % perc_types.len();
+        let ambient_pan = pan + (i as i32 * 10 - 30);
+        send_note(
+        get_drum_note(perc_types[perc_idx]),
+        base_vel - 30,
+        0,
+        100,
+        ambient_pan,
+        );
+    }
+    }
+
+        // Sparse hi-hat pattern
+        if step % 4 == 2 && ambient_cycle > 0.2 {
+        send_note(get_drum_note(DrumType::ClosedHH), base_vel / 3, 0, 100, pan);
+    }
+        if step % 32 == 24 && ambient_cycle > 0.7 {
+        send_note(
+        get_drum_note(DrumType::OpenHH),
+        base_vel / 2,
+        0,
+        100,
+        128 - pan,
+        );
+    }
+
+        get_drum_note(DrumType::ClosedHH)
+    }
 `}
         </code>
       </pre>
       </p>
+
 
         <p>To add your new bangaz emanators to it simply adda short description and you added functions, e.g.<pre><code>
   {`
     pub fn get_emanator_infos() -> Vec<EmanatorInfo> {
         vec![
             EmanatorInfo {
-        emanator_idx: MAX4LIVE_UI_BANGAZ_OFFSET_PATTERNS,
-        name: "Bangaz 1",
-        description: "Classic four-on-the-floor kick/snare with toms, enc1 changes fills/complexity!",
-        category: EmanatorCategory::DrumPattern,
-        complexity: 2,
-        function: kasm_emanator_bangaz_1,
-    },
+                emanator_idx: MAX4LIVE_UI_BANGAZ_OFFSET_PATTERNS,
+                name: "Bangaz 1",
+                description: "Classic four-on-the-floor kick/snare with toms, enc1 changes fills/complexity!",
+                category: EmanatorCategory::DrumPattern,
+                complexity: 2,
+                function: kasm_emanator_bangaz_1,
+            },
               ...
-`}
+            EmanatorInfo {
+                emanator_idx: MAX4LIVE_UI_BANGAZ_OFFSET_PATTERNS + 53,
+                name: "Bangaz 54",
+                description: "Ambient Dub Techno with Sparse Math Patterns",
+                category: EmanatorCategory::DrumPattern,
+                complexity: 2,
+                function: kasm_emanator_bangaz_54,
+            },
+...
+    `}
         </code>
       </pre>
         </p>
@@ -362,6 +464,7 @@ pub fn kasm_emanator_bangaz_1(
         <li>And many more, accessible through the emanator system.</li>
       </ul>
       </p>
+        <LatestDemoBangaz/>
     </div>
   );
 };

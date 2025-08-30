@@ -143,8 +143,6 @@ export default function Kasm({ onNavigate }: KasmProps) {
         {/* Show doc page only if activeSection is a docPage */}
         {activeSection !== 'whatsnew' && renderDocPage(activeSection as DocPage)}
       </div>
-
-      <LatestDemo />
     </div>
   );
 }

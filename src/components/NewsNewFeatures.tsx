@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import JogCanvas from '../../latest/JogCanvas';
 import type { JogCanvasHandle } from '../../latest/JogCanvas';
+import LatestDemo from "./LatestDemo.tsx";
 
 const NewsNewFeatures: React.FC = () => {
     const jogCanvasRef = useRef<JogCanvasHandle>(null);
@@ -46,6 +47,8 @@ const NewsNewFeatures: React.FC = () => {
                     ⬇️<br/>Kasm Jog.amxd
                 </button>
             </div>
+
+            <LatestDemo />
         </p>
     );
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import LatestDemoArpy from "./LatestDemoArpy.tsx";
 
 const ArpyDocs: React.FC = () => {
   return (
@@ -15,30 +16,62 @@ const ArpyDocs: React.FC = () => {
         active, incoming MIDI note-on messages add notes to the arpeggiator's
         chord, and note-off messages remove them. The arpeggiator then generates
         a sequence based on the currently held notes and the selected mode.
+        <br/>
+        <br/>
+        src/kasm_arpeggiator.rs
       <pre>
         <code>
           {`
-// Rust example of using the arpeggiator
-use kasm_sdk::arpeggiator::{kasm_arpeggiator_note_on, kasm_arpeggiator_note_off, kasm_arpeggiator_set_mode};
+fn generate_note_sequence() -> Vec<i32> {
+    let held_notes = HELD_NOTES.lock().unwrap();
+    let mode = *ARPEGGIATOR_MODE.lock().unwrap();
 
-fn play_arpeggio() {
-    // Set the arpeggiator mode (e.g., UpDown)
-    kasm_arpeggiator_set_mode(2);
+    let notes: Vec<i32> = held_notes.iter().map(|n| n.note).collect();
 
-    // Add notes to the arpeggiator
-    kasm_arpeggiator_note_on(60, 100); // C4
-    kasm_arpeggiator_note_on(64, 100); // E4
-    kasm_arpeggiator_note_on(67, 100); // G4
-
-    // The arpeggiator will now play a C major arpeggio.
-    // The kasm_arpeggiator_update() function, called by the main metronome,
-    // drives the arpeggio playback.
-
-    // To stop the arpeggio, send note-off messages
-    kasm_arpeggiator_note_off(60);
-    kasm_arpeggiator_note_off(64);
-    kasm_arpeggiator_note_off(67);
-}
+    match mode {
+        ArpeggiatorMode::Up => notes,
+        ArpeggiatorMode::Down => {
+            let mut reversed = notes;
+            reversed.reverse();
+            reversed
+        },
+        ArpeggiatorMode::UpDown => {
+            let mut sequence = notes.clone();
+            let mut down = notes;
+            down.reverse();
+            if down.len() > 1 {
+                down.remove(0); // Remove duplicate of highest note
+            }
+            if sequence.len() > 1 {
+                down.remove(down.len() - 1); // Remove duplicate of lowest note
+            }
+            sequence.extend(down);
+            sequence
+        },
+        ArpeggiatorMode::DownUp => {
+            let mut sequence = notes.clone();
+            sequence.reverse();
+            let mut up = notes;
+            if up.len() > 1 {
+                up.remove(0); // Remove duplicate of lowest note
+            }
+            if sequence.len() > 1 {
+                up.remove(up.len() - 1); // Remove duplicate of highest note
+            }
+            sequence.extend(up);
+            sequence
+        },
+        ArpeggiatorMode::Random => {
+            let mut rng = crate::SimpleRng::new(get_current_time_ms() as u32);
+            let mut shuffled = notes;
+            let len = shuffled.len();
+            for i in 0..len {
+                let j = (rng.next() as usize) % len;
+                shuffled.swap(i, j);
+            }
+            shuffled
+        },
+        ...
 `}
         </code>
       </pre>
@@ -70,13 +103,11 @@ fn play_arpeggio() {
         <li>Converge</li>
         <li>Diverge</li>
         <li>ConvergeDiverge</li>
-        <li>ThumbUp</li>
-        <li>ThumbUpDown</li>
-        <li>PinkyUp</li>
-        <li>PinkyUpDown</li>
-        ...
+        ... etc
       </ul>
       </p>
+
+      <LatestDemoArpy/>Q
     </div>
   );
 };
