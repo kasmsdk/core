@@ -109,9 +109,7 @@ impl InstrumentRule for HandDrumsRule {
     <p>
         <pre>
         <code>
-          {`
-          const MAX_JUMP_HUMAN_COULD_SPIN_SLIDER_FULL_SCALE: i32 = 48; // Realistic human jump for rotary dial (8 to 4 o'clock)
-
+          {`const MAX_JUMP_HUMAN_COULD_SPIN_SLIDER_FULL_SCALE: i32 = 48; // Realistic human jump for rotary dial (8 to 4 o'clock)
 static LAST_KNOWN_CC_VALUES: Lazy<Mutex<[Option<i32>; 128]>> = Lazy::new(|| Mutex::new([None; 128]));
 
 pub struct DialsAndFadersRule {
