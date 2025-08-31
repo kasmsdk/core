@@ -128,8 +128,13 @@ export default function Kasm({ onNavigate }: KasmProps) {
               </button>
               <button className="kasm-demo-btn" onClick={() => setActiveSection('looper')}>📖 <br/>Looper<br/>Docs</button>
             </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('rulez')}>
+                🎹 <br/>Rulez Demo
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>📖 <br/>Rulez<br/>Docs</button>
+            </div>
             <button className="kasm-demo-btn" onClick={() => setActiveSection('canvas')}>📖 <br/>Canvas<br/>Docs</button>
-            <button className="kasm-demo-btn" onClick={() => setActiveSection('rulez')}>📖 <br/>Rulez<br/>Docs</button>
             <button className="kasm-demo-btn" onClick={() => setActiveSection('krumhansel')}>📖 <br/>Key/Chord<br/>Docs</button>
           </div>
         </div>

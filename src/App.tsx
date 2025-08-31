@@ -14,6 +14,7 @@ import Arpy from "../arpy/Arpy";
 import Triggaz from "../triggaz/Triggaz";
 import LFO from "../lfo/LFO";
 import Looper from "./components/Looper";
+import Rulez from "./components/Rulez";
 import Canvas from "./components/Canvas";
 import Krumhansel from "./components/Krumhansel";
 import JogCanvas from "../latest/JogCanvas";
@@ -32,6 +33,7 @@ function App() {
     | "looper"
     | "jog"
     | "canvas"
+    | "rulez"
     | "krumhansel"
   >("kasm");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -51,6 +53,7 @@ function App() {
         "lfo",
         "looper",
         "jog",
+        "rulez",
         "canvas",
         "krumhansel",
       ].includes(appParam)
@@ -69,6 +72,7 @@ function App() {
     "triggaz",
     "lfo",
     "looper",
+    "rulez",
     "jog",
     "canvas",
   ].includes(currentApp);
@@ -159,6 +163,7 @@ function App() {
           {currentApp === "about" && <About />}
           {currentApp === "lfo" && <LFO />}
           {currentApp === "looper" && <Looper />}
+          {currentApp === "rulez" && <Rulez />}
           {currentApp === "jog" && <JogCanvas />}
           {currentApp === "canvas" && <Canvas />}
           {currentApp === "krumhansel" && <Krumhansel />}
