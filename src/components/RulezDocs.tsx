@@ -32,90 +32,172 @@ const RulezDocs: React.FC = () => {
       <pre>
         <code>
           {`
-pub struct HandDrumsRule;
-
 pub const MAX_NOTES_TWO_HANDS_CAN_PLAY: usize = 2; // Two hands can realistically play two notes at once
 const MIN_VELOCITY_TO_PRODUCE_SOUND: i32 = 5; // Very light touch
-const MINIMUM_TIMING_BETWEEN_ONE_NOTE_HUMANLY_POSSIBLE_TO_REPEAT_PLAY: u32 = 100; // Minimum time in ms between one note and the next on the same drum
+const SIMULTANEOUS_TIME_WINDOW_MS: i32 = 500; // Time window to consider notes simultaneous for two-hand play
 
 impl InstrumentRule for HandDrumsRule {
-    fn apply_rule(&self, notes: Vec<NoteData>) -> Vec<RulezResult> {
-        use std::collections::HashMap;
-        let mut results = Vec::new();
-        let mut notes_by_time: HashMap<i32, Vec<&NoteData>> = HashMap::new();
-        // Group notes by timestamp
-        for note in &notes {
-            notes_by_time.entry(note.start_time).or_default().push(note);
-        }
-        let mut notes_at_time = NOTES_AT_TIMESTAMP.lock().unwrap();
-        for (timestamp, notes_group) in notes_by_time {
-            let mut remove_timestamp = false;
-            let mut batch_allowed_pitches = std::collections::HashSet::new();
-            let mut batch_results = Vec::new();
-            for note in notes_group {
-                if note.velocity == 0 {
-                    batch_results.push((note, RuleOutcome::DoNothing));
-                    continue;
-                }
-                if note.velocity < MIN_VELOCITY_TO_PRODUCE_SOUND {
-                    batch_results.push((note, RuleOutcome::Ignore));
-                    continue;
-                }
-                if batch_allowed_pitches.len() < MAX_NOTES_TWO_HANDS_CAN_PLAY && !batch_allowed_pitches.contains(&note.note) {
-                    batch_allowed_pitches.insert(note.note);
-                    batch_results.push((note, RuleOutcome::DoNothing));
-                } else {
-                    batch_results.push((note, RuleOutcome::Ignore));
-                }
-            }
-            let entry = notes_at_time.entry(timestamp).or_insert_with(std::collections::HashSet::new);
-            for (note, outcome) in batch_results {
-                if note.velocity == 0 {
-                    if entry.is_empty() {
-                        remove_timestamp = true;
-                    }
-                } else if outcome == RuleOutcome::DoNothing {
-                    entry.insert(note.note);
-                }
-                results.push(RulezResult { note: note.clone(), outcome });
-            }
-            if remove_timestamp {
-                notes_at_time.remove(&timestamp);
-            }
-        }
-        results
-    }
-}
+    fn apply_rule(&self, notes: Vec<NoteData>, _resolve_by: RuleOutcome) -> Vec<RulezResult> {
+        // Build initial results, performing per-note checks (velocity, note-off)
+        let mut results: Vec<RulezResult> = Vec::new();
 
-pub fn can_add_hand_drums_note(note_data: &NoteData) -> bool {
-    let mut notes_at_time = NOTES_AT_TIMESTAMP.lock().unwrap();
-    let entry = notes_at_time.entry(note_data.start_time).or_insert_with(std::collections::HashSet::new);
-    if note_data.velocity == 0 {
-        if entry.remove(&note_data.note) {
-            post!("HandDrums: Note off at {} pitch {} removed, pitches now {:?}", note_data.start_time, note_data.note, entry);
+        for note in notes.into_iter() {
+            let mut outcome = RuleOutcome::DoNothing;
+            let mut note_allowed = true;
+
+            // Always allow note-off through
+            if note.event_type == crate::kasm_rulez::MidiEventType::Note && note.velocity_or_ccvalue == 0 {
+                outcome = RuleOutcome::DoNothing;
+            } else if note.velocity_or_ccvalue < MIN_VELOCITY_TO_PRODUCE_SOUND {
+                // Too light to produce sound on hand drums
+                outlet_message!(4, "kasm_rulez: HandDrumsRule: velocity too low to make a sound: {}", note.velocity_or_ccvalue);
+                outcome = RuleOutcome::Ignore;
+                note_allowed = false;
+            }
+
+            results.push(RulezResult { note_allowed, note, outcome });
         }
-        if entry.is_empty() {
-            notes_at_time.remove(&note_data.start_time);
+
+        // Deduplicate notes before bucketing (by all fields)
+        let mut unique_results: Vec<RulezResult> = Vec::new();
+        for r in results.into_iter() {
+            if !unique_results.iter().any(|ur| ur.note == r.note && ur.note.velocity_or_ccvalue == r.note.velocity_or_ccvalue && ur.note.start_time == r.note.start_time && ur.note.pan == r.note.pan && ur.note.length == r.note.length && ur.note.channel == r.note.channel && ur.note.event_type == r.note.event_type) {
+                unique_results.push(r);
+            }
         }
-        return true;
-    }
-    if note_data.velocity < MIN_VELOCITY_TO_PRODUCE_SOUND {
-        post!("HandDrums: Note at {} pitch {} blocked due to low velocity {}", note_data.start_time, note_data.note, note_data.velocity);
-        return false;
-    }
-    if entry.len() < MAX_NOTES_TWO_HANDS_CAN_PLAY {
-        entry.insert(note_data.note);
-        true
-    } else {
-        post!("HandDrums: Note at {} pitch {} blocked, pitches are {:?} (max {})", note_data.start_time, note_data.note, entry, MAX_NOTES_TWO_HANDS_CAN_PLAY);
-        false
+
+        // Group notes by time window buckets and enforce two-hand polyphony
+        use std::collections::BTreeMap;
+        let mut notes_by_bucket: BTreeMap<i32, Vec<usize>> = BTreeMap::new();
+        for (idx, r) in unique_results.iter().enumerate() {
+            if r.outcome == RuleOutcome::DoNothing {
+                let bucket = if r.note.start_time >= 0 { r.note.start_time / SIMULTANEOUS_TIME_WINDOW_MS } else { 0 };
+                notes_by_bucket.entry(bucket).or_default().push(idx);
+            }
+        }
+
+        for (&bucket, _group) in notes_by_bucket.iter() {
+            let mut allowed_count = 0;
+            for res in unique_results.iter_mut().filter(|r| {
+                let bucket_for_note = if r.note.start_time >= 0 {
+                    r.note.start_time / SIMULTANEOUS_TIME_WINDOW_MS
+                } else {
+                    0
+                };
+                bucket_for_note == bucket && r.outcome == RuleOutcome::DoNothing && r.note.event_type == crate::kasm_rulez::MidiEventType::Note
+            }) {
+                if allowed_count < MAX_NOTES_TWO_HANDS_CAN_PLAY {
+                    res.outcome = RuleOutcome::DoNothing;
+                    res.note_allowed = true;
+                    outlet_message!(4, "kasm_rulez: listening: hand drums");
+                    allowed_count += 1;
+                } else {
+                    res.outcome = RuleOutcome::Ignore;
+                    res.note_allowed = false;
+                    outlet_message!(4, "kasm_rulez: HandDrumsRule: only two drums at a time {}", res.note.note_or_cc);
+                }
+            }
+        }
+
+        unique_results
     }
 }
 `}
         </code>
       </pre>
       </p>
+    <p>
+        <pre>
+        <code>
+          {`
+          const MAX_JUMP_HUMAN_COULD_SPIN_SLIDER_FULL_SCALE: i32 = 48; // Realistic human jump for rotary dial (8 to 4 o'clock)
 
+static LAST_KNOWN_CC_VALUES: Lazy<Mutex<[Option<i32>; 128]>> = Lazy::new(|| Mutex::new([None; 128]));
+
+pub struct DialsAndFadersRule {
+    pub max_jump: i32,
+    pub smooth: bool,
+    pub smoothing_rate: i32,
+    pub min_smoothing_steps: i32,
+}
+
+fn get_cc_values() -> std::sync::MutexGuard<'static, [Option<i32>; 128]> {
+    LAST_KNOWN_CC_VALUES.lock().unwrap_or_else(|e| e.into_inner())
+}
+
+fn set_cc_values(cc_num: usize, value: i32) {
+    get_cc_values()[cc_num] = Some(value);
+}
+
+impl InstrumentRule for DialsAndFadersRule {
+    fn apply_rule(&self, notes: Vec<NoteData>, _resolve_by: RuleOutcome) -> Vec<RulezResult> {
+        if notes.is_empty() || notes[0].event_type != MidiEventType::CC {
+            // If not a CC event, pass through unchanged
+            return notes.into_iter().map(|note| RulezResult {
+                note_allowed: true,
+                note,
+                outcome: RuleOutcome::DoNothing,
+                }).collect();
+        }
+        let mut results = Vec::new();
+        if self.smooth && !notes.is_empty() {
+            let curr = &notes[notes.len() - 1];
+            let cc_num = curr.note_or_cc as usize % 128;
+            let last_value = get_cc_values()[cc_num];
+            set_cc_values(cc_num, curr.velocity_or_ccvalue);
+
+            if let Some(prev_velocity) = last_value {
+                let jump = (curr.velocity_or_ccvalue - prev_velocity).abs();
+                if jump > self.max_jump {
+                    outlet_message!(4,
+                        "kasm_rulez: EncoderDialsAndFadersRule: impossible encoder dial movement CC#={} value={} jumped more than max {}",
+                        curr.note_or_cc, curr.velocity_or_ccvalue, self.max_jump);
+
+                    let value_based_steps = (jump as f32 / self.max_jump as f32).ceil() as i32;
+                    let min_steps = self.min_smoothing_steps;
+                    let steps = value_based_steps.max(min_steps);
+                    for i in 0..=steps {
+                        let fraction = if steps == 0 { 1.0 } else { (i as f32) / (steps as f32) };
+                        let v = prev_velocity + ((curr.velocity_or_ccvalue - prev_velocity) as f32 * fraction).round() as i32;
+                        let mut note = curr.clone();
+                        note.velocity_or_ccvalue = v;
+                        note.start_time = i * self.smoothing_rate;
+                        send_cc(note.note_or_cc, note.velocity_or_ccvalue + 128 /* recurrsion */, note.start_time);
+                        results.push(RulezResult {
+                            note_allowed: false,
+                            note,
+                            outcome: RuleOutcome::Smooth,
+                        });
+                    }
+                    return results;
+                }
+            }
+        }
+        // No smoothing needed, just clamp if needed
+        for mut note in notes {
+            let mut outcome = RuleOutcome::DoNothing;
+            if note.velocity_or_ccvalue.abs() > self.max_jump {
+                note.velocity_or_ccvalue = note.velocity_or_ccvalue.signum() * self.max_jump;
+                outcome = RuleOutcome::Smooth;
+            }
+            let cc_num = note.note_or_cc as usize;
+            set_cc_values(cc_num, note.velocity_or_ccvalue);
+            results.push(RulezResult { note_allowed: true, note, outcome });
+        }
+        results
+    }
+}
+
+impl Default for DialsAndFadersRule {
+    fn default() -> Self {
+        DialsAndFadersRule { max_jump: MAX_JUMP_HUMAN_COULD_SPIN_SLIDER_FULL_SCALE, smooth: false, smoothing_rate: 20, min_smoothing_steps: 20 }
+    }
+}
+
+`}
+        </code>
+      </pre>
+      </p>
       <h2>Some Rulez Examples what you might do with it</h2>
         <p>
       <ul>
