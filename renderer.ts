@@ -9,7 +9,6 @@ export class Renderer {
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        // Remove direct background assignment; handled by CSS
 
         if (isWebGPUSupported()) {
             this.context = canvas.getContext('webgpu');
@@ -17,19 +16,22 @@ export class Renderer {
         }
 
         if (!this.useWebGPU) {
-            // Fallback to WebGL
-            this.context = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            // Fallback to WebGL with alpha: true for transparency
+            this.context = canvas.getContext('webgl', { alpha: true })
+                || canvas.getContext('experimental-webgl', { alpha: true });
         }
     }
 
     public clear() {
         if (this.useWebGPU && this.context) {
             // WebGPU clear logic
+            // Make sure compositing allows transparency if possible
             // ...existing WebGPU clear code...
         } else if (this.context) {
             // WebGL clear logic
             const gl = this.context as WebGLRenderingContext;
-            gl.clearColor(0, 0, 0, 1); // black background
+            // Clear with transparent color so CSS background shows through
+            gl.clearColor(0, 0, 0, 0); // alpha = 0 for transparency
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         }
     }
