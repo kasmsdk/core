@@ -1,4 +1,5 @@
 import React from "react";
+import LatestDemoRulez from "./LatestDemoRulez.tsx";
 
 const RulezDocs: React.FC = () => {
   return (
@@ -143,6 +144,7 @@ pub fn can_add_hand_drums_note(note_data: &NoteData) -> bool {
         </li>
       </ul>
         </p>
+        <LatestDemoRulez/>
     </div>
 
   );
