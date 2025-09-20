@@ -169,14 +169,11 @@ const Triggaz: React.FC = () => {
             <h1>Kasm Triggaz</h1>
             <p>Pose detection with webcam or video file to trigger MIDI events</p>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
-                <button className="kasm-demo-btn" onClick={initMidi} disabled={!!midiOutput}>
-                    {midiOutput ? 'MIDI Connected' : 'Connect MIDI'}
-                </button>
                 <div style={{ display: 'flex', gap: '16px' }}>
                     <button className="kasm-demo-btn" onClick={startCamera} disabled={!!stream}>
                         {stream ? 'Webcam On' : 'Start Webcam'}
                     </button>
-                    <label className="kasm-demo-btn" style={{ display: 'inline-block', cursor: 'pointer', margin: 0 }}>
+                    <label className="kasm-demo-btn">
                         Upload Video
                         <input type="file" accept="video/mp4" onChange={handleFileChange} style={{ display: 'none' }} />
                     </label>

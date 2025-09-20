@@ -696,7 +696,7 @@
   font-size: 1em;
   font-weight: 900;
   color: #eaeaea;
-  background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%), url('/metallic.png');
+  background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%), url('assets/textures/metallic.png');
   background-blend-mode: multiply;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
@@ -726,7 +726,7 @@
   font-size: 1em;
   font-weight: 900;
   color: #eaeaea;
-  background: radial-gradient(circle at 60% 40%, #004400 60%, #002200 100%), url('/metallic.png');
+  background: radial-gradient(circle at 60% 40%, #004400 60%, #002200 100%), url('assets/textures/metallic.png');
   background-blend-mode: color;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
@@ -760,7 +760,7 @@
   font-size: 1em;
   font-weight: 900;
   color: #eaeaea;
-  background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%), url('/metallic.png');
+  background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%), url('assets/textures/metallic.png');
   background-blend-mode: multiply;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
@@ -1008,7 +1008,7 @@ h1 {
 
 body {
   background: linear-gradient(rgba(34, 34, 34, 0.2), rgba(34, 34, 34, 0.2)),
-  url('/metallic.png');
+  url('assets/textures/metallic.png');
   background-repeat: repeat;
   background-size: auto;
   background-position: center;
@@ -1016,7 +1016,7 @@ body {
 
 p {
   background: linear-gradient(rgba(34, 34, 34, 0.2), rgba(34, 34, 34, 0.2)),
-    url('/metallic.png');
+    url('assets/textures/metallic.png');
   background-repeat: repeat;
   background-size: auto;
   background-position: center;
@@ -1050,7 +1050,7 @@ p {
   font-weight: 900;
   color: #eaeaea;
   background: radial-gradient(circle at 60% 40%, #888 60%, #999 100%),
-    url('/metallic.png'); /* worn plastic texture overlay */
+    url('assets/textures/metallic.png'); /* worn plastic texture overlay */
   background-blend-mode: multiply;
   background-size: cover, 120px 120px;
   background-repeat: no-repeat, repeat;
@@ -1076,7 +1076,7 @@ p {
 .kasm-sunken-panel {
   position: relative;
   background: linear-gradient(rgba(34, 34, 34, 0.2), rgba(34, 34, 34, 0.2)),
-    url('/metallic.png');
+    url('assets/textures/metallic.png');
   background-repeat: repeat;
   background-size: auto;
   background-position: center;
