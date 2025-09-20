@@ -151,7 +151,7 @@ export class SandstoneWebGPUMaterial {
     });
 
     // Load metallic.png as the main texture
-    const response = await fetch('./src/assets/textures/metallic.png');
+    const response = await fetch('/metallic.png');
     const imageBitmap = await createImageBitmap(await response.blob());
     this.metallicTexture = this.device.createTexture({
       size: [imageBitmap.width, imageBitmap.height, 1],
