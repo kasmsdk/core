@@ -65,6 +65,15 @@ const Triggaz: React.FC = () => {
         }
     };
 
+    const loadDemoMovie = () => {
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+            videoRef.current.src = 'https://kasmsdk.github.io/public/Kasm_Triggaz_Pose_Test.mp4';
+            videoRef.current.play();
+            setStream(null); // Stop webcam stream if it's running
+        }
+    };
+
     useEffect(() => {
         loadModel();
     }, []);
@@ -180,6 +189,9 @@ const Triggaz: React.FC = () => {
                         Upload Video
                         <input type="file" accept="video/mp4" onChange={handleFileChange} style={{ display: 'none' }} />
                     </label>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie}>
+                        Theremin Example
+                    </button>
                 </div>
                 <div className="kasm-sunken-panel">
                     <video ref={videoRef} autoPlay playsInline onLoadedMetadata={startDetectionLoop} style={{ width: '640px', height: '480px', borderRadius: '8px', display: 'block', objectFit: 'cover' }} />
