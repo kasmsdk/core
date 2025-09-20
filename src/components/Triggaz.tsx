@@ -69,67 +69,45 @@ const Triggaz: React.FC = () => {
         loadModel();
     }, []);
 
-    useEffect(() => {
-        const detectPose = async () => {
-            if (detectorRef.current && videoRef.current && canvasRef.current && !videoRef.current.paused) {
-                const video = videoRef.current;
-                const canvas = canvasRef.current;
-                const ctx = canvas.getContext('2d');
+    const detectPose = async () => {
+        if (detectorRef.current && videoRef.current && canvasRef.current && !videoRef.current.paused) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
 
-                if (ctx) {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
+            if (ctx) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.style.width = `${video.clientWidth}px`;
+                canvas.style.height = `${video.clientHeight}px`;
 
-                    const poses = await detectorRef.current.estimatePoses(video);
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const poses = await detectorRef.current.estimatePoses(video);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    poses.forEach(pose => {
-                        const nose = pose.keypoints.find(k => k.name === 'nose');
-                        if (nose && nose.score && nose.score > 0.5) {
-                            if (lastYRef.current !== null) {
-                                const deltaY = nose.y - lastYRef.current;
-                                if (deltaY < -10) { // Jumping up
-                                    sendMidiNote(60); // C4
-                                }
+                poses.forEach(pose => {
+                    const nose = pose.keypoints.find(k => k.name === 'nose');
+                    if (nose && nose.score && nose.score > 0.5) {
+                        if (lastYRef.current !== null) {
+                            const deltaY = nose.y - lastYRef.current;
+                            if (deltaY < -10) { // Jumping up
+                                sendMidiNote(60); // C4
                             }
-                            lastYRef.current = nose.y;
                         }
+                        lastYRef.current = nose.y;
+                    }
 
-                        drawSkeleton(pose.keypoints, 0.5, ctx);
-                    });
-                }
-                requestAnimationFrame(detectPose);
+                    drawSkeleton(pose.keypoints, 0.5, ctx);
+                });
             }
-        };
-
-        const videoElement = videoRef.current;
-        let animationFrameId: number;
-
-        const detectionLoop = async () => {
-            await detectPose();
-            animationFrameId = requestAnimationFrame(detectionLoop);
-        };
-
-        const startDetection = () => {
-            if (videoElement && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
-                detectionLoop();
-            }
-        };
-
-        if (videoElement) {
-            videoElement.addEventListener('loadedmetadata', startDetection);
+            requestAnimationFrame(detectPose);
         }
+    };
 
-        return () => {
-            if (videoElement) {
-                videoElement.removeEventListener('loadedmetadata', startDetection);
-            }
-            cancelAnimationFrame(animationFrameId);
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-        };
-    }, [stream, midiOutput]);
+    const startDetectionLoop = () => {
+        if (videoRef.current) {
+            detectPose();
+        }
+    };
 
     const KEYPOINT_EDGE_INDS_TO_COLOR = {
         'nose-left_eye': 'm',
@@ -211,7 +189,7 @@ const Triggaz: React.FC = () => {
                     </label>
                 </div>
                 <div className="kasm-sunken-panel">
-                    <video ref={videoRef} autoPlay playsInline style={{ width: '640px', height: '480px', borderRadius: '8px', display: 'block' }} />
+                    <video ref={videoRef} autoPlay playsInline onLoadedMetadata={startDetectionLoop} style={{ width: '640px', height: '480px', borderRadius: '8px', display: 'block', objectFit: 'cover' }} />
                     <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '640px', height: '480px', pointerEvents: 'none', borderRadius: '8px' }} />
                 </div>
             </div>
