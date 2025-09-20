@@ -109,50 +109,43 @@ const Triggaz: React.FC = () => {
         }
     };
 
-    const KEYPOINT_EDGE_INDS_TO_COLOR = {
-        'nose-left_eye': 'm',
-        'nose-right_eye': 'c',
-        'left_eye-left_ear': 'm',
-        'right_eye-right_ear': 'c',
-        'nose-left_shoulder': 'm',
-        'nose-right_shoulder': 'c',
-        'left_shoulder-left_elbow': 'm',
-        'left_elbow-left_wrist': 'm',
-        'right_shoulder-right_elbow': 'c',
-        'right_elbow-right_wrist': 'c',
-        'left_shoulder-right_shoulder': 'y',
-        'left_shoulder-left_hip': 'm',
-        'right_shoulder-right_hip': 'c',
-        'left_hip-right_hip': 'y',
-        'left_hip-left_knee': 'm',
-        'left_knee-left_ankle': 'm',
-        'right_hip-right_knee': 'c',
-        'right_knee-right_ankle': 'c'
+    const BODY_PARTS = {
+        'left_arm': [['left_shoulder', 'left_elbow'], ['left_elbow', 'left_wrist']],
+        'right_arm': [['right_shoulder', 'right_elbow'], ['right_elbow', 'right_wrist']],
+        'left_leg': [['left_hip', 'left_knee'], ['left_knee', 'left_ankle']],
+        'right_leg': [['right_hip', 'right_knee'], ['right_knee', 'right_ankle']],
+        'torso': [['left_shoulder', 'right_shoulder'], ['left_hip', 'right_hip'], ['left_shoulder', 'left_hip'], ['right_shoulder', 'right_hip']],
+        'face': [['left_eye', 'right_eye'], ['nose', 'left_eye'], ['nose', 'right_eye'], ['left_eye', 'left_ear'], ['right_eye', 'right_ear']]
     };
 
     const drawSkeleton = (keypoints: poseDetection.Keypoint[], minConfidence: number, ctx: CanvasRenderingContext2D) => {
         const keypointMap = new Map(keypoints.map(keypoint => [keypoint.name, keypoint]));
 
-        for (const [edge, color] of Object.entries(KEYPOINT_EDGE_INDS_TO_COLOR)) {
-            const [startName, endName] = edge.split('-');
+        const drawSegment = (startName: string, endName: string, color: string) => {
             const start = keypointMap.get(startName);
             const end = keypointMap.get(endName);
-
             if (start && end && start.score && end.score && start.score > minConfidence && end.score > minConfidence) {
                 ctx.beginPath();
                 ctx.moveTo(start.x, start.y);
                 ctx.lineTo(end.x, end.y);
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 4;
                 ctx.stroke();
             }
-        }
+        };
+
+        BODY_PARTS.left_arm.forEach(segment => drawSegment(segment[0], segment[1], '#FF0000')); // Red
+        BODY_PARTS.right_arm.forEach(segment => drawSegment(segment[0], segment[1], '#00FF00')); // Green
+        BODY_PARTS.left_leg.forEach(segment => drawSegment(segment[0], segment[1], '#FF0000')); // Red
+        BODY_PARTS.right_leg.forEach(segment => drawSegment(segment[0], segment[1], '#00FF00')); // Green
+        BODY_PARTS.torso.forEach(segment => drawSegment(segment[0], segment[1], '#FFFF00')); // Yellow
+        BODY_PARTS.face.forEach(segment => drawSegment(segment[0], segment[1], '#0000FF')); // Blue
 
         keypoints.forEach(keypoint => {
-            if (keypoint.score && keypoint.score > 0.5) {
+            if (keypoint.score && keypoint.score > minConfidence) {
                 ctx.beginPath();
                 ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
-                ctx.fillStyle = 'red';
+                ctx.fillStyle = '#FFFFFF'; // White
                 ctx.fill();
             }
         });
