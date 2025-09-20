@@ -28,8 +28,8 @@ const NewsNewFeatures: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
     return (
-        <p>
-            Whats New: New Components added in Kasm v1.14.3!<br/>Jog - video jogger canvas kasm_canvas_jog.rs<br/>
+        <div>
+            <p>Whats New: New Components added in Kasm v1.14.3!<br/>Jog - video jogger canvas kasm_canvas_jog.rs<br/></p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', margin: '16px 0' }}>
                 <JogCanvas ref={jogCanvasRef} />
                 <button
@@ -49,7 +49,7 @@ const NewsNewFeatures: React.FC = () => {
             </div>
 
             <LatestDemo />
-        </p>
+        </div>
     );
 };
 

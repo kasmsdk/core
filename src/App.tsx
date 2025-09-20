@@ -11,7 +11,7 @@ import Sidebar from "./components/Sidebar";
 import Bangaz from "../bangaz/Bangaz";
 import Emanator from "../emanator/Emanator";
 import Arpy from "../arpy/Arpy";
-import Triggaz from "../triggaz/Triggaz";
+import Triggaz from "./components/Triggaz";
 import LFO from "../lfo/LFO";
 import Looper from "./components/Looper";
 import Rulez from "./components/Rulez";

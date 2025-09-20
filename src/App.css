@@ -1072,6 +1072,29 @@ p {
 }
 
 
+/* Sunken panel style for video/canvas, matching <p> tag look */
+.kasm-sunken-panel {
+  position: relative;
+  background: linear-gradient(rgba(34, 34, 34, 0.2), rgba(34, 34, 34, 0.2)),
+    url("./assets/textures/metallic.png");
+  background-repeat: repeat;
+  background-size: auto;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: inset 2px 4px 12px rgba(0, 0, 0, 0.35),
+    inset -2px -4px 8px rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid #444;
+  padding: 0;
+  margin: 1.5rem 0;
+  width: 640px;
+  height: 480px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (max-width: 900px) {
   .kasm-demo-btn {
     flex: 1 1 90px;
