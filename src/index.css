@@ -3,7 +3,7 @@
   letter-spacing: 0.06em; /* Slightly increased for clarity */
   font-size: 20px; /* Increased base font size */
 
-  background-image: url('/metallic.png');
+  background-image: url('assets/textures/metallic.png');
   background-repeat: repeat;
   background-attachment: scroll; /* Ensure background moves with content */
 
