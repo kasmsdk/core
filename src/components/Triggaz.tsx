@@ -74,6 +74,33 @@ const Triggaz: React.FC = () => {
         }
     };
 
+    const loadDemoMovie2 = () => {
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+            videoRef.current.src = 'https://kasmsdk.github.io/public/kasm_pose_airguitar.webm';
+            videoRef.current.play();
+            setStream(null); // Stop webcam stream if it's running
+        }
+    };
+
+    const loadDemoMovie3 = () => {
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+            videoRef.current.src = 'https://kasmsdk.github.io/public/kasm_pose_jump.webm';
+            videoRef.current.play();
+            setStream(null); // Stop webcam stream if it's running
+        }
+    };
+
+    const loadDemoMovie4 = () => {
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+            videoRef.current.src = 'https://kasmsdk.github.io/public/kasm_pose_dance.webm';
+            videoRef.current.play();
+            setStream(null); // Stop webcam stream if it's running
+        }
+    };
+
     useEffect(() => {
         loadModel();
     }, []);
@@ -172,6 +199,16 @@ const Triggaz: React.FC = () => {
     const drawSkeleton = (keypoints: poseDetection.Keypoint[], minConfidence: number, ctx: CanvasRenderingContext2D) => {
         const keypointMap = new Map(keypoints.map(keypoint => [keypoint.name, keypoint]));
 
+        // Calculate scaling factor based on video resolution
+        // Base scale for 640x480, then scale up proportionally
+        const baseResolution = 640 * 480;
+        const currentResolution = ctx.canvas.width * ctx.canvas.height;
+        const scaleFactor = Math.max(1, Math.sqrt(currentResolution / baseResolution));
+
+        // Scale line width and circle radius based on resolution
+        const lineWidth = Math.max(2, Math.round(4 * scaleFactor));
+        const circleRadius = Math.max(3, Math.round(5 * scaleFactor));
+
         const drawSegment = (startName: string, endName: string, color: string) => {
             const start = keypointMap.get(startName);
             const end = keypointMap.get(endName);
@@ -180,7 +217,7 @@ const Triggaz: React.FC = () => {
                 ctx.moveTo(start.x, start.y);
                 ctx.lineTo(end.x, end.y);
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 4;
+                ctx.lineWidth = lineWidth;
                 ctx.stroke();
             }
         };
@@ -195,9 +232,13 @@ const Triggaz: React.FC = () => {
         keypoints.forEach(keypoint => {
             if (keypoint.score && keypoint.score > minConfidence) {
                 ctx.beginPath();
-                ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+                ctx.arc(keypoint.x, keypoint.y, circleRadius, 0, 2 * Math.PI);
                 ctx.fillStyle = '#FFFFFF'; // White
                 ctx.fill();
+                // Add a colored border for better visibility
+                ctx.strokeStyle = '#000000'; // Black border
+                ctx.lineWidth = Math.max(1, Math.round(scaleFactor));
+                ctx.stroke();
             }
         });
     };
@@ -243,6 +284,15 @@ const Triggaz: React.FC = () => {
                     </label>
                     <button className="kasm-demo-btn" onClick={loadDemoMovie}>
                         Theremin Example
+                    </button>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie2}>
+                        Air Guitar Example
+                    </button>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie3}>
+                        Jumping Example
+                    </button>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie4}>
+                        Dance Example
                     </button>
                 </div>
                 <div className="kasm-sunken-panel" ref={containerRef} style={{ position: 'relative', width: '640px', height: '480px' }}>
