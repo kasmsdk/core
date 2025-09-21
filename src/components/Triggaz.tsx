@@ -933,6 +933,12 @@ const Triggaz: React.FC = () => {
                     }}>
                         {displayJumpStatus}
                         </span>
+                        {jumpDistance !== null && landingPos && (
+                            <div style={{ fontSize: '13px', color: '#aaa', marginTop: '4px' }}>
+                                Distance jumped: <strong>{jumpDistance}px</strong><br />
+                                Landed at: <strong>x={Math.round(landingPos.x)}, y={Math.round(landingPos.y)}</strong>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
