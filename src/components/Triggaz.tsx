@@ -12,6 +12,10 @@ const Triggaz: React.FC = () => {
     const lastYRef = useRef<number | null>(null);
     // Track if detection loop is running
     const detectionLoopRunning = useRef(false);
+    // Track model loading state
+    const [modelLoaded, setModelLoaded] = useState(false);
+    // Track if we need to start detection after model loads
+    const shouldStartDetection = useRef(false);
 
     // --- Utility functions used in detection ---
     const sendMidiNote = (note: number, velocity = 127) => {
@@ -141,12 +145,21 @@ const Triggaz: React.FC = () => {
 
     const loadModel = async () => {
         try {
+            console.log("Loading pose detection model...");
             await tf.setBackend('webgl');
             await tf.ready();
             const model = poseDetection.SupportedModels.MoveNet;
             const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER};
             const detector = await poseDetection.createDetector(model, detectorConfig);
             detectorRef.current = detector;
+            setModelLoaded(true);
+            console.log("Pose detection model loaded successfully");
+
+            // If we're waiting to start detection, start it now
+            if (shouldStartDetection.current) {
+                shouldStartDetection.current = false;
+                startDetectionLoop();
+            }
         } catch (err) {
             console.error("Error loading model: ", err);
         }
@@ -183,6 +196,7 @@ const Triggaz: React.FC = () => {
             const url = 'https://kasmsdk.github.io/public/theremin.webm';
             setVideoCrossOrigin(url);
             videoRef.current.src = url;
+            videoRef.current.load(); // Ensure video is properly loaded
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -194,6 +208,7 @@ const Triggaz: React.FC = () => {
             const url = 'https://kasmsdk.github.io/public/kasm_pose_airguitar.webm';
             setVideoCrossOrigin(url);
             videoRef.current.src = url;
+            videoRef.current.load();
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -205,6 +220,7 @@ const Triggaz: React.FC = () => {
             const url = 'https://kasmsdk.github.io/public/kasm_pose_jump.webm';
             setVideoCrossOrigin(url);
             videoRef.current.src = url;
+            videoRef.current.load();
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -216,6 +232,7 @@ const Triggaz: React.FC = () => {
             const url = 'https://kasmsdk.github.io/public/kasm_pose_dance.webm';
             setVideoCrossOrigin(url);
             videoRef.current.src = url;
+            videoRef.current.load();
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -227,6 +244,7 @@ const Triggaz: React.FC = () => {
             const url = 'https://kasmsdk.github.io/public/Kasm_Triggaz_Pose_Test.mp4';
             setVideoCrossOrigin(url);
             videoRef.current.src = url;
+            videoRef.current.load();
             videoRef.current.play();
             setStream(null);
         }
@@ -234,14 +252,24 @@ const Triggaz: React.FC = () => {
 
     // Ensure updateCanvasSize is always called after video loads
     const handleLoadedMetadata = () => {
+        console.log("Video metadata loaded");
         updateCanvasSize();
         // Do not start detection loop here; wait for canplay
     };
 
     // Start detection loop only when video can play (first frame available)
     const handleCanPlay = () => {
+        console.log("Video can play, model loaded:", modelLoaded);
         updateCanvasSize();
-        startDetectionLoop();
+
+        // Only start detection if model is loaded
+        if (modelLoaded && detectorRef.current) {
+            startDetectionLoop();
+        } else {
+            // Mark that we should start detection once model is loaded
+            shouldStartDetection.current = true;
+            console.log("Waiting for model to load before starting detection");
+        }
     };
 
     // Use videoRect for pixel-perfect alignment
@@ -267,16 +295,26 @@ const Triggaz: React.FC = () => {
         }
     };
 
-    // Only start detection loop if not already running
+    // Only start detection loop if not already running and model is loaded
     const startDetectionLoop = () => {
-        if (detectionLoopRunning.current) return;
+        if (detectionLoopRunning.current || !modelLoaded || !detectorRef.current) {
+            console.log("Cannot start detection loop:", {
+                running: detectionLoopRunning.current,
+                modelLoaded,
+                detectorExists: !!detectorRef.current
+            });
+            return;
+        }
+
+        console.log("Starting detection loop");
         detectionLoopRunning.current = true;
+
+        // Add a small delay to ensure video is fully ready
         setTimeout(() => {
             updateCanvasSize();
             detectPose();
-        }, 50);
+        }, 100);
     };
-
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
@@ -286,6 +324,7 @@ const Triggaz: React.FC = () => {
                 videoRef.current.srcObject = null;
                 setVideoCrossOrigin(url);
                 videoRef.current.src = url;
+                videoRef.current.load();
                 videoRef.current.play();
                 setStream(null);
             }
@@ -302,14 +341,48 @@ const Triggaz: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Load model on component mount and auto-initialize MIDI
     useEffect(() => {
         loadModel();
+        initMidi(); // Auto-initialize MIDI on component mount
+    }, []);
+
+    // Reset detection loop flag when video ends or errors occur
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        const handleVideoEnd = () => {
+            console.log("Video ended, stopping detection");
+            detectionLoopRunning.current = false;
+        };
+
+        const handleVideoError = () => {
+            console.log("Video error, stopping detection");
+            detectionLoopRunning.current = false;
+        };
+
+        const handleVideoPause = () => {
+            console.log("Video paused, stopping detection");
+            detectionLoopRunning.current = false;
+        };
+
+        video.addEventListener('ended', handleVideoEnd);
+        video.addEventListener('error', handleVideoError);
+        video.addEventListener('pause', handleVideoPause);
+
+        return () => {
+            video.removeEventListener('ended', handleVideoEnd);
+            video.removeEventListener('error', handleVideoError);
+            video.removeEventListener('pause', handleVideoPause);
+        };
     }, []);
 
     return (
         <div className="kasm-landing-container">
             <h1>Kasm Triggaz</h1>
             <p>Pose detection with webcam or video file to trigger MIDI events</p>
+            {!modelLoaded && <p>Loading pose detection model...</p>}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
                 <div style={{ display: 'flex', gap: '16px' }}>
                     <button className="kasm-demo-btn" onClick={initMidi} disabled={!!midiOutput} style={{ display: 'none' }}>
@@ -322,19 +395,19 @@ const Triggaz: React.FC = () => {
                         Upload Video
                         <input type="file" accept="video/*" onChange={handleFileChange} style={{ display: 'none' }} />
                     </label>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie}>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie} disabled={!modelLoaded}>
                         Theremin Example
                     </button>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie2}>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie2} disabled={!modelLoaded}>
                         Air Guitar Example
                     </button>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie3}>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie3} disabled={!modelLoaded}>
                         Jumping Example
                     </button>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie4}>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie4} disabled={!modelLoaded}>
                         Dance Example
                     </button>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie5}>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie5} disabled={!modelLoaded}>
                         Triggaz Pose Test
                     </button>
                 </div>
