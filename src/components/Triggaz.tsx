@@ -5,6 +5,7 @@ import * as tf from '@tensorflow/tfjs';
 const Triggaz: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const detectorRef = useRef<poseDetection.PoseDetector | null>(null);
     const [midiOutput, setMidiOutput] = useState<WebMidi.MIDIOutput | null>(null);
@@ -46,8 +47,7 @@ const Triggaz: React.FC = () => {
             const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER};
             const detector = await poseDetection.createDetector(model, detectorConfig);
             detectorRef.current = detector;
-        } catch (err)
-        {
+        } catch (err) {
             console.error("Error loading model: ", err);
         }
     };
@@ -78,17 +78,55 @@ const Triggaz: React.FC = () => {
         loadModel();
     }, []);
 
+    const updateCanvasSize = () => {
+        if (videoRef.current && canvasRef.current && containerRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const container = containerRef.current;
+
+            // Get the actual displayed video dimensions
+            const videoRect = video.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            // Calculate the video's actual display size within the container
+            const videoAspectRatio = video.videoWidth / video.videoHeight;
+            const containerAspectRatio = containerRect.width / containerRect.height;
+
+            let displayWidth, displayHeight, offsetX = 0, offsetY = 0;
+
+            if (videoAspectRatio > containerAspectRatio) {
+                // Video is wider - fit to container width
+                displayWidth = containerRect.width;
+                displayHeight = containerRect.width / videoAspectRatio;
+                offsetY = (containerRect.height - displayHeight) / 2;
+            } else {
+                // Video is taller - fit to container height
+                displayHeight = containerRect.height;
+                displayWidth = containerRect.height * videoAspectRatio;
+                offsetX = (containerRect.width - displayWidth) / 2;
+            }
+
+            // Set canvas size to match video's native resolution for pose detection
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Set canvas display size and position to match the actual video display
+            canvas.style.width = `${displayWidth}px`;
+            canvas.style.height = `${displayHeight}px`;
+            canvas.style.left = `${offsetX}px`;
+            canvas.style.top = `${offsetY}px`;
+        }
+    };
+
     const detectPose = async () => {
         if (detectorRef.current && videoRef.current && canvasRef.current && !videoRef.current.paused) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
 
-            if (ctx) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.style.width = `${video.clientWidth}px`;
-                canvas.style.height = `${video.clientHeight}px`;
+            if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
+                // Update canvas size on each frame to handle dynamic video changes
+                updateCanvasSize();
 
                 const poses = await detectorRef.current.estimatePoses(video);
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -114,7 +152,11 @@ const Triggaz: React.FC = () => {
 
     const startDetectionLoop = () => {
         if (videoRef.current) {
-            detectPose();
+            // Wait a bit for video metadata to be fully loaded
+            setTimeout(() => {
+                updateCanvasSize();
+                detectPose();
+            }, 100);
         }
     };
 
@@ -173,13 +215,23 @@ const Triggaz: React.FC = () => {
         }
     };
 
+    // Handle window resize to keep canvas aligned
+    useEffect(() => {
+        const handleResize = () => {
+            updateCanvasSize();
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <div className="kasm-landing-container">
             <h1>Kasm Triggaz</h1>
             <p>Pose detection with webcam or video file to trigger MIDI events</p>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
                 <div style={{ display: 'flex', gap: '16px' }}>
-                    <button className="kasm-demo-btn" onClick={initMidi} disabled={!!midiOutput}  style={{ display: 'none' }} >
+                    <button className="kasm-demo-btn" onClick={initMidi} disabled={!!midiOutput} style={{ display: 'none' }}>
                         {midiOutput ? 'MIDI Connected' : 'Connect MIDI'}
                     </button>
                     <button className="kasm-demo-btn" onClick={startCamera} disabled={!!stream}>
@@ -193,9 +245,29 @@ const Triggaz: React.FC = () => {
                         Theremin Example
                     </button>
                 </div>
-                <div className="kasm-sunken-panel">
-                    <video ref={videoRef} autoPlay playsInline onLoadedMetadata={startDetectionLoop} style={{ width: '640px', height: '480px', borderRadius: '8px', display: 'block', objectFit: 'cover' }} />
-                    <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '640px', height: '480px', pointerEvents: 'none', borderRadius: '8px' }} />
+                <div className="kasm-sunken-panel" ref={containerRef} style={{ position: 'relative', width: '640px', height: '480px' }}>
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        onLoadedMetadata={startDetectionLoop}
+                        onResize={updateCanvasSize}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: '8px',
+                            display: 'block',
+                            objectFit: 'contain' // Changed from 'cover' to 'contain'
+                        }}
+                    />
+                    <canvas
+                        ref={canvasRef}
+                        style={{
+                            position: 'absolute',
+                            pointerEvents: 'none',
+                            borderRadius: '8px'
+                        }}
+                    />
                 </div>
             </div>
         </div>
