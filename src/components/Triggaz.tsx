@@ -68,7 +68,7 @@ const Triggaz: React.FC = () => {
     const loadDemoMovie = () => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
-            videoRef.current.src = 'https://kasmsdk.github.io/public/Kasm_Triggaz_Pose_Test.mp4';
+            videoRef.current.src = 'https://kasmsdk.github.io/public/theremin.webm';
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
