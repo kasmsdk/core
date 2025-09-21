@@ -55,10 +55,20 @@ const Triggaz: React.FC = () => {
     // Track if we need to start detection after model loads
     const shouldStartDetection = useRef(false);
 
-    // Movement display state
+    // Movement display state (original - kept for internal tracking)
     const [leftHandStatus, setLeftHandStatus] = useState<string>('Stationary');
     const [rightHandStatus, setRightHandStatus] = useState<string>('Stationary');
     const [jumpStatus, setJumpStatus] = useState<string>('On Ground');
+
+    // Enhanced status display with persistence (what gets displayed to user)
+    const [displayLeftHandStatus, setDisplayLeftHandStatus] = useState<string>('Stationary');
+    const [displayRightHandStatus, setDisplayRightHandStatus] = useState<string>('Stationary');
+    const [displayJumpStatus, setDisplayJumpStatus] = useState<string>('On Ground');
+
+    // Timers for status persistence
+    const leftHandStatusTimer = useRef<NodeJS.Timeout | null>(null);
+    const rightHandStatusTimer = useRef<NodeJS.Timeout | null>(null);
+    const jumpStatusTimer = useRef<NodeJS.Timeout | null>(null);
 
     // Browser detection
     const detectBrowser = () => {
@@ -73,6 +83,34 @@ const Triggaz: React.FC = () => {
             return 'Edge';
         }
         return 'Unknown';
+    };
+
+    // Helper function to update status with persistence
+    const updateStatusWithPersistence = (
+        newStatus: string,
+        currentDisplayStatus: string,
+        setDisplayStatus: React.Dispatch<React.SetStateAction<string>>,
+        timer: React.MutableRefObject<NodeJS.Timeout | null>,
+        minDisplayTime: number = 1000
+    ) => {
+        // If status is different from what's currently displayed, update immediately
+        if (newStatus !== currentDisplayStatus) {
+            setDisplayStatus(newStatus);
+
+            // Clear existing timer
+            if (timer.current) {
+                clearTimeout(timer.current);
+            }
+
+            // Set new timer to prevent rapid changes for minDisplayTime
+            timer.current = setTimeout(() => {
+                timer.current = null;
+            }, minDisplayTime);
+        }
+        // If status is the same and timer has expired, allow update
+        else if (!timer.current) {
+            setDisplayStatus(newStatus);
+        }
     };
 
     // --- Utility functions used in detection ---
@@ -140,39 +178,57 @@ const Triggaz: React.FC = () => {
         const leftAnkle = keypoints.find(k => k.name === 'left_ankle');
         const rightAnkle = keypoints.find(k => k.name === 'right_ankle');
         const nose = keypoints.find(k => k.name === 'nose');
+        const leftKnee = keypoints.find(k => k.name === 'left_knee');
+        const rightKnee = keypoints.find(k => k.name === 'right_knee');
 
         if (!leftAnkle?.score || !rightAnkle?.score || !nose?.score) return;
-        if (leftAnkle.score < 0.5 || rightAnkle.score < 0.5 || nose.score < 0.5) return;
+        if (leftAnkle.score < 0.3 || rightAnkle.score < 0.3 || nose.score < 0.3) return;
 
         const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
         const currentNoseY = nose.y;
 
-        // Initialize ground level
+        // Use knee positions as additional indicator if available
+        let avgKneeY = null;
+        if (leftKnee?.score && rightKnee?.score && leftKnee.score > 0.3 && rightKnee.score > 0.3) {
+            avgKneeY = (leftKnee.y + rightKnee.y) / 2;
+        }
+
+        // Initialize ground level with more robust detection
         if (groundLevel.current === null) {
             groundLevel.current = avgAnkleY;
         } else {
             // Update ground level gradually when person is likely on ground
             if (!isJumping.current) {
-                groundLevel.current = groundLevel.current * 0.95 + avgAnkleY * 0.05;
+                // Only update ground level if ankles are below a certain threshold relative to nose
+                const bodyHeight = avgAnkleY - currentNoseY;
+                if (bodyHeight > 100) { // Person is standing normally
+                    groundLevel.current = groundLevel.current * 0.9 + avgAnkleY * 0.1;
+                }
             }
         }
 
-        const jumpThreshold = 30; // pixels above ground level
-        const landingThreshold = 15; // pixels above ground level
+        // Dynamic thresholds based on estimated body height
+        const bodyHeight = Math.abs(avgAnkleY - currentNoseY);
+        const dynamicJumpThreshold = Math.max(15, bodyHeight * 0.08); // 8% of body height, min 15px
+        const dynamicLandingThreshold = Math.max(8, bodyHeight * 0.04); // 4% of body height, min 8px
 
-        // Detect jump start
-        if (!isJumping.current && avgAnkleY < groundLevel.current - jumpThreshold) {
+        console.log(`Ground: ${groundLevel.current?.toFixed(1)}, Ankle: ${avgAnkleY.toFixed(1)}, Threshold: ${dynamicJumpThreshold.toFixed(1)}, Diff: ${(groundLevel.current - avgAnkleY).toFixed(1)}`);
+
+        // Detect jump start - ankles are significantly above ground level
+        if (!isJumping.current && avgAnkleY < groundLevel.current - dynamicJumpThreshold) {
             isJumping.current = true;
             jumpStartY.current = currentNoseY;
             setJumpStatus('Jumping!');
+            updateStatusWithPersistence('Jumping!', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 1500);
             sendMidiNote(48, 127); // Low note for jump start
+            console.log('Jump detected!');
         }
 
-        // Detect landing
-        else if (isJumping.current && avgAnkleY > groundLevel.current - landingThreshold) {
+        // Detect landing - ankles return close to ground level
+        else if (isJumping.current && avgAnkleY > groundLevel.current - dynamicLandingThreshold) {
             isJumping.current = false;
 
-            // Add landing marker
+            // Add landing marker at ankle position
             const landingX = (leftAnkle.x + rightAnkle.x) / 2;
             const landingY = avgAnkleY;
 
@@ -184,12 +240,15 @@ const Triggaz: React.FC = () => {
             }]);
 
             setJumpStatus('Landed!');
+            updateStatusWithPersistence('Landed!', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 1500);
             sendMidiNote(36, 127); // Even lower note for landing
+            console.log('Landing detected!');
 
             // Reset status after delay
             setTimeout(() => {
                 setJumpStatus('On Ground');
-            }, 1000);
+                updateStatusWithPersistence('On Ground', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer);
+            }, 1500);
         }
     };
 
@@ -318,7 +377,7 @@ const Triggaz: React.FC = () => {
                             lastYRef.current = nose.y;
                         }
 
-                        // Hand movement tracking
+                        // Hand movement tracking with enhanced display
                         const leftWrist = pose.keypoints.find(k => k.name === 'left_wrist');
                         const rightWrist = pose.keypoints.find(k => k.name === 'right_wrist');
 
@@ -329,6 +388,7 @@ const Triggaz: React.FC = () => {
                                 'left'
                             );
                             setLeftHandStatus(leftStatus);
+                            updateStatusWithPersistence(leftStatus, displayLeftHandStatus, setDisplayLeftHandStatus, leftHandStatusTimer);
                         }
 
                         if (rightWrist && rightWrist.score && rightWrist.score > 0.5) {
@@ -338,6 +398,7 @@ const Triggaz: React.FC = () => {
                                 'right'
                             );
                             setRightHandStatus(rightStatus);
+                            updateStatusWithPersistence(rightStatus, displayRightHandStatus, setDisplayRightHandStatus, rightHandStatusTimer);
                         }
 
                         // Jump detection
@@ -572,9 +633,20 @@ const Triggaz: React.FC = () => {
         isJumping.current = false;
         jumpStartY.current = null;
         setJumpEvents([]);
+
+        // Reset both internal and display states
         setLeftHandStatus('Stationary');
         setRightHandStatus('Stationary');
         setJumpStatus('On Ground');
+
+        // Clear timers and reset display states
+        if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
+        if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
+        if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
+
+        setDisplayLeftHandStatus('Stationary');
+        setDisplayRightHandStatus('Stationary');
+        setDisplayJumpStatus('On Ground');
     };
 
     // Ensure updateCanvasSize is always called after video loads
@@ -681,6 +753,15 @@ const Triggaz: React.FC = () => {
         initMidi();
     }, []);
 
+    // Cleanup timers on component unmount
+    useEffect(() => {
+        return () => {
+            if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
+            if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
+            if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
+        };
+    }, []);
+
     // Reset detection loop flag when video ends or errors occur
     useEffect(() => {
         const video = videoRef.current;
@@ -782,22 +863,40 @@ const Triggaz: React.FC = () => {
                     />
                 </div>
             </div>
-            {/* Movement Status Display */}
-            <div style={{
-                justifyContent: 'left',
-            }}>
-                <div>
-                    <strong>Left Hand:</strong> {leftHandStatus}
-                </div>
-                <br/>
-                <div>
-                    <strong>Right Hand:</strong> {rightHandStatus}
-                </div>
-                <br/>
-                <div>
-                    <strong>Jump Status:</strong> <span style={{ color: jumpStatus === 'Jumping!' ? '#ffff00' : jumpStatus === 'Landed!' ? '#ff6600' : '#ffffff' }}>
-                        {jumpStatus}
-                    </span>
+
+            {/* Enhanced Movement Status Display with Persistence */}
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
+                <div style={{
+                    width: '640px',
+                    padding: '16px',
+                    fontFamily: 'monospace',
+                    fontSize: '14px',
+                    textAlign: 'left',
+                    lineHeight: '1.6' // Better line spacing
+                }}>
+                    <div style={{
+                        marginBottom: '12px',
+                        minHeight: '20px' // Consistent height to prevent layout shifts
+                    }}>
+                        <strong>Left Hand:</strong> {displayLeftHandStatus}
+                    </div>
+                    <div style={{
+                        marginBottom: '12px',
+                        minHeight: '20px'
+                    }}>
+                        <strong>Right Hand:</strong> {displayRightHandStatus}
+                    </div>
+                    <div style={{
+                        minHeight: '20px'
+                    }}>
+                        <strong>Jump Status:</strong> <span style={{
+                        color: displayJumpStatus === 'Jumping!' ? '#ff8888' :
+                            displayJumpStatus === 'Landed!' ? '#88ff88' : '#ffffff',
+                        fontWeight: 'bold'
+                    }}>
+                            {displayJumpStatus}
+                        </span>
+                    </div>
                 </div>
             </div>
 
