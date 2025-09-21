@@ -165,10 +165,24 @@ const Triggaz: React.FC = () => {
         }
     };
 
+    // Helper to set crossOrigin for remote videos
+    const setVideoCrossOrigin = (url: string) => {
+        if (videoRef.current) {
+            // Only set crossOrigin for remote URLs
+            if (/^https?:\/\//.test(url)) {
+                videoRef.current.crossOrigin = 'anonymous';
+            } else {
+                videoRef.current.removeAttribute('crossOrigin');
+            }
+        }
+    };
+
     const loadDemoMovie = () => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
-            videoRef.current.src = 'https://kasmsdk.github.io/public/theremin.webm';
+            const url = 'https://kasmsdk.github.io/public/theremin.webm';
+            setVideoCrossOrigin(url);
+            videoRef.current.src = url;
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -177,7 +191,9 @@ const Triggaz: React.FC = () => {
     const loadDemoMovie2 = () => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
-            videoRef.current.src = 'https://kasmsdk.github.io/public/kasm_pose_airguitar.webm';
+            const url = 'https://kasmsdk.github.io/public/kasm_pose_airguitar.webm';
+            setVideoCrossOrigin(url);
+            videoRef.current.src = url;
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -186,7 +202,9 @@ const Triggaz: React.FC = () => {
     const loadDemoMovie3 = () => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
-            videoRef.current.src = 'https://kasmsdk.github.io/public/kasm_pose_jump.webm';
+            const url = 'https://kasmsdk.github.io/public/kasm_pose_jump.webm';
+            setVideoCrossOrigin(url);
+            videoRef.current.src = url;
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -195,7 +213,9 @@ const Triggaz: React.FC = () => {
     const loadDemoMovie4 = () => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
-            videoRef.current.src = 'https://kasmsdk.github.io/public/kasm_pose_dance.webm';
+            const url = 'https://kasmsdk.github.io/public/kasm_pose_dance.webm';
+            setVideoCrossOrigin(url);
+            videoRef.current.src = url;
             videoRef.current.play();
             setStream(null); // Stop webcam stream if it's running
         }
@@ -204,7 +224,9 @@ const Triggaz: React.FC = () => {
     const loadDemoMovie5 = () => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
-            videoRef.current.src = 'https://kasmsdk.github.io/public/Kasm_Triggaz_Pose_Test.mp4';
+            const url = 'https://kasmsdk.github.io/public/Kasm_Triggaz_Pose_Test.mp4';
+            setVideoCrossOrigin(url);
+            videoRef.current.src = url;
             videoRef.current.play();
             setStream(null);
         }
@@ -256,6 +278,7 @@ const Triggaz: React.FC = () => {
             const url = URL.createObjectURL(file);
             if (videoRef.current) {
                 videoRef.current.srcObject = null;
+                setVideoCrossOrigin(url);
                 videoRef.current.src = url;
                 videoRef.current.play();
                 setStream(null);
