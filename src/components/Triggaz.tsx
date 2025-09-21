@@ -111,37 +111,24 @@ const Triggaz: React.FC = () => {
             const canvas = canvasRef.current;
             const container = containerRef.current;
 
-            // Get the actual displayed video dimensions
-            const videoRect = video.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-
-            // Calculate the video's actual display size within the container
-            const videoAspectRatio = video.videoWidth / video.videoHeight;
-            const containerAspectRatio = containerRect.width / containerRect.height;
-
-            let displayWidth, displayHeight, offsetX = 0, offsetY = 0;
-
-            if (videoAspectRatio > containerAspectRatio) {
-                // Video is wider - fit to container width
-                displayWidth = containerRect.width;
-                displayHeight = containerRect.width / videoAspectRatio;
-                offsetY = (containerRect.height - displayHeight) / 2;
-            } else {
-                // Video is taller - fit to container height
-                displayHeight = containerRect.height;
-                displayWidth = containerRect.height * videoAspectRatio;
-                offsetX = (containerRect.width - displayWidth) / 2;
+            // Set canvas pixel size to match video native resolution
+            if (video.videoWidth && video.videoHeight) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                // Resize the container div to match the video native size
+                container.style.width = `${video.videoWidth}px`;
+                container.style.height = `${video.videoHeight}px`;
             }
 
-            // Set canvas size to match video's native resolution for pose detection
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Set canvas display size and position to match the actual video display
-            canvas.style.width = `${displayWidth}px`;
-            canvas.style.height = `${displayHeight}px`;
-            canvas.style.left = `${offsetX}px`;
-            canvas.style.top = `${offsetY}px`;
+            // Overlay canvas to match video display size and position
+            const videoRect = video.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            canvas.style.position = 'absolute';
+            canvas.style.pointerEvents = 'none';
+            canvas.style.left = `${videoRect.left - containerRect.left}px`;
+            canvas.style.top = `${videoRect.top - containerRect.top}px`;
+            canvas.style.width = `${videoRect.width}px`;
+            canvas.style.height = `${videoRect.height}px`;
         }
     };
 
