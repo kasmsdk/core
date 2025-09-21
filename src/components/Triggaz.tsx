@@ -46,6 +46,10 @@ const Triggaz: React.FC = () => {
     const isJumping = useRef(false);
     const jumpStartY = useRef<number | null>(null);
     const groundLevel = useRef<number | null>(null);
+    // Add state for jump distance and positions
+    const [jumpDistance, setJumpDistance] = useState<number | null>(null);
+    const [takeoffPos, setTakeoffPos] = useState<{ x: number, y: number } | null>(null);
+    const [landingPos, setLandingPos] = useState<{ x: number, y: number } | null>(null);
 
     // Track if detection loop is running
     const detectionLoopRunning = useRef(false);
@@ -54,11 +58,6 @@ const Triggaz: React.FC = () => {
     const [loadingError, setLoadingError] = useState<string>('');
     // Track if we need to start detection after model loads
     const shouldStartDetection = useRef(false);
-
-    // Movement display state (original - kept for internal tracking)
-    const [leftHandStatus, setLeftHandStatus] = useState<string>('Stationary');
-    const [rightHandStatus, setRightHandStatus] = useState<string>('Stationary');
-    const [jumpStatus, setJumpStatus] = useState<string>('On Ground');
 
     // Enhanced status display with persistence (what gets displayed to user)
     const [displayLeftHandStatus, setDisplayLeftHandStatus] = useState<string>('Stationary');
@@ -178,8 +177,6 @@ const Triggaz: React.FC = () => {
         const leftAnkle = keypoints.find(k => k.name === 'left_ankle');
         const rightAnkle = keypoints.find(k => k.name === 'right_ankle');
         const nose = keypoints.find(k => k.name === 'nose');
-        const leftKnee = keypoints.find(k => k.name === 'left_knee');
-        const rightKnee = keypoints.find(k => k.name === 'right_knee');
 
         if (!leftAnkle?.score || !rightAnkle?.score || !nose?.score) return;
         if (leftAnkle.score < 0.3 || rightAnkle.score < 0.3 || nose.score < 0.3) return;
@@ -187,11 +184,6 @@ const Triggaz: React.FC = () => {
         const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
         const currentNoseY = nose.y;
 
-        // Use knee positions as additional indicator if available
-        let avgKneeY = null;
-        if (leftKnee?.score && rightKnee?.score && leftKnee.score > 0.3 && rightKnee.score > 0.3) {
-            avgKneeY = (leftKnee.y + rightKnee.y) / 2;
-        }
 
         // Initialize ground level with more robust detection
         if (groundLevel.current === null) {
@@ -218,12 +210,13 @@ const Triggaz: React.FC = () => {
         if (!isJumping.current && avgAnkleY < groundLevel.current - dynamicJumpThreshold) {
             isJumping.current = true;
             jumpStartY.current = currentNoseY;
-            setJumpStatus('Jumping!');
-            updateStatusWithPersistence('Jumping!', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 1500);
             sendMidiNote(48, 127); // Low note for jump start
+            // Store takeoff position
+            setTakeoffPos({ x: (leftAnkle.x + rightAnkle.x) / 2, y: avgAnkleY });
+            setLandingPos(null);
+            setJumpDistance(null);
             console.log('Jump detected!');
         }
-
         // Detect landing - ankles return close to ground level
         else if (isJumping.current && avgAnkleY > groundLevel.current - dynamicLandingThreshold) {
             isJumping.current = false;
@@ -238,16 +231,21 @@ const Triggaz: React.FC = () => {
                 timestamp: Date.now(),
                 fadeOpacity: 1.0
             }]);
-
-            setJumpStatus('Landed!');
-            updateStatusWithPersistence('Landed!', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 1500);
             sendMidiNote(36, 127); // Even lower note for landing
+            // Store landing position and calculate distance
+            setLandingPos({ x: landingX, y: landingY });
+            if (takeoffPos) {
+                const dx = landingX - takeoffPos.x;
+                const dy = landingY - takeoffPos.y;
+                setJumpDistance(Math.round(Math.sqrt(dx * dx + dy * dy)));
+            }
             console.log('Landing detected!');
 
             // Reset status after delay
             setTimeout(() => {
-                setJumpStatus('On Ground');
-                updateStatusWithPersistence('On Ground', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer);
+                setJumpDistance(null);
+                setTakeoffPos(null);
+                setLandingPos(null);
             }, 1500);
         }
     };
@@ -387,7 +385,6 @@ const Triggaz: React.FC = () => {
                                 leftHandMovement,
                                 'left'
                             );
-                            setLeftHandStatus(leftStatus);
                             updateStatusWithPersistence(leftStatus, displayLeftHandStatus, setDisplayLeftHandStatus, leftHandStatusTimer);
                         }
 
@@ -397,7 +394,6 @@ const Triggaz: React.FC = () => {
                                 rightHandMovement,
                                 'right'
                             );
-                            setRightHandStatus(rightStatus);
                             updateStatusWithPersistence(rightStatus, displayRightHandStatus, setDisplayRightHandStatus, rightHandStatusTimer);
                         }
 
@@ -634,19 +630,15 @@ const Triggaz: React.FC = () => {
         jumpStartY.current = null;
         setJumpEvents([]);
 
-        // Reset both internal and display states
-        setLeftHandStatus('Stationary');
-        setRightHandStatus('Stationary');
-        setJumpStatus('On Ground');
-
-        // Clear timers and reset display states
-        if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
-        if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
-        if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
-
+        // Only update display states
         setDisplayLeftHandStatus('Stationary');
         setDisplayRightHandStatus('Stationary');
         setDisplayJumpStatus('On Ground');
+
+        // Clear timers
+        if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
+        if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
+        if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
     };
 
     // Ensure updateCanvasSize is always called after video loads
@@ -894,8 +886,11 @@ const Triggaz: React.FC = () => {
                             displayJumpStatus === 'Landed!' ? '#88ff88' : '#ffffff',
                         fontWeight: 'bold'
                     }}>
-                            {displayJumpStatus}
-                        </span>
+    {displayJumpStatus}
+    {displayJumpStatus === 'Landed!' && jumpDistance !== null && takeoffPos && landingPos &&
+        ` (Jumped ${jumpDistance}px from (${Math.round(takeoffPos.x)},${Math.round(takeoffPos.y)}) to (${Math.round(landingPos.x)},${Math.round(landingPos.y)}))`
+    }
+</span>
                     </div>
                 </div>
             </div>
