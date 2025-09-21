@@ -68,6 +68,7 @@ const Triggaz: React.FC = () => {
     const leftHandStatusTimer = useRef<NodeJS.Timeout | null>(null);
     const rightHandStatusTimer = useRef<NodeJS.Timeout | null>(null);
     const jumpStatusTimer = useRef<NodeJS.Timeout | null>(null);
+    const jumpResetTimer = useRef<NodeJS.Timeout | null>(null);
 
     // Browser detection
     const detectBrowser = () => {
@@ -184,7 +185,6 @@ const Triggaz: React.FC = () => {
         const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
         const currentNoseY = nose.y;
 
-
         // Initialize ground level with more robust detection
         if (groundLevel.current === null) {
             groundLevel.current = avgAnkleY;
@@ -216,6 +216,14 @@ const Triggaz: React.FC = () => {
             setLandingPos(null);
             setJumpDistance(null);
             console.log('Jump detected!');
+
+            // Clear any existing reset timer
+            if (jumpResetTimer.current) {
+                clearTimeout(jumpResetTimer.current);
+                jumpResetTimer.current = null;
+            }
+
+            updateStatusWithPersistence('Jumping!', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 1500);
         }
         // Detect landing - ankles return close to ground level
         else if (isJumping.current && avgAnkleY > groundLevel.current - dynamicLandingThreshold) {
@@ -232,21 +240,40 @@ const Triggaz: React.FC = () => {
                 fadeOpacity: 1.0
             }]);
             sendMidiNote(36, 127); // Even lower note for landing
+
             // Store landing position and calculate distance
             setLandingPos({ x: landingX, y: landingY });
             if (takeoffPos) {
                 const dx = landingX - takeoffPos.x;
                 const dy = landingY - takeoffPos.y;
-                setJumpDistance(Math.round(Math.sqrt(dx * dx + dy * dy)));
+                const distance = Math.round(Math.sqrt(dx * dx + dy * dy));
+                setJumpDistance(distance);
+
+                // Calculate jump direction
+                let direction = 'vertical';
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    direction = dx > 0 ? 'right' : 'left';
+                } else if (Math.abs(dy) > 5) {
+                    direction = dy > 0 ? 'down' : 'up';
+                }
+
+                // Create the jump info message
+                const jumpInfo = distance > 10 ? `Landed! (${distance}px ${direction})` : 'Landed!';
+                console.log('Setting jump status to:', jumpInfo);
+
+                // Update the display status using the persistence function
+                updateStatusWithPersistence(jumpInfo, displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 2000);
+
+                // Set a single reset timer to go back to "On Ground"
+                jumpResetTimer.current = setTimeout(() => {
+                    updateStatusWithPersistence('On Ground', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 500);
+                    setJumpDistance(null);
+                    setTakeoffPos(null);
+                    setLandingPos(null);
+                    jumpResetTimer.current = null;
+                }, 2500);
             }
             console.log('Landing detected!');
-
-            // Reset status after delay
-            setTimeout(() => {
-                setJumpDistance(null);
-                setTakeoffPos(null);
-                setLandingPos(null);
-            }, 1500);
         }
     };
 
@@ -540,13 +567,16 @@ const Triggaz: React.FC = () => {
     // Helper to set crossOrigin for remote videos - improved for Safari
     const setVideoCrossOrigin = (url: string) => {
         if (videoRef.current) {
-            // Only set crossOrigin for remote URLs
             if (/^https?:\/\//.test(url)) {
-                videoRef.current.crossOrigin = 'anonymous';
+                // Try different CORS settings for Firefox
+                if (detectBrowser() === 'Firefox') {
+                    videoRef.current.crossOrigin = 'use-credentials';
+                } else {
+                    videoRef.current.crossOrigin = 'anonymous';
+                }
             } else {
                 videoRef.current.removeAttribute('crossOrigin');
             }
-            // Safari-specific: set preload
             videoRef.current.preload = 'metadata';
         }
     };
@@ -556,10 +586,17 @@ const Triggaz: React.FC = () => {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
             const url = 'https://kasmsdk.github.io/public/theremin.webm';
-            setVideoCrossOrigin(url);
+
+            // Firefox-specific handling
+            if (detectBrowser() === 'Firefox') {
+                // Remove crossOrigin for Firefox
+                videoRef.current.removeAttribute('crossOrigin');
+            } else {
+                setVideoCrossOrigin(url);
+            }
+
             videoRef.current.src = url;
             videoRef.current.load();
-            // Handle autoplay for Safari/Firefox
             videoRef.current.play().catch(err => {
                 console.warn('Autoplay blocked:', err);
             });
@@ -635,10 +672,17 @@ const Triggaz: React.FC = () => {
         setDisplayRightHandStatus('Stationary');
         setDisplayJumpStatus('On Ground');
 
-        // Clear timers
+        // Clear all timers
         if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
         if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
         if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
+        if (jumpResetTimer.current) clearTimeout(jumpResetTimer.current);
+
+        // Reset timer refs
+        leftHandStatusTimer.current = null;
+        rightHandStatusTimer.current = null;
+        jumpStatusTimer.current = null;
+        jumpResetTimer.current = null;
     };
 
     // Ensure updateCanvasSize is always called after video loads
@@ -751,6 +795,7 @@ const Triggaz: React.FC = () => {
             if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
             if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
             if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
+            if (jumpResetTimer.current) clearTimeout(jumpResetTimer.current);
         };
     }, []);
 
@@ -883,14 +928,11 @@ const Triggaz: React.FC = () => {
                     }}>
                         <strong>Jump Status:</strong> <span style={{
                         color: displayJumpStatus === 'Jumping!' ? '#ff8888' :
-                            displayJumpStatus === 'Landed!' ? '#88ff88' : '#ffffff',
+                            displayJumpStatus.startsWith('Landed!') ? '#88ff88' : '#ffffff',
                         fontWeight: 'bold'
                     }}>
-    {displayJumpStatus}
-    {displayJumpStatus === 'Landed!' && jumpDistance !== null && takeoffPos && landingPos &&
-        ` (Jumped ${jumpDistance}px from (${Math.round(takeoffPos.x)},${Math.round(takeoffPos.y)}) to (${Math.round(landingPos.x)},${Math.round(landingPos.y)}))`
-    }
-</span>
+                        {displayJumpStatus}
+                        </span>
                     </div>
                 </div>
             </div>
