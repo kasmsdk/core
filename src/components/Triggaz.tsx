@@ -13,6 +13,113 @@ const Triggaz: React.FC = () => {
     // Track if detection loop is running
     const detectionLoopRunning = useRef(false);
 
+    // --- Utility functions used in detection ---
+    const sendMidiNote = (note: number, velocity = 127) => {
+        if (midiOutput) {
+            midiOutput.send([0x90, note, velocity]); // Note on
+            setTimeout(() => {
+                midiOutput.send([0x80, note, 0]); // Note off
+            }, 100);
+        }
+    };
+
+    const BODY_PARTS = {
+        'left_arm': [['left_shoulder', 'left_elbow'], ['left_elbow', 'left_wrist']],
+        'right_arm': [['right_shoulder', 'right_elbow'], ['right_elbow', 'right_wrist']],
+        'left_leg': [['left_hip', 'left_knee'], ['left_knee', 'left_ankle']],
+        'right_leg': [['right_hip', 'right_knee'], ['right_knee', 'right_ankle']],
+        'torso': [['left_shoulder', 'right_shoulder'], ['left_hip', 'right_hip'], ['left_shoulder', 'left_hip'], ['right_shoulder', 'right_hip']],
+        'face': [['left_eye', 'right_eye'], ['nose', 'left_eye'], ['nose', 'right_eye'], ['left_eye', 'left_ear'], ['right_eye', 'right_ear']]
+    };
+
+    const drawSkeleton = (keypoints: poseDetection.Keypoint[], minConfidence: number, ctx: CanvasRenderingContext2D) => {
+        const keypointMap = new Map(keypoints.map(keypoint => [keypoint.name, keypoint]));
+        const baseResolution = 640 * 480;
+        const currentResolution = ctx.canvas.width * ctx.canvas.height;
+        const scaleFactor = Math.max(1, Math.sqrt(currentResolution / baseResolution));
+        const lineWidth = Math.max(2, Math.round(4 * scaleFactor));
+        const circleRadius = Math.max(3, Math.round(5 * scaleFactor));
+        const drawSegment = (startName: string, endName: string, color: string) => {
+            const start = keypointMap.get(startName);
+            const end = keypointMap.get(endName);
+            if (start && end && start.score && end.score && start.score > minConfidence && end.score > minConfidence) {
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth;
+                ctx.stroke();
+            }
+        };
+        BODY_PARTS.left_arm.forEach(segment => drawSegment(segment[0], segment[1], '#FF0000'));
+        BODY_PARTS.right_arm.forEach(segment => drawSegment(segment[0], segment[1], '#00FF00'));
+        BODY_PARTS.left_leg.forEach(segment => drawSegment(segment[0], segment[1], '#FF0000'));
+        BODY_PARTS.right_leg.forEach(segment => drawSegment(segment[0], segment[1], '#00FF00'));
+        BODY_PARTS.torso.forEach(segment => drawSegment(segment[0], segment[1], '#FFFF00'));
+        BODY_PARTS.face.forEach(segment => drawSegment(segment[0], segment[1], '#0000FF'));
+        keypoints.forEach(keypoint => {
+            if (keypoint.score && keypoint.score > minConfidence) {
+                ctx.beginPath();
+                ctx.arc(keypoint.x, keypoint.y, circleRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = Math.max(1, Math.round(scaleFactor));
+                ctx.stroke();
+            }
+        });
+    };
+
+    // --- Main pose detection loop ---
+    const detectPose = async () => {
+        if (detectorRef.current && videoRef.current && canvasRef.current && !videoRef.current.paused) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
+                // Use videoRect for canvas overlay and drawing scale
+                const videoRect = video.getBoundingClientRect();
+                // Set canvas style to match videoRect (displayed size)
+                canvas.style.position = 'absolute';
+                canvas.style.pointerEvents = 'none';
+                canvas.style.left = `${videoRect.left - (containerRef.current?.getBoundingClientRect().left || 0)}px`;
+                canvas.style.top = `${videoRect.top - (containerRef.current?.getBoundingClientRect().top || 0)}px`;
+                canvas.style.width = `${videoRect.width}px`;
+                canvas.style.height = `${videoRect.height}px`;
+                // Set canvas internal size to match video display size for 1:1 drawing
+                if (canvas.width !== Math.round(videoRect.width) || canvas.height !== Math.round(videoRect.height)) {
+                    canvas.width = Math.round(videoRect.width);
+                    canvas.height = Math.round(videoRect.height);
+                }
+                // Draw pose scaled to videoRect
+                const poses = await detectorRef.current.estimatePoses(video);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Calculate scale factors from video intrinsic to display size
+                const scaleX = videoRect.width / video.videoWidth;
+                const scaleY = videoRect.height / video.videoHeight;
+                ctx.save();
+                ctx.scale(scaleX, scaleY);
+                poses.forEach(pose => {
+                    const nose = pose.keypoints.find(k => k.name === 'nose');
+                    if (nose && nose.score && nose.score > 0.5) {
+                        if (lastYRef.current !== null) {
+                            const deltaY = nose.y - lastYRef.current;
+                            if (deltaY < -10) {
+                                sendMidiNote(60);
+                            }
+                        }
+                        lastYRef.current = nose.y;
+                    }
+                    drawSkeleton(pose.keypoints, 0.5, ctx);
+                });
+                ctx.restore();
+            }
+            requestAnimationFrame(detectPose);
+        } else {
+            detectionLoopRunning.current = false;
+        }
+    };
+
     const initMidi = async () => {
         if (navigator.requestMIDIAccess) {
             try {
@@ -29,15 +136,6 @@ const Triggaz: React.FC = () => {
             }
         } else {
             console.error("Web MIDI API is not supported in this browser.");
-        }
-    };
-
-    const sendMidiNote = (note: number, velocity = 127) => {
-        if (midiOutput) {
-            midiOutput.send([0x90, note, velocity]); // Note on
-            setTimeout(() => {
-                midiOutput.send([0x80, note, 0]); // Note off
-            }, 100);
         }
     };
 
@@ -124,18 +222,14 @@ const Triggaz: React.FC = () => {
             const video = videoRef.current;
             const canvas = canvasRef.current;
             const container = containerRef.current;
-
             if (video.videoWidth && video.videoHeight) {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 container.style.width = `${video.videoWidth}px`;
                 container.style.height = `${video.videoHeight}px`;
             }
-
-            // Use videoRect for alignment
             const videoRect = video.getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
-            // Use videoRect for canvas overlay
             canvas.style.position = 'absolute';
             canvas.style.pointerEvents = 'none';
             canvas.style.left = `${videoRect.left - containerRect.left}px`;
@@ -149,68 +243,12 @@ const Triggaz: React.FC = () => {
     const startDetectionLoop = () => {
         if (detectionLoopRunning.current) return;
         detectionLoopRunning.current = true;
-        // Wait for video to be ready and canvas to be sized
         setTimeout(() => {
             updateCanvasSize();
             detectPose();
         }, 50);
     };
 
-    const BODY_PARTS = {
-        'left_arm': [['left_shoulder', 'left_elbow'], ['left_elbow', 'left_wrist']],
-        'right_arm': [['right_shoulder', 'right_elbow'], ['right_elbow', 'right_wrist']],
-        'left_leg': [['left_hip', 'left_knee'], ['left_knee', 'left_ankle']],
-        'right_leg': [['right_hip', 'right_knee'], ['right_knee', 'right_ankle']],
-        'torso': [['left_shoulder', 'right_shoulder'], ['left_hip', 'right_hip'], ['left_shoulder', 'left_hip'], ['right_shoulder', 'right_hip']],
-        'face': [['left_eye', 'right_eye'], ['nose', 'left_eye'], ['nose', 'right_eye'], ['left_eye', 'left_ear'], ['right_eye', 'right_ear']]
-    };
-
-    const drawSkeleton = (keypoints: poseDetection.Keypoint[], minConfidence: number, ctx: CanvasRenderingContext2D) => {
-        const keypointMap = new Map(keypoints.map(keypoint => [keypoint.name, keypoint]));
-
-        // Calculate scaling factor based on video resolution
-        // Base scale for 640x480, then scale up proportionally
-        const baseResolution = 640 * 480;
-        const currentResolution = ctx.canvas.width * ctx.canvas.height;
-        const scaleFactor = Math.max(1, Math.sqrt(currentResolution / baseResolution));
-
-        // Scale line width and circle radius based on resolution
-        const lineWidth = Math.max(2, Math.round(4 * scaleFactor));
-        const circleRadius = Math.max(3, Math.round(5 * scaleFactor));
-
-        const drawSegment = (startName: string, endName: string, color: string) => {
-            const start = keypointMap.get(startName);
-            const end = keypointMap.get(endName);
-            if (start && end && start.score && end.score && start.score > minConfidence && end.score > minConfidence) {
-                ctx.beginPath();
-                ctx.moveTo(start.x, start.y);
-                ctx.lineTo(end.x, end.y);
-                ctx.strokeStyle = color;
-                ctx.lineWidth = lineWidth;
-                ctx.stroke();
-            }
-        };
-
-        BODY_PARTS.left_arm.forEach(segment => drawSegment(segment[0], segment[1], '#FF0000')); // Red
-        BODY_PARTS.right_arm.forEach(segment => drawSegment(segment[0], segment[1], '#00FF00')); // Green
-        BODY_PARTS.left_leg.forEach(segment => drawSegment(segment[0], segment[1], '#FF0000')); // Red
-        BODY_PARTS.right_leg.forEach(segment => drawSegment(segment[0], segment[1], '#00FF00')); // Green
-        BODY_PARTS.torso.forEach(segment => drawSegment(segment[0], segment[1], '#FFFF00')); // Yellow
-        BODY_PARTS.face.forEach(segment => drawSegment(segment[0], segment[1], '#0000FF')); // Blue
-
-        keypoints.forEach(keypoint => {
-            if (keypoint.score && keypoint.score > minConfidence) {
-                ctx.beginPath();
-                ctx.arc(keypoint.x, keypoint.y, circleRadius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#FFFFFF'; // White
-                ctx.fill();
-                // Add a colored border for better visibility
-                ctx.strokeStyle = '#000000'; // Black border
-                ctx.lineWidth = Math.max(1, Math.round(scaleFactor));
-                ctx.stroke();
-            }
-        });
-    };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
