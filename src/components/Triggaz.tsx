@@ -235,6 +235,12 @@ const Triggaz: React.FC = () => {
     // Ensure updateCanvasSize is always called after video loads
     const handleLoadedMetadata = () => {
         updateCanvasSize();
+        // Do not start detection loop here; wait for canplay
+    };
+
+    // Start detection loop only when video can play (first frame available)
+    const handleCanPlay = () => {
+        updateCanvasSize();
         startDetectionLoop();
     };
 
@@ -338,6 +344,7 @@ const Triggaz: React.FC = () => {
                         autoPlay
                         playsInline
                         onLoadedMetadata={handleLoadedMetadata}
+                        onCanPlay={handleCanPlay}
                         onResize={updateCanvasSize}
                         style={{
                             width: '100%',
