@@ -187,7 +187,7 @@ const Triggaz: React.FC = () => {
                     </button>
                     <label className="kasm-demo-btn">
                         Upload Video
-                        <input type="file" accept="video/mp4" onChange={handleFileChange} style={{ display: 'none' }} />
+                        <input type="file" accept="video/*" onChange={handleFileChange} style={{ display: 'none' }} />
                     </label>
                     <button className="kasm-demo-btn" onClick={loadDemoMovie}>
                         Theremin Example
