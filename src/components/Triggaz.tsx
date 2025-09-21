@@ -10,6 +10,8 @@ const Triggaz: React.FC = () => {
     const detectorRef = useRef<poseDetection.PoseDetector | null>(null);
     const [midiOutput, setMidiOutput] = useState<WebMidi.MIDIOutput | null>(null);
     const lastYRef = useRef<number | null>(null);
+    // Track if detection loop is running
+    const detectionLoopRunning = useRef(false);
 
     const initMidi = async () => {
         if (navigator.requestMIDIAccess) {
@@ -101,28 +103,39 @@ const Triggaz: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        loadModel();
-    }, []);
+    const loadDemoMovie5 = () => {
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+            videoRef.current.src = 'https://kasmsdk.github.io/public/Kasm_Triggaz_Pose_Test.mp4';
+            videoRef.current.play();
+            setStream(null);
+        }
+    };
 
+    // Ensure updateCanvasSize is always called after video loads
+    const handleLoadedMetadata = () => {
+        updateCanvasSize();
+        startDetectionLoop();
+    };
+
+    // Use videoRect for pixel-perfect alignment
     const updateCanvasSize = () => {
         if (videoRef.current && canvasRef.current && containerRef.current) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
             const container = containerRef.current;
 
-            // Set canvas pixel size to match video native resolution
             if (video.videoWidth && video.videoHeight) {
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                // Resize the container div to match the video native size
                 container.style.width = `${video.videoWidth}px`;
                 container.style.height = `${video.videoHeight}px`;
             }
 
-            // Overlay canvas to match video display size and position
+            // Use videoRect for alignment
             const videoRect = video.getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
+            // Use videoRect for canvas overlay
             canvas.style.position = 'absolute';
             canvas.style.pointerEvents = 'none';
             canvas.style.left = `${videoRect.left - containerRect.left}px`;
@@ -132,46 +145,15 @@ const Triggaz: React.FC = () => {
         }
     };
 
-    const detectPose = async () => {
-        if (detectorRef.current && videoRef.current && canvasRef.current && !videoRef.current.paused) {
-            const video = videoRef.current;
-            const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
-
-            if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-                // Update canvas size on each frame to handle dynamic video changes
-                updateCanvasSize();
-
-                const poses = await detectorRef.current.estimatePoses(video);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                poses.forEach(pose => {
-                    const nose = pose.keypoints.find(k => k.name === 'nose');
-                    if (nose && nose.score && nose.score > 0.5) {
-                        if (lastYRef.current !== null) {
-                            const deltaY = nose.y - lastYRef.current;
-                            if (deltaY < -10) { // Jumping up
-                                sendMidiNote(60); // C4
-                            }
-                        }
-                        lastYRef.current = nose.y;
-                    }
-
-                    drawSkeleton(pose.keypoints, 0.5, ctx);
-                });
-            }
-            requestAnimationFrame(detectPose);
-        }
-    };
-
+    // Only start detection loop if not already running
     const startDetectionLoop = () => {
-        if (videoRef.current) {
-            // Wait a bit for video metadata to be fully loaded
-            setTimeout(() => {
-                updateCanvasSize();
-                detectPose();
-            }, 100);
-        }
+        if (detectionLoopRunning.current) return;
+        detectionLoopRunning.current = true;
+        // Wait for video to be ready and canvas to be sized
+        setTimeout(() => {
+            updateCanvasSize();
+            detectPose();
+        }, 50);
     };
 
     const BODY_PARTS = {
@@ -238,7 +220,7 @@ const Triggaz: React.FC = () => {
                 videoRef.current.srcObject = null;
                 videoRef.current.src = url;
                 videoRef.current.play();
-                setStream(null); // Stop webcam stream if it's running
+                setStream(null);
             }
         }
     };
@@ -251,6 +233,10 @@ const Triggaz: React.FC = () => {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        loadModel();
     }, []);
 
     return (
@@ -281,20 +267,23 @@ const Triggaz: React.FC = () => {
                     <button className="kasm-demo-btn" onClick={loadDemoMovie4}>
                         Dance Example
                     </button>
+                    <button className="kasm-demo-btn" onClick={loadDemoMovie5}>
+                        Triggaz Pose Test
+                    </button>
                 </div>
                 <div className="kasm-sunken-panel" ref={containerRef} style={{ position: 'relative', width: '640px', height: '480px' }}>
                     <video
                         ref={videoRef}
                         autoPlay
                         playsInline
-                        onLoadedMetadata={startDetectionLoop}
+                        onLoadedMetadata={handleLoadedMetadata}
                         onResize={updateCanvasSize}
                         style={{
                             width: '100%',
                             height: '100%',
                             borderRadius: '8px',
                             display: 'block',
-                            objectFit: 'contain' // Changed from 'cover' to 'contain'
+                            objectFit: 'contain'
                         }}
                     />
                     <canvas
