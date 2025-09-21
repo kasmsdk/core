@@ -56,6 +56,7 @@ function App() {
         "rulez",
         "canvas",
         "krumhansel",
+        "triggaz",
       ].includes(appParam)
     ) {
       setCurrentApp(appParam as typeof currentApp);
