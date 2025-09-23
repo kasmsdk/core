@@ -17,6 +17,7 @@ import Looper from "./components/Looper";
 import Rulez from "./components/Rulez";
 import Canvas from "./components/Canvas";
 import Krumhansel from "./components/Krumhansel";
+import Jog from "./components/Jog";
 import JogCanvas from "../latest/JogCanvas";
 import "./App.css";
 
@@ -165,7 +166,8 @@ function App() {
           {currentApp === "lfo" && <LFO />}
           {currentApp === "looper" && <Looper />}
           {currentApp === "rulez" && <Rulez />}
-          {currentApp === "jog" && <JogCanvas />}
+          {currentApp === "jog" && <Jog />}
+          {currentApp === "canvas-jog" && <JogCanvas />}
           {currentApp === "canvas" && <Canvas />}
           {currentApp === "krumhansel" && <Krumhansel />}
         </div>

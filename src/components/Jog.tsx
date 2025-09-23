@@ -16,7 +16,7 @@ interface JumpEvent {
     fadeOpacity: number;
 }
 
-const Triggaz: React.FC = () => {
+const Jog: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -840,7 +840,7 @@ const Triggaz: React.FC = () => {
 
     return (
         <div className="kasm-landing-container">
-            <h1>Kasm Triggaz</h1>
+            <h1>Kasm Jog</h1>
             <p>Pose detection with webcam or video file to trigger MIDI events</p>
 
             {/* Browser and Status Info */}
@@ -956,4 +956,4 @@ const Triggaz: React.FC = () => {
     );
 };
 
-export default Triggaz;
+export default Jog;
