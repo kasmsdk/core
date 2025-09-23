@@ -31,12 +31,15 @@ interface TimelineMarker {
     description?: string;
 }
 
+type ShaderEffect = 'none' | 'tint-red' | 'ripple' | 'glow' | 'vignette' | 'analog-film';
+
 const DEFAULT_STREAM_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
 
 const Jog: React.FC = () => {
     const [streamUrl, setStreamUrl] = useState<string>(DEFAULT_STREAM_URL);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const effectCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const detectorRef = useRef<poseDetection.PoseDetector | null>(null);
@@ -51,6 +54,10 @@ const Jog: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [playbackRate, setPlaybackRate] = useState<number>(1);
     const [volume, setVolume] = useState<number>(1);
+    const [videoAspectRatio, setVideoAspectRatio] = useState<number>(16/9);
+
+    // Shader effects
+    const [selectedEffect, setSelectedEffect] = useState<ShaderEffect>('none');
 
     // Video streaming support
     const hlsRef = useRef<any>(null);
@@ -118,20 +125,115 @@ const Jog: React.FC = () => {
             // Load HLS.js
             if (!window.Hls) {
                 const script1 = document.createElement('script');
-                script1.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js';
+                script1.src = 'hls.min.js';
                 document.head.appendChild(script1);
             }
 
             // Load Dash.js
             if (!window.dashjs) {
                 const script2 = document.createElement('script');
-                script2.src = 'https://cdn.dashjs.org/latest/dash.all.min.js';
+                script2.src = 'dash.all.min.js';
                 document.head.appendChild(script2);
             }
         };
 
         loadLibraries();
     }, []);
+
+    // Apply shader effects to canvas
+    const applyShaderEffect = (ctx: CanvasRenderingContext2D, effect: ShaderEffect, time: number = 0) => {
+        if (effect === 'none') return;
+
+        const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        const data = imageData.data;
+
+        switch (effect) {
+            case 'tint-red':
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.min(255, data[i] * 1.3); // Enhance red
+                    data[i + 1] *= 0.8; // Reduce green
+                    data[i + 2] *= 0.8; // Reduce blue
+                }
+                break;
+
+            case 'glow':
+                // Create a soft glow effect
+                for (let i = 0; i < data.length; i += 4) {
+                    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    if (brightness > 100) {
+                        const glow = Math.min(40, (brightness - 100) * 0.3);
+                        data[i] = Math.min(255, data[i] + glow);
+                        data[i + 1] = Math.min(255, data[i + 1] + glow);
+                        data[i + 2] = Math.min(255, data[i + 2] + glow);
+                    }
+                }
+                break;
+
+            case 'vignette':
+                const centerX = ctx.canvas.width / 2;
+                const centerY = ctx.canvas.height / 2;
+                const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+
+                for (let y = 0; y < ctx.canvas.height; y++) {
+                    for (let x = 0; x < ctx.canvas.width; x++) {
+                        const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+                        const vignette = Math.max(0, 1 - (distance / maxDistance) * 1.2);
+                        const index = (y * ctx.canvas.width + x) * 4;
+
+                        data[index] *= vignette;     // R
+                        data[index + 1] *= vignette; // G
+                        data[index + 2] *= vignette; // B
+                    }
+                }
+                break;
+
+            case 'analog-film':
+                // Add film grain and color shift
+                for (let i = 0; i < data.length; i += 4) {
+                    const noise = (Math.random() - 0.5) * 30;
+                    data[i] = Math.max(0, Math.min(255, data[i] + noise * 0.8)); // R with slight emphasis
+                    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise * 0.6)); // G
+                    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise * 0.9)); // B with blue tint
+
+                    // Reduce saturation slightly for vintage look
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = data[i] * 0.9 + avg * 0.1;
+                    data[i + 1] = data[i + 1] * 0.9 + avg * 0.1;
+                    data[i + 2] = data[i + 2] * 0.9 + avg * 0.1;
+                }
+                break;
+
+            case 'ripple':
+                // Create ripple effect using time for animation
+                const rippleImageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
+                const rippleData = rippleImageData.data;
+
+                for (let y = 0; y < ctx.canvas.height; y++) {
+                    for (let x = 0; x < ctx.canvas.width; x++) {
+                        const centerX = ctx.canvas.width / 2;
+                        const centerY = ctx.canvas.height / 2;
+                        const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+
+                        const wave = Math.sin((distance * 0.02) - (time * 0.01)) * 5;
+                        const sourceX = Math.max(0, Math.min(ctx.canvas.width - 1, x + wave));
+                        const sourceY = Math.max(0, Math.min(ctx.canvas.height - 1, y));
+
+                        const sourceIndex = (Math.floor(sourceY) * ctx.canvas.width + Math.floor(sourceX)) * 4;
+                        const targetIndex = (y * ctx.canvas.width + x) * 4;
+
+                        rippleData[targetIndex] = data[sourceIndex];
+                        rippleData[targetIndex + 1] = data[sourceIndex + 1];
+                        rippleData[targetIndex + 2] = data[sourceIndex + 2];
+                        rippleData[targetIndex + 3] = data[sourceIndex + 3];
+                    }
+                }
+
+                ctx.putImageData(rippleImageData, 0, 0);
+                return; // Return early since we've already put the image data
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+    };
 
     // Video time update handler
     const handleTimeUpdate = useCallback(() => {
@@ -145,6 +247,11 @@ const Jog: React.FC = () => {
         if (videoRef.current) {
             setDuration(videoRef.current.duration);
             setCurrentTime(videoRef.current.currentTime);
+
+            // Calculate and set aspect ratio
+            const aspectRatio = videoRef.current.videoWidth / videoRef.current.videoHeight;
+            setVideoAspectRatio(aspectRatio);
+            console.log(`Video aspect ratio: ${aspectRatio} (${videoRef.current.videoWidth}x${videoRef.current.videoHeight})`);
         }
         console.log("Video metadata loaded");
         updateCanvasSize();
@@ -520,30 +627,32 @@ const Jog: React.FC = () => {
 
     // Main pose detection loop
     const detectPose = async () => {
-        if (detectorRef.current && videoRef.current && canvasRef.current && !videoRef.current.paused) {
+        if (detectorRef.current && videoRef.current && canvasRef.current && effectCanvasRef.current && !videoRef.current.paused) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
+            const effectCanvas = effectCanvasRef.current;
             const ctx = canvas.getContext('2d');
-            if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-                try {
-                    const videoRect = video.getBoundingClientRect();
-                    canvas.style.position = 'absolute';
-                    canvas.style.pointerEvents = 'none';
-                    canvas.style.left = `${videoRect.left - (containerRef.current?.getBoundingClientRect().left || 0)}px`;
-                    canvas.style.top = `${videoRect.top - (containerRef.current?.getBoundingClientRect().top || 0)}px`;
-                    canvas.style.width = `${videoRect.width}px`;
-                    canvas.style.height = `${videoRect.height}px`;
+            const effectCtx = effectCanvas.getContext('2d');
 
-                    if (canvas.width !== Math.round(videoRect.width) || canvas.height !== Math.round(videoRect.height)) {
-                        canvas.width = Math.round(videoRect.width);
-                        canvas.height = Math.round(videoRect.height);
+            if (ctx && effectCtx && video.videoWidth > 0 && video.videoHeight > 0) {
+                try {
+                    // First, draw the video frame to the effect canvas for shader processing
+                    effectCtx.drawImage(video, 0, 0, effectCanvas.width, effectCanvas.height);
+
+                    // Apply shader effects to the effect canvas
+                    if (selectedEffect !== 'none') {
+                        applyShaderEffect(effectCtx, selectedEffect, Date.now());
                     }
 
+                    // Now do pose detection on the original video (unaffected by shaders)
                     const poses = await detectorRef.current.estimatePoses(video);
+
+                    // Clear the pose overlay canvas
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                    const scaleX = videoRect.width / video.videoWidth;
-                    const scaleY = videoRect.height / video.videoHeight;
+                    // Calculate scale factors for pose overlay
+                    const scaleX = canvas.width / video.videoWidth;
+                    const scaleY = canvas.height / video.videoHeight;
                     ctx.save();
                     ctx.scale(scaleX, scaleY);
 
@@ -735,24 +844,35 @@ const Jog: React.FC = () => {
     };
 
     const updateCanvasSize = () => {
-        if (videoRef.current && canvasRef.current && containerRef.current) {
+        if (videoRef.current && canvasRef.current && effectCanvasRef.current && containerRef.current) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
+            const effectCanvas = effectCanvasRef.current;
             const container = containerRef.current;
+
             if (video.videoWidth && video.videoHeight) {
+                // Calculate the display size while maintaining aspect ratio
+                const containerWidth = Math.min(640, window.innerWidth * 0.8);
+                const containerHeight = containerWidth / videoAspectRatio;
+
+                // Set container size
+                container.style.width = `${containerWidth}px`;
+                container.style.height = `${containerHeight}px`;
+
+                // Set canvas internal resolution to match video
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                container.style.width = `${video.videoWidth}px`;
-                container.style.height = `${video.videoHeight}px`;
+                effectCanvas.width = video.videoWidth;
+                effectCanvas.height = video.videoHeight;
+
+                // Set canvas display size to match container
+                canvas.style.width = `${containerWidth}px`;
+                canvas.style.height = `${containerHeight}px`;
+                effectCanvas.style.width = `${containerWidth}px`;
+                effectCanvas.style.height = `${containerHeight}px`;
+
+                console.log(`Canvas updated: ${video.videoWidth}x${video.videoHeight} -> ${containerWidth}x${containerHeight}`);
             }
-            const videoRect = video.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            canvas.style.position = 'absolute';
-            canvas.style.pointerEvents = 'none';
-            canvas.style.left = `${videoRect.left - containerRect.left}px`;
-            canvas.style.top = `${videoRect.top - containerRect.top}px`;
-            canvas.style.width = `${videoRect.width}px`;
-            canvas.style.height = `${videoRect.height}px`;
         }
     };
 
@@ -809,7 +929,7 @@ const Jog: React.FC = () => {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    }, [videoAspectRatio]);
 
     useEffect(() => {
         const browser = detectBrowser();
@@ -888,7 +1008,7 @@ const Jog: React.FC = () => {
                 fontSize: '12px',
                 color: '#666'
             }}>
-                Browser: {browserInfo} | MIDI: {midiSupported ? (midiOutput ? 'Connected' : 'Supported') : 'Not Supported'} | Video Type: {videoType.toUpperCase()}
+                Browser: {browserInfo} | MIDI: {midiSupported ? (midiOutput ? 'Connected' : 'Supported') : 'Not Supported'} | Video Type: {videoType.toUpperCase()} | Aspect Ratio: {videoAspectRatio.toFixed(2)}
             </div>
 
             {!modelLoaded && !loadingError && <p>Loading pose detection model...</p>}
@@ -912,8 +1032,8 @@ const Jog: React.FC = () => {
                     </button>
                 </div>
 
-                {/* URL Input for HLS/DASH streams */}
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                {/* URL Input and Shader Effects */}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <input
                         type="text"
                         placeholder="Enter HLS (.m3u8) or DASH (.mpd) URL"
@@ -935,44 +1055,66 @@ const Jog: React.FC = () => {
                             loadVideoWithStreaming(streamUrl);
                         }
                     }}>Load Stream</button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <label>Effect:</label>
+                        <select
+                            value={selectedEffect}
+                            onChange={e => setSelectedEffect(e.target.value as ShaderEffect)}
+                            style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        >
+                            <option value="none">None</option>
+                            <option value="tint-red">Tint Red</option>
+                            <option value="ripple">Ripple</option>
+                            <option value="glow">Glow</option>
+                            <option value="vignette">Vignette</option>
+                            <option value="analog-film">Analog Film</option>
+                        </select>
+                    </div>
                 </div>
 
                 {/* Video Container */}
                 <div ref={containerRef} style={{
                     position: 'relative',
-                    width: 'min(640px, 80vw)',
-                    height: 'auto',
-                    aspectRatio: '4/3',
                     maxWidth: '80vw',
                     border: '2px solid #333',
                     borderRadius: '8px',
                     background: '#000',
                     margin: '0 auto'
                 }}>
+                    {/* Hidden video element for pose detection */}
                     <video
                         ref={videoRef}
                         muted
                         playsInline
                         style={{
-                            width: '100%',
-                            height: '100%',
-                            maxWidth: '80vw',
-                            maxHeight: '80vh',
-                            borderRadius: '6px',
-                            display: 'block',
-                            objectFit: 'contain'
+                            position: 'absolute',
+                            opacity: 0,
+                            pointerEvents: 'none'
                         }}
                     />
+
+                    {/* Effect canvas - displays the video with shaders */}
+                    <canvas
+                        ref={effectCanvasRef}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            borderRadius: '6px',
+                            display: 'block'
+                        }}
+                    />
+
+                    {/* Pose overlay canvas - displays skeleton and markers */}
                     <canvas
                         ref={canvasRef}
                         style={{
                             position: 'absolute',
+                            top: 0,
+                            left: 0,
                             pointerEvents: 'none',
-                            borderRadius: '6px',
-                            width: '100%',
-                            height: '100%',
-                            maxWidth: '80vw',
-                            maxHeight: '80vh'
+                            borderRadius: '6px'
                         }}
                     />
                 </div>
@@ -1180,7 +1322,7 @@ const Jog: React.FC = () => {
                     <div style={{ minHeight: '20px' }}>
                         <strong>Jump Status:</strong> <span style={{
                         color: displayJumpStatus === 'Jumping!' ? '#ff8888' :
-                            displayJumpStatus.startsWith('Landed!') ? '#88ff88' : '#fff',
+                            displayJumpStatus.startsWith('Landed!') ? '#88ff88' : '#333',
                         fontWeight: 'bold'
                     }}>
                             {displayJumpStatus}
@@ -1193,6 +1335,29 @@ const Jog: React.FC = () => {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* Instructions */}
+            <div style={{
+                maxWidth: '640px',
+                margin: '0 auto',
+                padding: '16px',
+                background: '#e8f4f8',
+                border: '1px solid #bee5eb',
+                borderRadius: '8px',
+                fontSize: '14px'
+            }}>
+                <h4 style={{ margin: '0 0 8px 0' }}>Controls & Features:</h4>
+                <ul style={{ margin: '0', paddingLeft: '20px' }}>
+                    <li>Use mouse wheel over video to scrub timeline</li>
+                    <li>Hold transport buttons (◀/▶/⏪/⏩) for jog control</li>
+                    <li>Click timeline markers to jump to specific times</li>
+                    <li>Add markers at current playhead position</li>
+                    <li>Select shader effects to apply visual filters</li>
+                    <li>Video maintains correct aspect ratio automatically</li>
+                    <li>Pose detection works independently of shader effects</li>
+                    <li>Supports MP4, HLS (.m3u8), and DASH (.mpd) streams</li>
+                </ul>
             </div>
         </div>
     );
