@@ -48,6 +48,11 @@ const WebXR: React.FC = () => {
         grabController: null
     });
 
+    // Debug states
+    const [debugInfo, setDebugInfo] = useState<string>('Initializing...');
+    const [threeJsStatus, setThreeJsStatus] = useState<string>('Not initialized');
+    const [renderCount, setRenderCount] = useState<number>(0);
+
     // Pose detection refs
     const detectorRef = useRef<poseDetection.PoseDetector | null>(null);
     const [modelLoaded, setModelLoaded] = useState(false);
@@ -84,116 +89,248 @@ const WebXR: React.FC = () => {
 
     // Initialize Three.js scene
     const initThreeJS = useCallback(() => {
-        if (!canvasRef.current) return;
+        if (!canvasRef.current) {
+            console.error('DEBUG: Canvas ref is null in initThreeJS');
+            setDebugInfo('Error: Canvas ref is null');
+            return;
+        }
 
-        const canvas = canvasRef.current;
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-        renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.xr.enabled = true;
+        console.log('DEBUG: Starting Three.js initialization...');
+        setDebugInfo('Initializing Three.js...');
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+        try {
+            const canvas = canvasRef.current;
+            console.log('DEBUG: Canvas dimensions:', canvas.clientWidth, 'x', canvas.clientHeight);
 
-        // Add lighting
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-        scene.add(ambientLight);
+            const renderer = new THREE.WebGLRenderer({
+                canvas,
+                alpha: true,
+                antialias: true,
+                preserveDrawingBuffer: true
+            });
+            console.log('DEBUG: WebGL renderer created');
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(1, 1, 1);
-        scene.add(directionalLight);
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(0x202020, 1); // Dark gray instead of black for debugging
+            renderer.xr.enabled = true;
+            console.log('DEBUG: Renderer configured, XR enabled:', renderer.xr.enabled);
 
-        // Create virtual instrument cube
-        const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-        const material = new THREE.MeshLambertMaterial({
-            color: 0x00ff88,
-            transparent: true,
-            opacity: 0.8
-        });
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(0, 0, -1);
-        scene.add(cube);
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x404040); // Even lighter gray for scene background
+            console.log('DEBUG: Scene created with background color');
 
-        // Add wireframe for better visibility
-        const wireframe = new THREE.WireframeGeometry(geometry);
-        const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-        const wireframeMesh = new THREE.LineSegments(wireframe, wireframeMaterial);
-        cube.add(wireframeMesh);
+            const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 2); // Move camera back to see the cube
+            console.log('DEBUG: Camera created and positioned at:', camera.position);
 
-        rendererRef.current = renderer;
-        sceneRef.current = scene;
-        cameraRef.current = camera;
-        virtualCubeRef.current = cube;
+            // Add more lighting for better visibility
+            const ambientLight = new THREE.AmbientLight(0x404040, 1.0); // Brighter ambient
+            scene.add(ambientLight);
+            console.log('DEBUG: Ambient light added');
 
-        console.log('Three.js scene initialized');
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0); // Brighter directional
+            directionalLight.position.set(2, 2, 2);
+            scene.add(directionalLight);
+            console.log('DEBUG: Directional light added');
+
+            // Add a second light for better illumination
+            const pointLight = new THREE.PointLight(0xffffff, 0.5, 100);
+            pointLight.position.set(-2, 2, 2);
+            scene.add(pointLight);
+            console.log('DEBUG: Point light added');
+
+            // Create virtual instrument cube with more visible properties
+            const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2); // Larger cube
+            console.log('DEBUG: Cube geometry created, size: 0.2x0.2x0.2');
+
+            const material = new THREE.MeshLambertMaterial({
+                color: 0x00ff88,
+                transparent: false, // Make it opaque for debugging
+                side: THREE.DoubleSide
+            });
+            console.log('DEBUG: Cube material created');
+
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.set(0, 0, -1);
+            scene.add(cube);
+            console.log('DEBUG: Cube added to scene at position:', cube.position);
+
+            // Add wireframe for better visibility
+            const wireframe = new THREE.WireframeGeometry(geometry);
+            const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+            const wireframeMesh = new THREE.LineSegments(wireframe, wireframeMaterial);
+            cube.add(wireframeMesh);
+            console.log('DEBUG: Wireframe added to cube');
+
+            // Add helper objects for debugging
+            const axesHelper = new THREE.AxesHelper(1);
+            scene.add(axesHelper);
+            console.log('DEBUG: Axes helper added');
+
+            // Add grid helper
+            const gridHelper = new THREE.GridHelper(2, 10);
+            scene.add(gridHelper);
+            console.log('DEBUG: Grid helper added');
+
+            rendererRef.current = renderer;
+            sceneRef.current = scene;
+            cameraRef.current = camera;
+            virtualCubeRef.current = cube;
+
+            setThreeJsStatus('Initialized successfully');
+            setDebugInfo('Three.js initialized, starting fallback render...');
+            console.log('DEBUG: Three.js initialization complete');
+
+            // Start a fallback render loop for non-XR mode
+            startFallbackRenderLoop();
+
+        } catch (error) {
+            console.error('DEBUG: Error in initThreeJS:', error);
+            setDebugInfo(`Three.js init error: ${error}`);
+            setThreeJsStatus(`Error: ${error}`);
+        }
+    }, []);
+
+    // Fallback render loop for non-XR mode (debugging)
+    const startFallbackRenderLoop = useCallback(() => {
+        if (!rendererRef.current || !sceneRef.current || !cameraRef.current) {
+            console.error('DEBUG: Cannot start fallback render - missing Three.js components');
+            return;
+        }
+
+        console.log('DEBUG: Starting fallback render loop...');
+        let frameCount = 0;
+
+        const animate = () => {
+            if (rendererRef.current && sceneRef.current && cameraRef.current && virtualCubeRef.current) {
+                frameCount++;
+
+                // Rotate cube for visual confirmation
+                virtualCubeRef.current.rotation.x += 0.01;
+                virtualCubeRef.current.rotation.y += 0.01;
+
+                // Update render count every 60 frames
+                if (frameCount % 60 === 0) {
+                    setRenderCount(prev => prev + 60);
+                    console.log(`DEBUG: Rendered ${frameCount} frames`);
+                }
+
+                try {
+                    rendererRef.current.render(sceneRef.current, cameraRef.current);
+                } catch (renderError) {
+                    console.error('DEBUG: Render error:', renderError);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+        setDebugInfo('Fallback render loop active');
+        console.log('DEBUG: Fallback render loop started successfully');
     }, []);
 
     // WebXR support detection
     const checkXRSupport = useCallback(async () => {
+        console.log('DEBUG: Checking WebXR support...');
+        setDebugInfo('Checking WebXR support...');
+
         if (!('xr' in navigator)) {
-            console.log('WebXR not supported');
+            console.log('DEBUG: WebXR not supported - navigator.xr not available');
+            setDebugInfo('WebXR not supported in this browser');
             return;
         }
 
         try {
-            const arSupported = await (navigator as any).xr.isSessionSupported('immersive-ar');
-            const vrSupported = await (navigator as any).xr.isSessionSupported('immersive-vr');
+            const xrNavigator = (navigator as any).xr;
+            console.log('DEBUG: WebXR navigator found, checking session support...');
 
+            const arSupported = await xrNavigator.isSessionSupported('immersive-ar');
+            const vrSupported = await xrNavigator.isSessionSupported('immersive-vr');
+
+            console.log(`DEBUG: WebXR Support - AR: ${arSupported}, VR: ${vrSupported}`);
             setXrSupported({ ar: arSupported, vr: vrSupported });
-            console.log(`WebXR Support - AR: ${arSupported}, VR: ${vrSupported}`);
+            setDebugInfo(`WebXR Support - AR: ${arSupported}, VR: ${vrSupported}`);
         } catch (error) {
-            console.error('Error checking WebXR support:', error);
+            console.error('DEBUG: Error checking WebXR support:', error);
             setXrSupported({ ar: false, vr: false });
+            setDebugInfo(`WebXR check error: ${error}`);
         }
     }, []);
 
     // Start XR session
     const startXRSession = useCallback(async (mode: 'ar' | 'vr') => {
-        if (!rendererRef.current || !('xr' in navigator)) return;
+        console.log(`DEBUG: Attempting to start ${mode.toUpperCase()} session...`);
+        setDebugInfo(`Starting ${mode.toUpperCase()} session...`);
+
+        if (!rendererRef.current || !('xr' in navigator)) {
+            console.error('DEBUG: Cannot start XR session - missing renderer or WebXR not supported');
+            setDebugInfo('Error: WebXR not available or renderer not initialized');
+            return;
+        }
 
         try {
             const sessionMode = mode === 'ar' ? 'immersive-ar' : 'immersive-vr';
             const requiredFeatures = mode === 'ar' ? ['camera-access'] : [];
             const optionalFeatures = ['hand-tracking', 'local-floor'];
 
+            console.log(`DEBUG: Requesting ${sessionMode} session with features:`, { requiredFeatures, optionalFeatures });
+
             const session = await (navigator as any).xr.requestSession(sessionMode, {
                 requiredFeatures,
                 optionalFeatures
             });
 
+            console.log('DEBUG: XR session created successfully:', session);
+            console.log('DEBUG: Session input sources:', session.inputSources);
+
             await rendererRef.current.xr.setSession(session);
+            console.log('DEBUG: Session set on renderer');
+
             xrSessionRef.current = session;
             setCurrentMode(mode);
 
             // Set up session event handlers
             session.addEventListener('end', handleXRSessionEnd);
             session.addEventListener('inputsourceschange', handleInputSourcesChange);
+            console.log('DEBUG: Event listeners attached to session');
 
             // Start render loop
+            console.log('DEBUG: Starting XR animation loop...');
             rendererRef.current.setAnimationLoop(renderXRFrame);
 
-            console.log(`${mode.toUpperCase()} session started`);
+            setDebugInfo(`${mode.toUpperCase()} session active`);
+            console.log(`DEBUG: ${mode.toUpperCase()} session started successfully`);
 
             // For AR mode, also start camera and pose detection
             if (mode === 'ar') {
+                console.log('DEBUG: Starting camera for AR mode...');
                 await startCamera();
             }
 
         } catch (error) {
-            console.error(`Failed to start ${mode} session:`, error);
-            alert(`Failed to start ${mode.toUpperCase()} session. Make sure you have a compatible headset or device.`);
+            console.error(`DEBUG: Failed to start ${mode} session:`, error);
+            setDebugInfo(`${mode.toUpperCase()} session failed: ${error}`);
+            alert(`Failed to start ${mode.toUpperCase()} session. Error: ${error}`);
         }
     }, []);
 
     // Handle XR session end
     const handleXRSessionEnd = useCallback(() => {
+        console.log('DEBUG: XR session ending...');
         if (rendererRef.current) {
             rendererRef.current.setAnimationLoop(null);
+            console.log('DEBUG: Animation loop stopped');
         }
         xrSessionRef.current = null;
         setCurrentMode('none');
         setInstrumentState(prev => ({ ...prev, isGrabbed: false, grabController: null }));
-        console.log('XR session ended');
+        setDebugInfo('XR session ended, fallback mode active');
+        console.log('DEBUG: XR session ended, returned to fallback rendering');
+
+        // Restart fallback rendering
+        startFallbackRenderLoop();
     }, []);
 
     // Handle input sources change (controllers)
@@ -203,24 +340,51 @@ const WebXR: React.FC = () => {
 
     // XR render loop
     const renderXRFrame = useCallback((_timestamp: number, frame: XRFrame) => {
-        if (!rendererRef.current || !sceneRef.current || !cameraRef.current || !virtualCubeRef.current) return;
+        if (!rendererRef.current || !sceneRef.current || !cameraRef.current || !virtualCubeRef.current) {
+            console.warn('DEBUG: Missing components in XR render frame');
+            return;
+        }
 
-        const session = frame.session;
-        const referenceSpace = rendererRef.current.xr.getReferenceSpace();
+        try {
+            const session = frame.session;
+            const referenceSpace = rendererRef.current.xr.getReferenceSpace();
 
-        if (referenceSpace) {
+            if (!referenceSpace) {
+                console.warn('DEBUG: No reference space available in XR frame');
+                return;
+            }
+
             const pose = frame.getViewerPose(referenceSpace);
 
             if (pose) {
+                // Update render count
+                setRenderCount(prev => {
+                    const newCount = prev + 1;
+                    if (newCount % 60 === 0) {
+                        console.log(`DEBUG: XR rendered ${newCount} frames`);
+                    }
+                    return newCount;
+                });
+
                 // Handle controller input
                 handleControllerInput(session, frame);
 
                 // Update virtual instrument
                 updateVirtualInstrument();
 
+                // Animate cube for visual confirmation
+                if (virtualCubeRef.current) {
+                    virtualCubeRef.current.rotation.x += 0.01;
+                    virtualCubeRef.current.rotation.y += 0.01;
+                }
+
                 // Render the scene
                 rendererRef.current.render(sceneRef.current, cameraRef.current);
+            } else {
+                console.warn('DEBUG: No pose available in XR frame');
             }
+        } catch (error) {
+            console.error('DEBUG: Error in XR render frame:', error);
         }
     }, []);
 
@@ -643,16 +807,19 @@ const WebXR: React.FC = () => {
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1>WebXR Virtual Instrument Controller</h1>
 
-            {/* Status Info */}
+            {/* Status Info with Debug */}
             <div style={{
                 textAlign: 'center',
                 margin: '10px 0',
                 fontSize: '12px',
-                color: '#666'
+                color: '#666',
+                fontFamily: 'monospace'
             }}>
-                WebXR Support - AR: {xrSupported.ar ? 'Yes' : 'No'} | VR: {xrSupported.vr ? 'Yes' : 'No'} |
-                MIDI: {midiSupported ? (midiOutput ? 'Connected' : 'Supported') : 'Not Supported'} |
-                Current Mode: {currentMode.toUpperCase()}
+                <div>WebXR Support - AR: {xrSupported.ar ? 'Yes' : 'No'} | VR: {xrSupported.vr ? 'Yes' : 'No'}</div>
+                <div>MIDI: {midiSupported ? (midiOutput ? 'Connected' : 'Supported') : 'Not Supported'} | Current Mode: {currentMode.toUpperCase()}</div>
+                <div><strong>Three.js Status:</strong> {threeJsStatus}</div>
+                <div><strong>Debug:</strong> {debugInfo}</div>
+                <div><strong>Render Count:</strong> {renderCount} frames</div>
             </div>
 
             {!modelLoaded && !loadingError && <p>Loading pose detection model...</p>}
@@ -708,6 +875,36 @@ const WebXR: React.FC = () => {
 
                     <button onClick={initMidi} disabled={!!midiOutput || !midiSupported}>
                         {midiOutput ? 'MIDI Connected' : midiSupported ? 'Connect MIDI' : 'MIDI Unsupported'}
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            console.log('DEBUG: Manual render test triggered');
+                            setDebugInfo('Manual render test...');
+                            if (rendererRef.current && sceneRef.current && cameraRef.current) {
+                                try {
+                                    rendererRef.current.render(sceneRef.current, cameraRef.current);
+                                    setDebugInfo('Manual render successful');
+                                    console.log('DEBUG: Manual render completed successfully');
+                                } catch (error) {
+                                    setDebugInfo(`Manual render failed: ${error}`);
+                                    console.error('DEBUG: Manual render failed:', error);
+                                }
+                            } else {
+                                setDebugInfo('Manual render failed: Missing components');
+                                console.error('DEBUG: Missing components for manual render');
+                            }
+                        }}
+                        style={{
+                            padding: '12px 24px',
+                            background: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Test Render
                     </button>
                 </div>
 
