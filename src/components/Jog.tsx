@@ -31,7 +31,10 @@ interface TimelineMarker {
     description?: string;
 }
 
+const DEFAULT_STREAM_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+
 const Jog: React.FC = () => {
+    const [streamUrl, setStreamUrl] = useState<string>(DEFAULT_STREAM_URL);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -258,6 +261,9 @@ const Jog: React.FC = () => {
 
         video.load();
         setStream(null);
+        setTimeout(() => {
+            video.play().catch(() => {});
+        }, 200);
     }, []);
 
     // Browser detection
@@ -861,6 +867,16 @@ const Jog: React.FC = () => {
         };
     }, [handlePlay, handlePause, handleTimeUpdate, handleLoadedMetadata]);
 
+    // On mount, load and play the default stream
+    useEffect(() => {
+        resetTrackingState();
+        loadVideoWithStreaming(DEFAULT_STREAM_URL);
+        // Try to autoplay after loading
+        setTimeout(() => {
+            videoRef.current?.play().catch(() => {});
+        }, 500);
+    }, []);
+
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1>Enhanced Kasm Jog with Professional Video Controls</h1>
@@ -902,21 +918,21 @@ const Jog: React.FC = () => {
                         type="text"
                         placeholder="Enter HLS (.m3u8) or DASH (.mpd) URL"
                         style={{ width: '300px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        value={streamUrl}
+                        onChange={e => setStreamUrl(e.target.value)}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
-                                const url = (e.target as HTMLInputElement).value;
-                                if (url) {
+                                if (streamUrl) {
                                     resetTrackingState();
-                                    loadVideoWithStreaming(url);
+                                    loadVideoWithStreaming(streamUrl);
                                 }
                             }
                         }}
                     />
                     <button onClick={() => {
-                        const input = document.querySelector('input[placeholder*="HLS"]') as HTMLInputElement;
-                        if (input?.value) {
+                        if (streamUrl) {
                             resetTrackingState();
-                            loadVideoWithStreaming(input.value);
+                            loadVideoWithStreaming(streamUrl);
                         }
                     }}>Load Stream</button>
                 </div>
@@ -924,11 +940,14 @@ const Jog: React.FC = () => {
                 {/* Video Container */}
                 <div ref={containerRef} style={{
                     position: 'relative',
-                    width: '640px',
-                    height: '480px',
+                    width: 'min(640px, 80vw)',
+                    height: 'auto',
+                    aspectRatio: '4/3',
+                    maxWidth: '80vw',
                     border: '2px solid #333',
                     borderRadius: '8px',
-                    background: '#000'
+                    background: '#000',
+                    margin: '0 auto'
                 }}>
                     <video
                         ref={videoRef}
@@ -937,6 +956,8 @@ const Jog: React.FC = () => {
                         style={{
                             width: '100%',
                             height: '100%',
+                            maxWidth: '80vw',
+                            maxHeight: '80vh',
                             borderRadius: '6px',
                             display: 'block',
                             objectFit: 'contain'
@@ -947,14 +968,18 @@ const Jog: React.FC = () => {
                         style={{
                             position: 'absolute',
                             pointerEvents: 'none',
-                            borderRadius: '6px'
+                            borderRadius: '6px',
+                            width: '100%',
+                            height: '100%',
+                            maxWidth: '80vw',
+                            maxHeight: '80vh'
                         }}
                     />
                 </div>
 
                 {/* Professional Video Controls */}
                 <div style={{
-                    width: '640px',
+                    width: 'min(640px, 80vw)',
                     padding: '16px',
                     borderRadius: '8px',
                     border: '1px solid #ccc'
@@ -1050,7 +1075,7 @@ const Jog: React.FC = () => {
 
                 {/* Timeline Markers Table */}
                 <div style={{
-                    width: '640px',
+                    width: 'min(640px, 80vw)',
                     border: '1px solid #ddd',
                     borderRadius: '8px',
                     overflow: 'hidden'
@@ -1137,7 +1162,7 @@ const Jog: React.FC = () => {
             {/* Movement Status Display */}
             <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
                 <div style={{
-                    width: '640px',
+                    width: 'min(640px, 80vw)',
                     padding: '16px',
                     fontFamily: 'monospace',
                     fontSize: '14px',
