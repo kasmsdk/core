@@ -10,6 +10,7 @@ import CanvasDocs from './CanvasDocs';
 import RulezDocs from './RulezDocs';
 import KrumhanselDocs from './KrumhanselDocs';
 import JogDocs from './JogDocs';
+import WebXRDocs from './WebXRDocs';
 
 interface KasmProps {
   onNavigate: (app: string) => void;
@@ -27,6 +28,7 @@ type DocPage =
   | 'krumhansel'
   | 'lfo'
   | 'jog'
+  | 'webxr'
   | 'looper';
 
 type ActiveSection = 'whatsnew' | DocPage;
@@ -125,6 +127,12 @@ export default function Kasm({ onNavigate }: KasmProps) {
                 🎹 <br/>Jog
               </button>
               <button className="kasm-demo-btn" onClick={() => setActiveSection('jog')}>📖 <br/>Jog<br/>Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('webxr')}>
+                🎹 <br/>WebXR
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('webxr')}>📖 <br/>WebXR<br/>Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('lfo')}>

@@ -19,6 +19,7 @@ import Canvas from "./components/Canvas";
 import Krumhansel from "./components/Krumhansel";
 import Jog from "./components/Jog";
 import JogCanvas from "../latest/JogCanvas";
+import WebXR from "./components/WebXR";
 import "./App.css";
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
     | "lfo"
     | "looper"
     | "jog"
+    | "webxr"
     | "canvas"
     | "canvas-jog"
     | "rulez"
@@ -55,6 +57,7 @@ function App() {
         "lfo",
         "looper",
         "jog",
+        "webxr",
         "rulez",
         "canvas",
         "krumhansel",
@@ -77,6 +80,7 @@ function App() {
     "looper",
     "rulez",
     "jog",
+    "webxr",
     "canvas",
   ].includes(currentApp);
 
@@ -168,6 +172,7 @@ function App() {
           {currentApp === "looper" && <Looper />}
           {currentApp === "rulez" && <Rulez />}
           {currentApp === "jog" && <Jog />}
+          {currentApp === "webxr" && <WebXR />}
           {currentApp === "canvas-jog" && <JogCanvas />}
           {currentApp === "canvas" && <Canvas />}
           {currentApp === "krumhansel" && <Krumhansel />}
