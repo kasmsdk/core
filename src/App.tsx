@@ -34,6 +34,7 @@ function App() {
     | "looper"
     | "jog"
     | "canvas"
+    | "canvas-jog"
     | "rulez"
     | "krumhansel"
   >("kasm");

@@ -1,6 +1,14 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs';
+
+// Type declarations for HLS.js and Dash.js
+declare global {
+    interface Window {
+        Hls: any;
+        dashjs: any;
+    }
+}
 
 interface HandMovement {
     direction: 'up' | 'down' | 'left' | 'right' | 'stationary';
@@ -16,6 +24,13 @@ interface JumpEvent {
     fadeOpacity: number;
 }
 
+interface TimelineMarker {
+    id: string;
+    time: number;
+    label: string;
+    description?: string;
+}
+
 const Jog: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,6 +41,31 @@ const Jog: React.FC = () => {
     const [midiSupported, setMidiSupported] = useState<boolean>(false);
     const [browserInfo, setBrowserInfo] = useState<string>('');
     const lastYRef = useRef<number | null>(null);
+
+    // Video player state
+    const [currentTime, setCurrentTime] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(0);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [playbackRate, setPlaybackRate] = useState<number>(1);
+    const [volume, setVolume] = useState<number>(1);
+
+    // Video streaming support
+    const hlsRef = useRef<any>(null);
+    const dashPlayerRef = useRef<any>(null);
+    const [videoType, setVideoType] = useState<'mp4' | 'hls' | 'dash' | 'webcam'>('mp4');
+
+    // Timeline markers
+    const [timelineMarkers, setTimelineMarkers] = useState<TimelineMarker[]>([
+        { id: '1', time: 10, label: 'Marker 1', description: 'First movement sequence' },
+        { id: '2', time: 30, label: 'Marker 2', description: 'Jump sequence begins' },
+        { id: '3', time: 60, label: 'Marker 3', description: 'Hand gestures' },
+        { id: '4', time: 90, label: 'Marker 4', description: 'Complex movements' }
+    ]);
+
+    // Jog controls
+    const [jogSpeed, setJogSpeed] = useState<number>(0);
+    const jogIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const lastWheelTime = useRef<number>(0);
 
     // Hand tracking state
     const leftHandMovement = useRef<HandMovement>({
@@ -46,7 +86,6 @@ const Jog: React.FC = () => {
     const isJumping = useRef(false);
     const jumpStartY = useRef<number | null>(null);
     const groundLevel = useRef<number | null>(null);
-    // Add state for jump distance and positions
     const [jumpDistance, setJumpDistance] = useState<number | null>(null);
     const [takeoffPos, setTakeoffPos] = useState<{ x: number, y: number } | null>(null);
     const [landingPos, setLandingPos] = useState<{ x: number, y: number } | null>(null);
@@ -59,7 +98,7 @@ const Jog: React.FC = () => {
     // Track if we need to start detection after model loads
     const shouldStartDetection = useRef(false);
 
-    // Enhanced status display with persistence (what gets displayed to user)
+    // Enhanced status display with persistence
     const [displayLeftHandStatus, setDisplayLeftHandStatus] = useState<string>('Stationary');
     const [displayRightHandStatus, setDisplayRightHandStatus] = useState<string>('Stationary');
     const [displayJumpStatus, setDisplayJumpStatus] = useState<string>('On Ground');
@@ -69,6 +108,157 @@ const Jog: React.FC = () => {
     const rightHandStatusTimer = useRef<NodeJS.Timeout | null>(null);
     const jumpStatusTimer = useRef<NodeJS.Timeout | null>(null);
     const jumpResetTimer = useRef<NodeJS.Timeout | null>(null);
+
+    // Load HLS.js and Dash.js libraries dynamically
+    useEffect(() => {
+        const loadLibraries = async () => {
+            // Load HLS.js
+            if (!window.Hls) {
+                const script1 = document.createElement('script');
+                script1.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js';
+                document.head.appendChild(script1);
+            }
+
+            // Load Dash.js
+            if (!window.dashjs) {
+                const script2 = document.createElement('script');
+                script2.src = 'https://cdn.dashjs.org/latest/dash.all.min.js';
+                document.head.appendChild(script2);
+            }
+        };
+
+        loadLibraries();
+    }, []);
+
+    // Video time update handler
+    const handleTimeUpdate = useCallback(() => {
+        if (videoRef.current) {
+            setCurrentTime(videoRef.current.currentTime);
+        }
+    }, []);
+
+    // Video metadata loaded handler
+    const handleLoadedMetadata = useCallback(() => {
+        if (videoRef.current) {
+            setDuration(videoRef.current.duration);
+            setCurrentTime(videoRef.current.currentTime);
+        }
+        console.log("Video metadata loaded");
+        updateCanvasSize();
+    }, []);
+
+    // Play/pause handlers
+    const handlePlay = useCallback(() => {
+        setIsPlaying(true);
+        handleVideoPlay();
+    }, []);
+
+    const handlePause = useCallback(() => {
+        setIsPlaying(false);
+        detectionLoopRunning.current = false;
+    }, []);
+
+    // Jog control functions
+    const startJog = useCallback((speed: number) => {
+        setJogSpeed(speed);
+        if (jogIntervalRef.current) {
+            clearInterval(jogIntervalRef.current);
+        }
+
+        if (speed !== 0 && videoRef.current) {
+            jogIntervalRef.current = setInterval(() => {
+                if (videoRef.current) {
+                    const newTime = videoRef.current.currentTime + (speed * 0.1);
+                    videoRef.current.currentTime = Math.max(0, Math.min(newTime, duration));
+                }
+            }, 100);
+        }
+    }, [duration]);
+
+    const stopJog = useCallback(() => {
+        setJogSpeed(0);
+        if (jogIntervalRef.current) {
+            clearInterval(jogIntervalRef.current);
+            jogIntervalRef.current = null;
+        }
+    }, []);
+
+    // Mouse wheel handler for scrubbing
+    const handleWheel = useCallback((e: WheelEvent) => {
+        e.preventDefault();
+        const now = Date.now();
+
+        // Throttle wheel events
+        if (now - lastWheelTime.current < 50) return;
+        lastWheelTime.current = now;
+
+        if (videoRef.current) {
+            const delta = -e.deltaY * 0.1; // Adjust sensitivity
+            const newTime = videoRef.current.currentTime + delta;
+            videoRef.current.currentTime = Math.max(0, Math.min(newTime, duration));
+        }
+    }, [duration]);
+
+    // Timeline marker jump
+    const jumpToMarker = useCallback((time: number) => {
+        if (videoRef.current) {
+            videoRef.current.currentTime = time;
+            setCurrentTime(time);
+        }
+    }, []);
+
+    // Add new timeline marker
+    const addTimelineMarker = useCallback(() => {
+        const newMarker: TimelineMarker = {
+            id: Date.now().toString(),
+            time: currentTime,
+            label: `Marker ${timelineMarkers.length + 1}`,
+            description: `Added at ${Math.round(currentTime)}s`
+        };
+        setTimelineMarkers(prev => [...prev, newMarker].sort((a, b) => a.time - b.time));
+    }, [currentTime, timelineMarkers.length]);
+
+    // Load video with appropriate streaming support
+    const loadVideoWithStreaming = useCallback((url: string) => {
+        if (!videoRef.current) return;
+
+        // Clean up existing players
+        if (hlsRef.current) {
+            hlsRef.current.destroy();
+            hlsRef.current = null;
+        }
+        if (dashPlayerRef.current) {
+            dashPlayerRef.current.destroy();
+            dashPlayerRef.current = null;
+        }
+
+        const video = videoRef.current;
+        video.srcObject = null;
+
+        // Determine video type
+        if (url.includes('.m3u8')) {
+            setVideoType('hls');
+            if (window.Hls && window.Hls.isSupported()) {
+                hlsRef.current = new window.Hls();
+                hlsRef.current.loadSource(url);
+                hlsRef.current.attachMedia(video);
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+            }
+        } else if (url.includes('.mpd')) {
+            setVideoType('dash');
+            if (window.dashjs) {
+                dashPlayerRef.current = window.dashjs.MediaPlayer().create();
+                dashPlayerRef.current.initialize(video, url, false);
+            }
+        } else {
+            setVideoType('mp4');
+            video.src = url;
+        }
+
+        video.load();
+        setStream(null);
+    }, []);
 
     // Browser detection
     const detectBrowser = () => {
@@ -93,40 +283,30 @@ const Jog: React.FC = () => {
         timer: React.MutableRefObject<NodeJS.Timeout | null>,
         minDisplayTime: number = 1000
     ) => {
-        // If status is different from what's currently displayed, update immediately
         if (newStatus !== currentDisplayStatus) {
             setDisplayStatus(newStatus);
-
-            // Clear existing timer
             if (timer.current) {
                 clearTimeout(timer.current);
             }
-
-            // Set new timer to prevent rapid changes for minDisplayTime
             timer.current = setTimeout(() => {
                 timer.current = null;
             }, minDisplayTime);
-        }
-        // If status is the same and timer has expired, allow update
-        else if (!timer.current) {
+        } else if (!timer.current) {
             setDisplayStatus(newStatus);
         }
     };
 
-    // --- Utility functions used in detection ---
+    // MIDI and pose detection functions (keeping existing functionality)
     const sendMidiNote = (note: number, velocity = 127) => {
         if (midiOutput) {
             try {
-                midiOutput.send([0x90, note, velocity]); // Note on
+                midiOutput.send([0x90, note, velocity]);
                 setTimeout(() => {
-                    midiOutput.send([0x80, note, 0]); // Note off
+                    midiOutput.send([0x80, note, 0]);
                 }, 100);
             } catch (error) {
                 console.warn('MIDI send failed:', error);
             }
-        } else if (!midiSupported) {
-            // Visual feedback when MIDI is not available
-            console.log(`♪ Note ${note} (velocity: ${velocity})`);
         }
     };
 
@@ -145,11 +325,10 @@ const Jog: React.FC = () => {
         const deltaX = currentPos.x - lastPosition.x;
         const deltaY = currentPos.y - lastPosition.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const speed = Math.round(distance * 10) / 10; // Round to 1 decimal
+        const speed = Math.round(distance * 10) / 10;
 
         let newDirection: 'up' | 'down' | 'left' | 'right' | 'stationary' = 'stationary';
 
-        // Determine primary direction (threshold for movement detection)
         if (distance > 2) {
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 newDirection = deltaX > 0 ? 'right' : 'left';
@@ -158,10 +337,8 @@ const Jog: React.FC = () => {
             }
         }
 
-        // Check for direction change
         if (newDirection !== handMovement.current.direction && newDirection !== 'stationary') {
             handMovement.current.directionChangeCount++;
-            // Send MIDI note on direction change
             const midiNote = handName === 'left' ? 64 + (handMovement.current.directionChangeCount % 12) : 72 + (handMovement.current.directionChangeCount % 12);
             sendMidiNote(midiNote, Math.min(127, Math.round(speed * 10)));
         }
@@ -185,51 +362,38 @@ const Jog: React.FC = () => {
         const avgAnkleY = (leftAnkle.y + rightAnkle.y) / 2;
         const currentNoseY = nose.y;
 
-        // Initialize ground level with more robust detection
         if (groundLevel.current === null) {
             groundLevel.current = avgAnkleY;
         } else {
-            // Update ground level gradually when person is likely on ground
             if (!isJumping.current) {
-                // Only update ground level if ankles are below a certain threshold relative to nose
                 const bodyHeight = avgAnkleY - currentNoseY;
-                if (bodyHeight > 100) { // Person is standing normally
+                if (bodyHeight > 100) {
                     groundLevel.current = groundLevel.current * 0.9 + avgAnkleY * 0.1;
                 }
             }
         }
 
-        // Dynamic thresholds based on estimated body height
         const bodyHeight = Math.abs(avgAnkleY - currentNoseY);
-        const dynamicJumpThreshold = Math.max(15, bodyHeight * 0.08); // 8% of body height, min 15px
-        const dynamicLandingThreshold = Math.max(8, bodyHeight * 0.04); // 4% of body height, min 8px
+        const dynamicJumpThreshold = Math.max(15, bodyHeight * 0.08);
+        const dynamicLandingThreshold = Math.max(8, bodyHeight * 0.04);
 
-        console.log(`Ground: ${groundLevel.current?.toFixed(1)}, Ankle: ${avgAnkleY.toFixed(1)}, Threshold: ${dynamicJumpThreshold.toFixed(1)}, Diff: ${(groundLevel.current - avgAnkleY).toFixed(1)}`);
-
-        // Detect jump start - ankles are significantly above ground level
         if (!isJumping.current && avgAnkleY < groundLevel.current - dynamicJumpThreshold) {
             isJumping.current = true;
             jumpStartY.current = currentNoseY;
-            sendMidiNote(48, 127); // Low note for jump start
-            // Store takeoff position
+            sendMidiNote(48, 127);
             setTakeoffPos({ x: (leftAnkle.x + rightAnkle.x) / 2, y: avgAnkleY });
             setLandingPos(null);
             setJumpDistance(null);
-            console.log('Jump detected!');
 
-            // Clear any existing reset timer
             if (jumpResetTimer.current) {
                 clearTimeout(jumpResetTimer.current);
                 jumpResetTimer.current = null;
             }
 
             updateStatusWithPersistence('Jumping!', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 1500);
-        }
-        // Detect landing - ankles return close to ground level
-        else if (isJumping.current && avgAnkleY > groundLevel.current - dynamicLandingThreshold) {
+        } else if (isJumping.current && avgAnkleY > groundLevel.current - dynamicLandingThreshold) {
             isJumping.current = false;
 
-            // Add landing marker at ankle position
             const landingX = (leftAnkle.x + rightAnkle.x) / 2;
             const landingY = avgAnkleY;
 
@@ -239,9 +403,8 @@ const Jog: React.FC = () => {
                 timestamp: Date.now(),
                 fadeOpacity: 1.0
             }]);
-            sendMidiNote(36, 127); // Even lower note for landing
+            sendMidiNote(36, 127);
 
-            // Store landing position and calculate distance
             setLandingPos({ x: landingX, y: landingY });
             if (takeoffPos) {
                 const dx = landingX - takeoffPos.x;
@@ -249,7 +412,6 @@ const Jog: React.FC = () => {
                 const distance = Math.round(Math.sqrt(dx * dx + dy * dy));
                 setJumpDistance(distance);
 
-                // Calculate jump direction
                 let direction = 'vertical';
                 if (Math.abs(dx) > Math.abs(dy)) {
                     direction = dx > 0 ? 'right' : 'left';
@@ -257,14 +419,9 @@ const Jog: React.FC = () => {
                     direction = dy > 0 ? 'down' : 'up';
                 }
 
-                // Create the jump info message
                 const jumpInfo = distance > 10 ? `Landed! (${distance}px ${direction})` : 'Landed!';
-                console.log('Setting jump status to:', jumpInfo);
-
-                // Update the display status using the persistence function
                 updateStatusWithPersistence(jumpInfo, displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 2000);
 
-                // Set a single reset timer to go back to "On Ground"
                 jumpResetTimer.current = setTimeout(() => {
                     updateStatusWithPersistence('On Ground', displayJumpStatus, setDisplayJumpStatus, jumpStatusTimer, 500);
                     setJumpDistance(null);
@@ -273,7 +430,6 @@ const Jog: React.FC = () => {
                     jumpResetTimer.current = null;
                 }, 2500);
             }
-            console.log('Landing detected!');
         }
     };
 
@@ -329,7 +485,7 @@ const Jog: React.FC = () => {
 
     const drawJumpMarkers = (ctx: CanvasRenderingContext2D) => {
         const now = Date.now();
-        const fadeDuration = 3000; // 3 seconds fade
+        const fadeDuration = 3000;
 
         jumpEvents.forEach((jumpEvent) => {
             const age = now - jumpEvent.timestamp;
@@ -345,7 +501,6 @@ const Jog: React.FC = () => {
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Add "LAND" text
                 ctx.font = '12px Arial';
                 ctx.fillStyle = '#FFFFFF';
                 ctx.textAlign = 'center';
@@ -354,11 +509,10 @@ const Jog: React.FC = () => {
             }
         });
 
-        // Clean up old jump events
         setJumpEvents(prev => prev.filter(event => now - event.timestamp < fadeDuration));
     };
 
-    // --- Main pose detection loop ---
+    // Main pose detection loop
     const detectPose = async () => {
         if (detectorRef.current && videoRef.current && canvasRef.current && !videoRef.current.paused) {
             const video = videoRef.current;
@@ -366,31 +520,28 @@ const Jog: React.FC = () => {
             const ctx = canvas.getContext('2d');
             if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
                 try {
-                    // Use videoRect for canvas overlay and drawing scale
                     const videoRect = video.getBoundingClientRect();
-                    // Set canvas style to match videoRect (displayed size)
                     canvas.style.position = 'absolute';
                     canvas.style.pointerEvents = 'none';
                     canvas.style.left = `${videoRect.left - (containerRef.current?.getBoundingClientRect().left || 0)}px`;
                     canvas.style.top = `${videoRect.top - (containerRef.current?.getBoundingClientRect().top || 0)}px`;
                     canvas.style.width = `${videoRect.width}px`;
                     canvas.style.height = `${videoRect.height}px`;
-                    // Set canvas internal size to match video display size for 1:1 drawing
+
                     if (canvas.width !== Math.round(videoRect.width) || canvas.height !== Math.round(videoRect.height)) {
                         canvas.width = Math.round(videoRect.width);
                         canvas.height = Math.round(videoRect.height);
                     }
-                    // Draw pose scaled to videoRect
+
                     const poses = await detectorRef.current.estimatePoses(video);
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    // Calculate scale factors from video intrinsic to display size
+
                     const scaleX = videoRect.width / video.videoWidth;
                     const scaleY = videoRect.height / video.videoHeight;
                     ctx.save();
                     ctx.scale(scaleX, scaleY);
 
                     poses.forEach(pose => {
-                        // Original nose tracking for head movement
                         const nose = pose.keypoints.find(k => k.name === 'nose');
                         if (nose && nose.score && nose.score > 0.5) {
                             if (lastYRef.current !== null) {
@@ -402,7 +553,6 @@ const Jog: React.FC = () => {
                             lastYRef.current = nose.y;
                         }
 
-                        // Hand movement tracking with enhanced display
                         const leftWrist = pose.keypoints.find(k => k.name === 'left_wrist');
                         const rightWrist = pose.keypoints.find(k => k.name === 'right_wrist');
 
@@ -424,15 +574,11 @@ const Jog: React.FC = () => {
                             updateStatusWithPersistence(rightStatus, displayRightHandStatus, setDisplayRightHandStatus, rightHandStatusTimer);
                         }
 
-                        // Jump detection
                         detectJump(pose.keypoints);
-
                         drawSkeleton(pose.keypoints, 0.5, ctx);
                     });
 
-                    // Draw jump markers (in scaled context)
                     drawJumpMarkers(ctx);
-
                     ctx.restore();
                 } catch (error) {
                     console.warn('Detection loop error:', error);
@@ -445,7 +591,6 @@ const Jog: React.FC = () => {
     };
 
     const initMidi = async () => {
-        // Check MIDI support first
         if (typeof navigator.requestMIDIAccess === 'undefined') {
             console.warn("Web MIDI API is not supported in this browser.");
             setMidiSupported(false);
@@ -462,7 +607,7 @@ const Jog: React.FC = () => {
                 console.log("MIDI connected:", output.name);
             } else {
                 console.warn("No MIDI output devices found.");
-                setMidiSupported(true); // API is supported, just no devices
+                setMidiSupported(true);
             }
         } catch (err) {
             console.error("Could not access MIDI devices:", err);
@@ -475,7 +620,6 @@ const Jog: React.FC = () => {
             console.log("Loading pose detection model...");
             setLoadingError('');
 
-            // Try multiple backends for better browser compatibility
             const backends = ['webgl', 'webgpu', 'cpu'];
             let backendSet = false;
 
@@ -504,7 +648,6 @@ const Jog: React.FC = () => {
             setModelLoaded(true);
             console.log("Pose detection model loaded successfully");
 
-            // If we're waiting to start detection, start it now
             if (shouldStartDetection.current) {
                 shouldStartDetection.current = false;
                 startDetectionLoop();
@@ -512,30 +655,6 @@ const Jog: React.FC = () => {
         } catch (err) {
             console.error("Error loading model: ", err);
             setLoadingError(`Failed to load model: ${err instanceof Error ? err.message : 'Unknown error'}`);
-
-            // Try with CPU backend as fallback
-            if (!modelLoaded) {
-                try {
-                    console.log("Trying CPU backend as fallback...");
-                    await tf.setBackend('cpu');
-                    await tf.ready();
-                    const model = poseDetection.SupportedModels.MoveNet;
-                    const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING};
-                    const detector = await poseDetection.createDetector(model, detectorConfig);
-                    detectorRef.current = detector;
-                    setModelLoaded(true);
-                    setLoadingError('');
-                    console.log("Pose detection model loaded with CPU backend");
-
-                    if (shouldStartDetection.current) {
-                        shouldStartDetection.current = false;
-                        startDetectionLoop();
-                    }
-                } catch (fallbackErr) {
-                    console.error("CPU fallback also failed:", fallbackErr);
-                    setLoadingError(`Model loading failed completely: ${fallbackErr instanceof Error ? fallbackErr.message : 'Unknown error'}`);
-                }
-            }
         }
     };
 
@@ -552,100 +671,15 @@ const Jog: React.FC = () => {
             const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
-                // Add event listener to handle auto-play restrictions
                 videoRef.current.addEventListener('loadedmetadata', () => {
                     videoRef.current?.play().catch(console.error);
                 });
             }
             setStream(mediaStream);
+            setVideoType('webcam');
         } catch (err) {
             console.error("Error accessing webcam: ", err);
             alert(`Camera access failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        }
-    };
-
-    // Helper to set crossOrigin for remote videos - improved for Safari
-    const setVideoCrossOrigin = (url: string) => {
-        if (videoRef.current) {
-            if (/^https?:\/\//.test(url)) {
-                // Try different CORS settings for Firefox
-                if (detectBrowser() === 'Firefox') {
-                    videoRef.current.crossOrigin = 'use-credentials';
-                } else {
-                    videoRef.current.crossOrigin = 'anonymous';
-                }
-            } else {
-                videoRef.current.removeAttribute('crossOrigin');
-            }
-            videoRef.current.preload = 'metadata';
-        }
-    };
-
-    const loadDemoMovie = () => {
-        resetTrackingState();
-        if (videoRef.current) {
-            videoRef.current.srcObject = null;
-            const url = 'https://kasmsdk.github.io/public/theremin.webm';
-
-            // Firefox-specific handling
-            if (detectBrowser() === 'Firefox') {
-                // Remove crossOrigin for Firefox
-                videoRef.current.removeAttribute('crossOrigin');
-            } else {
-                setVideoCrossOrigin(url);
-            }
-
-            videoRef.current.src = url;
-            videoRef.current.load();
-            videoRef.current.play().catch(err => {
-                console.warn('Autoplay blocked:', err);
-            });
-            setStream(null);
-        }
-    };
-
-    const loadDemoMovie2 = () => {
-        resetTrackingState();
-        if (videoRef.current) {
-            videoRef.current.srcObject = null;
-            const url = 'https://kasmsdk.github.io/public/kasm_pose_airguitar.webm';
-            setVideoCrossOrigin(url);
-            videoRef.current.src = url;
-            videoRef.current.load();
-            videoRef.current.play().catch(err => {
-                console.warn('Autoplay blocked:', err);
-            });
-            setStream(null);
-        }
-    };
-
-    const loadDemoMovie3 = () => {
-        resetTrackingState();
-        if (videoRef.current) {
-            videoRef.current.srcObject = null;
-            const url = 'https://kasmsdk.github.io/public/kasm_pose_jump.webm';
-            setVideoCrossOrigin(url);
-            videoRef.current.src = url;
-            videoRef.current.load();
-            videoRef.current.play().catch(err => {
-                console.warn('Autoplay blocked:', err);
-            });
-            setStream(null);
-        }
-    };
-
-    const loadDemoMovie4 = () => {
-        resetTrackingState();
-        if (videoRef.current) {
-            videoRef.current.srcObject = null;
-            const url = 'https://kasmsdk.github.io/public/kasm_pose_dance.webm';
-            setVideoCrossOrigin(url);
-            videoRef.current.src = url;
-            videoRef.current.load();
-            videoRef.current.play().catch(err => {
-                console.warn('Autoplay blocked:', err);
-            });
-            setStream(null);
         }
     };
 
@@ -667,47 +701,33 @@ const Jog: React.FC = () => {
         jumpStartY.current = null;
         setJumpEvents([]);
 
-        // Only update display states
         setDisplayLeftHandStatus('Stationary');
         setDisplayRightHandStatus('Stationary');
         setDisplayJumpStatus('On Ground');
 
-        // Clear all timers
         if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
         if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
         if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
         if (jumpResetTimer.current) clearTimeout(jumpResetTimer.current);
 
-        // Reset timer refs
         leftHandStatusTimer.current = null;
         rightHandStatusTimer.current = null;
         jumpStatusTimer.current = null;
         jumpResetTimer.current = null;
     };
 
-    // Ensure updateCanvasSize is always called after video loads
-    const handleLoadedMetadata = () => {
-        console.log("Video metadata loaded");
-        updateCanvasSize();
-        // Do not start detection loop here; wait for canplay
-    };
-
-    // Start detection loop only when video can play (first frame available)
     const handleCanPlay = () => {
         console.log("Video can play, model loaded:", modelLoaded);
         updateCanvasSize();
 
-        // Only start detection if model is loaded
         if (modelLoaded && detectorRef.current) {
             startDetectionLoop();
         } else {
-            // Mark that we should start detection once model is loaded
             shouldStartDetection.current = true;
             console.log("Waiting for model to load before starting detection");
         }
     };
 
-    // Use videoRect for pixel-perfect alignment
     const updateCanvasSize = () => {
         if (videoRef.current && canvasRef.current && containerRef.current) {
             const video = videoRef.current;
@@ -730,25 +750,25 @@ const Jog: React.FC = () => {
         }
     };
 
-    // Only start detection loop if not already running and model is loaded
     const startDetectionLoop = () => {
         if (detectionLoopRunning.current || !modelLoaded || !detectorRef.current) {
-            console.log("Cannot start detection loop:", {
-                running: detectionLoopRunning.current,
-                modelLoaded,
-                detectorExists: !!detectorRef.current
-            });
             return;
         }
 
         console.log("Starting detection loop");
         detectionLoopRunning.current = true;
 
-        // Add a small delay to ensure video is fully ready
         setTimeout(() => {
             updateCanvasSize();
             detectPose();
         }, 100);
+    };
+
+    const handleVideoPlay = () => {
+        if (!detectionLoopRunning.current) {
+            detectionLoopRunning.current = true;
+            requestAnimationFrame(detectPose);
+        }
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -756,20 +776,26 @@ const Jog: React.FC = () => {
             resetTrackingState();
             const file = event.target.files[0];
             const url = URL.createObjectURL(file);
-            if (videoRef.current) {
-                videoRef.current.srcObject = null;
-                setVideoCrossOrigin(url);
-                videoRef.current.src = url;
-                videoRef.current.load();
-                videoRef.current.play().catch(err => {
-                    console.warn('File video autoplay blocked:', err);
-                });
-                setStream(null);
-            }
+            loadVideoWithStreaming(url);
         }
     };
 
-    // Handle window resize to keep canvas aligned
+    // Format time for display
+    const formatTime = (time: number): string => {
+        const minutes = Math.floor(time / 60);
+        const seconds = Math.floor(time % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    // Add wheel event listener for scrubbing
+    useEffect(() => {
+        const container = containerRef.current;
+        if (container) {
+            container.addEventListener('wheel', handleWheel, { passive: false });
+            return () => container.removeEventListener('wheel', handleWheel);
+        }
+    }, [handleWheel]);
+
     useEffect(() => {
         const handleResize = () => {
             updateCanvasSize();
@@ -779,7 +805,6 @@ const Jog: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Load model on component mount and detect browser
     useEffect(() => {
         const browser = detectBrowser();
         setBrowserInfo(browser);
@@ -789,59 +814,56 @@ const Jog: React.FC = () => {
         initMidi();
     }, []);
 
-    // Cleanup timers on component unmount
     useEffect(() => {
         return () => {
             if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
             if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
             if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
             if (jumpResetTimer.current) clearTimeout(jumpResetTimer.current);
+            if (jogIntervalRef.current) clearInterval(jogIntervalRef.current);
+
+            // Cleanup streaming players
+            if (hlsRef.current) hlsRef.current.destroy();
+            if (dashPlayerRef.current) dashPlayerRef.current.destroy();
         };
     }, []);
 
-    // Reset detection loop flag when video ends or errors occur
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
 
         const handleVideoEnd = () => {
-            console.log("Video ended, stopping detection");
             detectionLoopRunning.current = false;
+            setIsPlaying(false);
         };
 
-        const handleVideoError = (e: Event) => {
-            console.log("Video error, stopping detection", e);
+        const handleVideoError = (_e: Event) => {
             detectionLoopRunning.current = false;
-        };
-
-        const handleVideoPause = () => {
-            console.log("Video paused, stopping detection");
-            detectionLoopRunning.current = false;
+            setIsPlaying(false);
         };
 
         video.addEventListener('ended', handleVideoEnd);
         video.addEventListener('error', handleVideoError);
-        video.addEventListener('pause', handleVideoPause);
+        video.addEventListener('play', handlePlay);
+        video.addEventListener('pause', handlePause);
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        video.addEventListener('loadedmetadata', handleLoadedMetadata);
+        video.addEventListener('canplay', handleCanPlay);
 
         return () => {
             video.removeEventListener('ended', handleVideoEnd);
             video.removeEventListener('error', handleVideoError);
-            video.removeEventListener('pause', handleVideoPause);
+            video.removeEventListener('play', handlePlay);
+            video.removeEventListener('pause', handlePause);
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+            video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+            video.removeEventListener('canplay', handleCanPlay);
         };
-    }, []);
-
-    const handleVideoPlay = () => {
-        // Start or resume the pose estimation loop when the video starts playing
-        if (!detectionLoopRunning.current) {
-            detectionLoopRunning.current = true;
-            requestAnimationFrame(detectPose);
-        }
-    };
+    }, [handlePlay, handlePause, handleTimeUpdate, handleLoadedMetadata]);
 
     return (
-        <div className="kasm-landing-container">
-            <h1>Kasm Jog</h1>
-            <p>Pose detection with webcam or video file to trigger MIDI events</p>
+        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+            <h1>Enhanced Kasm Jog with Professional Video Controls</h1>
 
             {/* Browser and Status Info */}
             <div style={{
@@ -850,51 +872,72 @@ const Jog: React.FC = () => {
                 fontSize: '12px',
                 color: '#666'
             }}>
-                Browser: {browserInfo} | MIDI: {midiSupported ? (midiOutput ? 'Connected' : 'Supported') : 'Not Supported'}
+                Browser: {browserInfo} | MIDI: {midiSupported ? (midiOutput ? 'Connected' : 'Supported') : 'Not Supported'} | Video Type: {videoType.toUpperCase()}
             </div>
 
             {!modelLoaded && !loadingError && <p>Loading pose detection model...</p>}
             {loadingError && <p style={{ color: 'red' }}>Error: {loadingError}</p>}
 
+            {/* Control Buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    <button className="kasm-demo-btn" onClick={initMidi} disabled={!!midiOutput || !midiSupported}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <button onClick={initMidi} disabled={!!midiOutput || !midiSupported}>
                         {midiOutput ? 'MIDI Connected' : midiSupported ? 'Connect MIDI' : 'MIDI Unsupported'}
                     </button>
-                    <button className="kasm-demo-btn" onClick={startCamera} disabled={!!stream}>
+                    <button onClick={startCamera} disabled={!!stream}>
                         {stream ? 'Webcam On' : 'Start Webcam'}
                     </button>
-                    <label className="kasm-demo-btn">
+                    <label style={{ cursor: 'pointer', padding: '8px 16px', background: '#007acc', color: 'white', borderRadius: '4px' }}>
                         Upload Video
                         <input type="file" accept="video/*" onChange={handleFileChange} style={{ display: 'none' }} />
                     </label>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie} disabled={!modelLoaded}>
+                    <button onClick={() => loadVideoWithStreaming('https://kasmsdk.github.io/public/theremin.webm')} disabled={!modelLoaded}>
                         Theremin Example
                     </button>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie2} disabled={!modelLoaded}>
-                        Air Guitar Example
-                    </button>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie3} disabled={!modelLoaded}>
-                        Jumping Example
-                    </button>
-                    <button className="kasm-demo-btn" onClick={loadDemoMovie4} disabled={!modelLoaded}>
-                        Dance Example
-                    </button>
                 </div>
-                <div className="kasm-sunken-panel" ref={containerRef} style={{ position: 'relative', width: '640px', height: '480px' }}>
+
+                {/* URL Input for HLS/DASH streams */}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                        type="text"
+                        placeholder="Enter HLS (.m3u8) or DASH (.mpd) URL"
+                        style={{ width: '300px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                const url = (e.target as HTMLInputElement).value;
+                                if (url) {
+                                    resetTrackingState();
+                                    loadVideoWithStreaming(url);
+                                }
+                            }
+                        }}
+                    />
+                    <button onClick={() => {
+                        const input = document.querySelector('input[placeholder*="HLS"]') as HTMLInputElement;
+                        if (input?.value) {
+                            resetTrackingState();
+                            loadVideoWithStreaming(input.value);
+                        }
+                    }}>Load Stream</button>
+                </div>
+
+                {/* Video Container */}
+                <div ref={containerRef} style={{
+                    position: 'relative',
+                    width: '640px',
+                    height: '480px',
+                    border: '2px solid #333',
+                    borderRadius: '8px',
+                    background: '#000'
+                }}>
                     <video
                         ref={videoRef}
-                        autoPlay
                         muted
                         playsInline
-                        onLoadedMetadata={handleLoadedMetadata}
-                        onCanPlay={handleCanPlay}
-                        onResize={updateCanvasSize}
-                        onPlay={handleVideoPlay}
                         style={{
                             width: '100%',
                             height: '100%',
-                            borderRadius: '8px',
+                            borderRadius: '6px',
                             display: 'block',
                             objectFit: 'contain'
                         }}
@@ -904,13 +947,194 @@ const Jog: React.FC = () => {
                         style={{
                             position: 'absolute',
                             pointerEvents: 'none',
-                            borderRadius: '8px'
+                            borderRadius: '6px'
                         }}
                     />
                 </div>
+
+                {/* Professional Video Controls */}
+                <div style={{
+                    width: '640px',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid #ccc'
+                }}>
+                    {/* Transport Controls */}
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                        <button onClick={() => videoRef.current && (videoRef.current.currentTime = 0)}>⏮</button>
+                        <button
+                            onMouseDown={() => startJog(-2)}
+                            onMouseUp={stopJog}
+                            onMouseLeave={stopJog}
+                        >⏪</button>
+                        <button
+                            onMouseDown={() => startJog(-0.5)}
+                            onMouseUp={stopJog}
+                            onMouseLeave={stopJog}
+                        >◀</button>
+                        <button onClick={() => videoRef.current && (isPlaying ? videoRef.current.pause() : videoRef.current.play())}>
+                            {isPlaying ? '⏸' : '▶'}
+                        </button>
+                        <button
+                            onMouseDown={() => startJog(0.5)}
+                            onMouseUp={stopJog}
+                            onMouseLeave={stopJog}
+                        >▶</button>
+                        <button
+                            onMouseDown={() => startJog(2)}
+                            onMouseUp={stopJog}
+                            onMouseLeave={stopJog}
+                        >⏩</button>
+                        <button onClick={() => videoRef.current && (videoRef.current.currentTime = duration)}>⏭</button>
+                    </div>
+
+                    {/* Timeline Scrubber */}
+                    <div style={{ marginBottom: '16px' }}>
+                        <input
+                            type="range"
+                            min="0"
+                            max={duration || 100}
+                            value={currentTime}
+                            onChange={(e) => {
+                                if (videoRef.current) {
+                                    videoRef.current.currentTime = parseFloat(e.target.value);
+                                }
+                            }}
+                            style={{ width: '100%' }}
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#666' }}>
+                            <span>{formatTime(currentTime)}</span>
+                            <span>Jog Speed: {jogSpeed}x</span>
+                            <span>{formatTime(duration)}</span>
+                        </div>
+                    </div>
+
+                    {/* Speed and Volume Controls */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <div>
+                            <label>Speed: </label>
+                            <select
+                                value={playbackRate}
+                                onChange={(e) => {
+                                    const rate = parseFloat(e.target.value);
+                                    setPlaybackRate(rate);
+                                    if (videoRef.current) videoRef.current.playbackRate = rate;
+                                }}
+                            >
+                                <option value={0.25}>0.25x</option>
+                                <option value={0.5}>0.5x</option>
+                                <option value={1}>1x</option>
+                                <option value={1.25}>1.25x</option>
+                                <option value={1.5}>1.5x</option>
+                                <option value={2}>2x</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Volume: </label>
+                            <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                value={volume}
+                                onChange={(e) => {
+                                    const vol = parseFloat(e.target.value);
+                                    setVolume(vol);
+                                    if (videoRef.current) videoRef.current.volume = vol;
+                                }}
+                                style={{ width: '100px' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Timeline Markers Table */}
+                <div style={{
+                    width: '640px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{
+                        padding: '12px',
+                        borderBottom: '1px solid #ddd',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <h3 style={{ margin: 0 }}>Timeline Markers</h3>
+                        <button
+                            onClick={addTimelineMarker}
+                            style={{
+                                padding: '6px 12px',
+                                background: '#007acc',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Add Marker
+                        </button>
+                    </div>
+                    <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                            <tr style={{ background: '#f0f0f0' }}>
+                                <th style={{ padding: '8px', textAlign: 'left', borderRight: '1px solid #ddd' }}>Time</th>
+                                <th style={{ padding: '8px', textAlign: 'left', borderRight: '1px solid #ddd' }}>Label</th>
+                                <th style={{ padding: '8px', textAlign: 'left', borderRight: '1px solid #ddd' }}>Description</th>
+                                <th style={{ padding: '8px', textAlign: 'left' }}>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {timelineMarkers.map((marker) => (
+                                <tr
+                                    key={marker.id}
+                                    style={{
+                                        borderBottom: '1px solid #eee',
+                                        cursor: 'pointer',
+                                        background: Math.abs(currentTime - marker.time) < 1 ? '#e3f2fd' : 'transparent'
+                                    }}
+                                    onClick={() => jumpToMarker(marker.time)}
+                                >
+                                    <td style={{ padding: '8px', borderRight: '1px solid #eee' }}>
+                                        {formatTime(marker.time)}
+                                    </td>
+                                    <td style={{ padding: '8px', borderRight: '1px solid #eee' }}>
+                                        {marker.label}
+                                    </td>
+                                    <td style={{ padding: '8px', borderRight: '1px solid #eee' }}>
+                                        {marker.description}
+                                    </td>
+                                    <td style={{ padding: '8px' }}>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setTimelineMarkers(prev => prev.filter(m => m.id !== marker.id));
+                                            }}
+                                            style={{
+                                                padding: '2px 8px',
+                                                background: '#ff4444',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '3px',
+                                                cursor: 'pointer',
+                                                fontSize: '12px'
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            {/* Enhanced Movement Status Display with Persistence */}
+            {/* Movement Status Display */}
             <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
                 <div style={{
                     width: '640px',
@@ -918,32 +1142,26 @@ const Jog: React.FC = () => {
                     fontFamily: 'monospace',
                     fontSize: '14px',
                     textAlign: 'left',
-                    lineHeight: '1.6' // Better line spacing
+                    lineHeight: '1.6',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px'
                 }}>
-                    <div style={{
-                        marginBottom: '12px',
-                        minHeight: '20px' // Consistent height to prevent layout shifts
-                    }}>
+                    <div style={{ marginBottom: '12px', minHeight: '20px' }}>
                         <strong>Left Hand:</strong> {displayLeftHandStatus}
                     </div>
-                    <div style={{
-                        marginBottom: '12px',
-                        minHeight: '20px'
-                    }}>
+                    <div style={{ marginBottom: '12px', minHeight: '20px' }}>
                         <strong>Right Hand:</strong> {displayRightHandStatus}
                     </div>
-                    <div style={{
-                        minHeight: '20px'
-                    }}>
+                    <div style={{ minHeight: '20px' }}>
                         <strong>Jump Status:</strong> <span style={{
                         color: displayJumpStatus === 'Jumping!' ? '#ff8888' :
-                            displayJumpStatus.startsWith('Landed!') ? '#88ff88' : '#ffffff',
+                            displayJumpStatus.startsWith('Landed!') ? '#88ff88' : '#fff',
                         fontWeight: 'bold'
                     }}>
-                        {displayJumpStatus}
+                            {displayJumpStatus}
                         </span>
                         {jumpDistance !== null && landingPos && (
-                            <div style={{ fontSize: '13px', color: '#aaa', marginTop: '4px' }}>
+                            <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>
                                 Distance jumped: <strong>{jumpDistance}px</strong><br />
                                 Landed at: <strong>x={Math.round(landingPos.x)}, y={Math.round(landingPos.y)}</strong>
                             </div>
@@ -951,7 +1169,6 @@ const Jog: React.FC = () => {
                     </div>
                 </div>
             </div>
-
         </div>
     );
 };
