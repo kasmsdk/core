@@ -66,6 +66,8 @@ export default function Kasm({ onNavigate }: KasmProps) {
         return <LooperDocs />;
       case 'jog':
         return <JogDocs />;
+      case 'webxr':
+        return <WebXRDocs />;
       default:
         return <EmanatorDocs />;
     }

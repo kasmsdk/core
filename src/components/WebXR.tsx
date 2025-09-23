@@ -36,14 +36,11 @@ const WebXR: React.FC = () => {
     const sceneRef = useRef<THREE.Scene | null>(null);
     const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
     const xrSessionRef = useRef<XRSession | null>(null);
-    const frameLoopRef = useRef<number | null>(null);
     const virtualCubeRef = useRef<THREE.Mesh | null>(null);
-    const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
 
     // State
     const [xrSupported, setXrSupported] = useState<{ ar: boolean; vr: boolean }>({ ar: false, vr: false });
     const [currentMode, setCurrentMode] = useState<XRMode>('none');
-    const [stream, setStream] = useState<MediaStream | null>(null);
     const [instrumentState, setInstrumentState] = useState<VirtualInstrumentState>({
         position: { x: 0, y: 0, z: -1 },
         rotation: { a: 0, b: 0, c: 0 },
@@ -74,7 +71,6 @@ const WebXR: React.FC = () => {
     // Jump detection state
     const [jumpEvents, setJumpEvents] = useState<JumpEvent[]>([]);
     const isJumping = useRef(false);
-    const jumpStartY = useRef<number | null>(null);
     const groundLevel = useRef<number | null>(null);
 
     // Status display
@@ -206,21 +202,25 @@ const WebXR: React.FC = () => {
     }, []);
 
     // XR render loop
-    const renderXRFrame = useCallback((timestamp: number, frame: XRFrame) => {
+    const renderXRFrame = useCallback((_timestamp: number, frame: XRFrame) => {
         if (!rendererRef.current || !sceneRef.current || !cameraRef.current || !virtualCubeRef.current) return;
 
         const session = frame.session;
-        const pose = frame.getViewerPose(rendererRef.current.xr.getReferenceSpace());
+        const referenceSpace = rendererRef.current.xr.getReferenceSpace();
 
-        if (pose) {
-            // Handle controller input
-            handleControllerInput(session, frame);
+        if (referenceSpace) {
+            const pose = frame.getViewerPose(referenceSpace);
 
-            // Update virtual instrument
-            updateVirtualInstrument();
+            if (pose) {
+                // Handle controller input
+                handleControllerInput(session, frame);
 
-            // Render the scene
-            rendererRef.current.render(sceneRef.current, cameraRef.current);
+                // Update virtual instrument
+                updateVirtualInstrument();
+
+                // Render the scene
+                rendererRef.current.render(sceneRef.current, cameraRef.current);
+            }
         }
     }, []);
 
@@ -365,7 +365,7 @@ const WebXR: React.FC = () => {
                     startDetectionLoop();
                 });
             }
-            setStream(mediaStream);
+            console.log('Camera started for AR mode');
         } catch (err) {
             console.error("Error accessing camera: ", err);
         }
@@ -464,7 +464,7 @@ const WebXR: React.FC = () => {
     const calculateMovement = (
         currentPos: { x: number; y: number },
         handMovement: React.MutableRefObject<HandMovement>,
-        handName: string
+        _handName: string
     ): string => {
         const { lastPosition } = handMovement.current;
 
@@ -750,8 +750,9 @@ const WebXR: React.FC = () => {
                 padding: '20px',
                 border: '2px solid #007acc',
                 borderRadius: '12px',
+                background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
             }}>
-                <h3 style={{ margin: '0 0 16px 0', textAlign: 'center', color: '#fff' }}>Virtual Instrument Controller</h3>
+                <h3 style={{ margin: '0 0 16px 0', textAlign: 'center', color: '#333' }}>Virtual Instrument Controller</h3>
 
                 <div style={{
                     display: 'grid',
@@ -760,15 +761,15 @@ const WebXR: React.FC = () => {
                     fontFamily: 'monospace',
                     fontSize: '16px'
                 }}>
-                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}>
-                        <h4 style={{ margin: '0 0 8px 0', color: '#aaffaa' }}>Spatial Offset (XYZ)</h4>
+                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px' }}>
+                        <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>Position (XYZ)</h4>
                         <div><strong>X:</strong> {instrumentState.position.x.toFixed(3)}</div>
                         <div><strong>Y:</strong> {instrumentState.position.y.toFixed(3)}</div>
                         <div><strong>Z:</strong> {instrumentState.position.z.toFixed(3)}</div>
                     </div>
 
-                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}>
-                        <h4 style={{ margin: '0 0 8px 0', color: '#ffff7a' }}>3D Rotation (ABC)</h4>
+                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px' }}>
+                        <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>Rotation (ABC)</h4>
                         <div><strong>A:</strong> {instrumentState.rotation.a.toFixed(1)}°</div>
                         <div><strong>B:</strong> {instrumentState.rotation.b.toFixed(1)}°</div>
                         <div><strong>C:</strong> {instrumentState.rotation.c.toFixed(1)}°</div>
@@ -778,7 +779,7 @@ const WebXR: React.FC = () => {
                 <div style={{
                     marginTop: '16px',
                     padding: '12px',
-                    background: instrumentState.isGrabbed ? 'rgba(255,68,68,0.6)' : 'rgba(0,255,136,0.6)',
+                    background: instrumentState.isGrabbed ? 'rgba(255,68,68,0.2)' : 'rgba(0,255,136,0.2)',
                     borderRadius: '8px',
                     textAlign: 'center',
                     fontWeight: 'bold',
@@ -825,6 +826,7 @@ const WebXR: React.FC = () => {
                 maxWidth: '640px',
                 margin: '20px auto 0',
                 padding: '16px',
+                background: '#e8f4f8',
                 border: '1px solid #bee5eb',
                 borderRadius: '8px',
                 fontSize: '14px'
