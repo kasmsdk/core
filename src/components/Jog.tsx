@@ -31,13 +31,7 @@ interface TimelineMarker {
     description?: string;
 }
 
-type ShaderEffect =
-    'none' | 'sepia' | 'black-white' | 'vintage' | 'warm' | 'cool' | 'saturate' | 'desaturate' |
-    'high-contrast' | 'low-contrast' | 'brightness' | 'darkness' | 'neon' | 'cyberpunk' | 'retro-tv' |
-    'film-noir' | 'pastel' | 'vibrant' | 'instagram' | 'lomography' | 'tint-red' | 'glow' | 'blur' |
-    'sharpen' | 'emboss' | 'edge-detect' | 'pixelate' | 'noise' | 'static' | 'mirror-x' | 'mirror-y' |
-    'invert' | 'posterize' | 'ripple' | 'vignette' | 'analog-film' | 'kaleidoscope' | 'chromatic-aberration' |
-    'lens-distortion' | 'light-leak' | 'dust-scratches';
+type ShaderEffect = 'none' | 'tint-red' | 'ripple' | 'glow' | 'vignette' | 'analog-film';
 
 const DEFAULT_STREAM_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
 
@@ -45,6 +39,7 @@ const Jog: React.FC = () => {
     const [streamUrl, setStreamUrl] = useState<string>(DEFAULT_STREAM_URL);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const effectCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const detectorRef = useRef<poseDetection.PoseDetector | null>(null);
@@ -52,7 +47,6 @@ const Jog: React.FC = () => {
     const [midiSupported, setMidiSupported] = useState<boolean>(false);
     const [browserInfo, setBrowserInfo] = useState<string>('');
     const lastYRef = useRef<number | null>(null);
-    const animationFrameRef = useRef<number | null>(null);
 
     // Video player state
     const [currentTime, setCurrentTime] = useState<number>(0);
@@ -106,14 +100,21 @@ const Jog: React.FC = () => {
     const [takeoffPos, setTakeoffPos] = useState<{ x: number, y: number } | null>(null);
     const [landingPos, setLandingPos] = useState<{ x: number, y: number } | null>(null);
 
+    // Track if detection loop is running
+    const detectionLoopRunning = useRef(false);
     // Track model loading state
     const [modelLoaded, setModelLoaded] = useState(false);
     const [loadingError, setLoadingError] = useState<string>('');
+    // Track if we need to start detection after model loads
+    const shouldStartDetection = useRef(false);
 
     // Enhanced status display with persistence
     const [displayLeftHandStatus, setDisplayLeftHandStatus] = useState<string>('Stationary');
     const [displayRightHandStatus, setDisplayRightHandStatus] = useState<string>('Stationary');
     const [displayJumpStatus, setDisplayJumpStatus] = useState<string>('On Ground');
+
+    // Current time clock state
+    const [currentClockTime, setCurrentClockTime] = useState<string>('');
 
     // Timers for status persistence
     const leftHandStatusTimer = useRef<NodeJS.Timeout | null>(null);
@@ -121,117 +122,45 @@ const Jog: React.FC = () => {
     const jumpStatusTimer = useRef<NodeJS.Timeout | null>(null);
     const jumpResetTimer = useRef<NodeJS.Timeout | null>(null);
 
-    // Shader effect groups for organized dropdown
-    const effectGroups = {
-        'Basic': ['none', 'sepia', 'black-white', 'invert'],
-        'Color & Grading': ['vintage', 'warm', 'cool', 'saturate', 'desaturate', 'high-contrast', 'low-contrast', 'brightness', 'darkness'],
-        'Stylistic': ['neon', 'cyberpunk', 'retro-tv', 'film-noir', 'pastel', 'vibrant', 'instagram', 'lomography', 'tint-red'],
-        'Effects': ['glow', 'blur', 'sharpen', 'emboss', 'edge-detect', 'pixelate', 'noise', 'static', 'mirror-x', 'mirror-y'],
-        'Advanced': ['ripple', 'vignette', 'analog-film', 'kaleidoscope', 'chromatic-aberration', 'lens-distortion', 'light-leak', 'dust-scratches']
-    };
-
     // Load HLS.js and Dash.js libraries dynamically
     useEffect(() => {
         const loadLibraries = async () => {
+            // Load HLS.js
             if (!window.Hls) {
                 const script1 = document.createElement('script');
                 script1.src = 'hls.min.js';
                 document.head.appendChild(script1);
             }
+
+            // Load Dash.js
             if (!window.dashjs) {
                 const script2 = document.createElement('script');
                 script2.src = 'dash.all.min.js';
                 document.head.appendChild(script2);
             }
         };
+
         loadLibraries();
     }, []);
 
-    // Apply comprehensive shader effects to canvas
+    // Apply shader effects to canvas
     const applyShaderEffect = (ctx: CanvasRenderingContext2D, effect: ShaderEffect, time: number = 0) => {
         if (effect === 'none') return;
 
         const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
         const data = imageData.data;
-        const width = ctx.canvas.width;
-        const height = ctx.canvas.height;
 
         switch (effect) {
-            case 'sepia':
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i], g = data[i + 1], b = data[i + 2];
-                    data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
-                    data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
-                    data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
-                }
-                break;
-
-            case 'black-white':
-                for (let i = 0; i < data.length; i += 4) {
-                    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-                    data[i] = data[i + 1] = data[i + 2] = gray;
-                }
-                break;
-
-            case 'invert':
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = 255 - data[i];
-                    data[i + 1] = 255 - data[i + 1];
-                    data[i + 2] = 255 - data[i + 2];
-                }
-                break;
-
-            case 'vintage':
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i], g = data[i + 1], b = data[i + 2];
-                    data[i] = Math.min(255, r * 1.2 + 20);
-                    data[i + 1] = Math.min(255, g * 0.9 + 10);
-                    data[i + 2] = Math.min(255, b * 0.7 - 10);
-                }
-                break;
-
-            case 'warm':
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = Math.min(255, data[i] * 1.1);
-                    data[i + 1] = Math.min(255, data[i + 1] * 1.05);
-                    data[i + 2] = Math.min(255, data[i + 2] * 0.9);
-                }
-                break;
-
-            case 'cool':
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = Math.min(255, data[i] * 0.9);
-                    data[i + 1] = Math.min(255, data[i + 1] * 0.95);
-                    data[i + 2] = Math.min(255, data[i + 2] * 1.1);
-                }
-                break;
-
-            case 'saturate':
-                for (let i = 0; i < data.length; i += 4) {
-                    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-                    data[i] = Math.min(255, gray + (data[i] - gray) * 1.5);
-                    data[i + 1] = Math.min(255, gray + (data[i + 1] - gray) * 1.5);
-                    data[i + 2] = Math.min(255, gray + (data[i + 2] - gray) * 1.5);
-                }
-                break;
-
-            case 'brightness':
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = Math.min(255, data[i] + 40);
-                    data[i + 1] = Math.min(255, data[i + 1] + 40);
-                    data[i + 2] = Math.min(255, data[i + 2] + 40);
-                }
-                break;
-
             case 'tint-red':
                 for (let i = 0; i < data.length; i += 4) {
-                    data[i] = Math.min(255, data[i] * 1.3);
-                    data[i + 1] *= 0.8;
-                    data[i + 2] *= 0.8;
+                    data[i] = Math.min(255, data[i] * 1.3); // Enhance red
+                    data[i + 1] *= 0.8; // Reduce green
+                    data[i + 2] *= 0.8; // Reduce blue
                 }
                 break;
 
             case 'glow':
+                // Create a soft glow effect
                 for (let i = 0; i < data.length; i += 4) {
                     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
                     if (brightness > 100) {
@@ -244,48 +173,32 @@ const Jog: React.FC = () => {
                 break;
 
             case 'vignette':
-                const vignetteCenterX = width / 2;
-                const vignetteCenterY = height / 2;
-                const vignetteMaxDistance = Math.sqrt(vignetteCenterX * vignetteCenterX + vignetteCenterY * vignetteCenterY);
-                for (let y = 0; y < height; y++) {
-                    for (let x = 0; x < width; x++) {
-                        const distance = Math.sqrt((x - vignetteCenterX) ** 2 + (y - vignetteCenterY) ** 2);
-                        const vignette = Math.max(0, 1 - (distance / vignetteMaxDistance) * 1.2);
-                        const index = (y * width + x) * 4;
-                        data[index] *= vignette;
-                        data[index + 1] *= vignette;
-                        data[index + 2] *= vignette;
+                const centerX = ctx.canvas.width / 2;
+                const centerY = ctx.canvas.height / 2;
+                const maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);
+
+                for (let y = 0; y < ctx.canvas.height; y++) {
+                    for (let x = 0; x < ctx.canvas.width; x++) {
+                        const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+                        const vignette = Math.max(0, 1 - (distance / maxDistance) * 1.2);
+                        const index = (y * ctx.canvas.width + x) * 4;
+
+                        data[index] *= vignette;     // R
+                        data[index + 1] *= vignette; // G
+                        data[index + 2] *= vignette; // B
                     }
                 }
                 break;
 
-            case 'ripple':
-                const rippleImageData = ctx.createImageData(width, height);
-                const rippleData = rippleImageData.data;
-                const rippleCenterX = width / 2;
-                const rippleCenterY = height / 2;
-                for (let y = 0; y < height; y++) {
-                    for (let x = 0; x < width; x++) {
-                        const distance = Math.sqrt((x - rippleCenterX) ** 2 + (y - rippleCenterY) ** 2);
-                        const wave = Math.sin((distance * 0.02) - (time * 0.01)) * 5;
-                        const sourceX = Math.max(0, Math.min(width - 1, x + wave));
-                        const sourceY = Math.max(0, Math.min(height - 1, y));
-                        const sourceIndex = (Math.floor(sourceY) * width + Math.floor(sourceX)) * 4;
-                        const targetIndex = (y * width + x) * 4;
-                        for (let c = 0; c < 4; c++) {
-                            rippleData[targetIndex + c] = data[sourceIndex + c];
-                        }
-                    }
-                }
-                ctx.putImageData(rippleImageData, 0, 0);
-                return;
-
             case 'analog-film':
+                // Add film grain and color shift
                 for (let i = 0; i < data.length; i += 4) {
                     const noise = (Math.random() - 0.5) * 30;
-                    data[i] = Math.max(0, Math.min(255, data[i] + noise * 0.8));
-                    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise * 0.6));
-                    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise * 0.9));
+                    data[i] = Math.max(0, Math.min(255, data[i] + noise * 0.8)); // R with slight emphasis
+                    data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise * 0.6)); // G
+                    data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise * 0.9)); // B with blue tint
+
+                    // Reduce saturation slightly for vintage look
                     const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
                     data[i] = data[i] * 0.9 + avg * 0.1;
                     data[i + 1] = data[i + 1] * 0.9 + avg * 0.1;
@@ -293,34 +206,33 @@ const Jog: React.FC = () => {
                 }
                 break;
 
-            case 'pixelate':
-                const pixelSize = 8;
-                for (let y = 0; y < height; y += pixelSize) {
-                    for (let x = 0; x < width; x += pixelSize) {
-                        let r = 0, g = 0, b = 0, count = 0;
-                        for (let py = y; py < Math.min(y + pixelSize, height); py++) {
-                            for (let px = x; px < Math.min(x + pixelSize, width); px++) {
-                                const idx = (py * width + px) * 4;
-                                r += data[idx];
-                                g += data[idx + 1];
-                                b += data[idx + 2];
-                                count++;
-                            }
-                        }
-                        r = Math.floor(r / count);
-                        g = Math.floor(g / count);
-                        b = Math.floor(b / count);
-                        for (let py = y; py < Math.min(y + pixelSize, height); py++) {
-                            for (let px = x; px < Math.min(x + pixelSize, width); px++) {
-                                const idx = (py * width + px) * 4;
-                                data[idx] = r;
-                                data[idx + 1] = g;
-                                data[idx + 2] = b;
-                            }
-                        }
+            case 'ripple':
+                // Create ripple effect using time for animation
+                const rippleImageData = ctx.createImageData(ctx.canvas.width, ctx.canvas.height);
+                const rippleData = rippleImageData.data;
+
+                for (let y = 0; y < ctx.canvas.height; y++) {
+                    for (let x = 0; x < ctx.canvas.width; x++) {
+                        const centerX = ctx.canvas.width / 2;
+                        const centerY = ctx.canvas.height / 2;
+                        const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+
+                        const wave = Math.sin((distance * 0.02) - (time * 0.01)) * 5;
+                        const sourceX = Math.max(0, Math.min(ctx.canvas.width - 1, x + wave));
+                        const sourceY = Math.max(0, Math.min(ctx.canvas.height - 1, y));
+
+                        const sourceIndex = (Math.floor(sourceY) * ctx.canvas.width + Math.floor(sourceX)) * 4;
+                        const targetIndex = (y * ctx.canvas.width + x) * 4;
+
+                        rippleData[targetIndex] = data[sourceIndex];
+                        rippleData[targetIndex + 1] = data[sourceIndex + 1];
+                        rippleData[targetIndex + 2] = data[sourceIndex + 2];
+                        rippleData[targetIndex + 3] = data[sourceIndex + 3];
                     }
                 }
-                break;
+
+                ctx.putImageData(rippleImageData, 0, 0);
+                return; // Return early since we've already put the image data
         }
 
         ctx.putImageData(imageData, 0, 0);
@@ -338,6 +250,8 @@ const Jog: React.FC = () => {
         if (videoRef.current) {
             setDuration(videoRef.current.duration);
             setCurrentTime(videoRef.current.currentTime);
+
+            // Calculate and set aspect ratio
             const aspectRatio = videoRef.current.videoWidth / videoRef.current.videoHeight;
             setVideoAspectRatio(aspectRatio);
             console.log(`Video aspect ratio: ${aspectRatio} (${videoRef.current.videoWidth}x${videoRef.current.videoHeight})`);
@@ -349,12 +263,12 @@ const Jog: React.FC = () => {
     // Play/pause handlers
     const handlePlay = useCallback(() => {
         setIsPlaying(true);
-        startPoseDetection();
+        handleVideoPlay();
     }, []);
 
     const handlePause = useCallback(() => {
         setIsPlaying(false);
-        stopPoseDetection();
+        detectionLoopRunning.current = false;
     }, []);
 
     // Jog control functions
@@ -385,11 +299,10 @@ const Jog: React.FC = () => {
     // Mouse wheel handler for scrubbing
     const handleWheel = useCallback((e: WheelEvent) => {
         e.preventDefault();
-        const now = Date.now();
-
-        if (now - lastWheelTime.current < 50) return;
+        const now = videoRef.current?.currentTime ?? 0;
+        // Throttle wheel events
+        if (now - lastWheelTime.current < 0.05) return;
         lastWheelTime.current = now;
-
         if (videoRef.current) {
             const delta = -e.deltaY * 0.1;
             const newTime = videoRef.current.currentTime + delta;
@@ -407,11 +320,12 @@ const Jog: React.FC = () => {
 
     // Add new timeline marker
     const addTimelineMarker = useCallback(() => {
+        const videoTime = videoRef.current?.currentTime ?? currentTime;
         const newMarker: TimelineMarker = {
             id: Date.now().toString(),
-            time: currentTime,
+            time: videoTime,
             label: `Marker ${timelineMarkers.length + 1}`,
-            description: `Added at ${Math.round(currentTime)}s`
+            description: `Added at ${Math.round(videoTime)}s`
         };
         setTimelineMarkers(prev => [...prev, newMarker].sort((a, b) => a.time - b.time));
     }, [currentTime, timelineMarkers.length]);
@@ -420,6 +334,7 @@ const Jog: React.FC = () => {
     const loadVideoWithStreaming = useCallback((url: string) => {
         if (!videoRef.current) return;
 
+        // Clean up existing players
         if (hlsRef.current) {
             hlsRef.current.destroy();
             hlsRef.current = null;
@@ -432,6 +347,7 @@ const Jog: React.FC = () => {
         const video = videoRef.current;
         video.srcObject = null;
 
+        // Determine video type
         if (url.includes('.m3u8')) {
             setVideoType('hls');
             if (window.Hls && window.Hls.isSupported()) {
@@ -495,7 +411,7 @@ const Jog: React.FC = () => {
         }
     };
 
-    // MIDI functions
+    // MIDI and pose detection functions (keeping existing functionality)
     const sendMidiNote = (note: number, velocity = 127) => {
         if (midiOutput) {
             try {
@@ -599,7 +515,7 @@ const Jog: React.FC = () => {
             setJumpEvents(prev => [...prev, {
                 x: landingX,
                 y: landingY,
-                timestamp: Date.now(),
+                timestamp: videoRef.current?.currentTime ?? 0,
                 fadeOpacity: 1.0
             }]);
             sendMidiNote(36, 127);
@@ -683,8 +599,8 @@ const Jog: React.FC = () => {
     };
 
     const drawJumpMarkers = (ctx: CanvasRenderingContext2D) => {
-        const now = Date.now();
-        const fadeDuration = 3000;
+        const now = videoRef.current?.currentTime ?? 0;
+        const fadeDuration = 3; // seconds
 
         jumpEvents.forEach((jumpEvent) => {
             const age = now - jumpEvent.timestamp;
@@ -708,93 +624,86 @@ const Jog: React.FC = () => {
             }
         });
 
-        setJumpEvents(prev => prev.filter(event => now - event.timestamp < fadeDuration));
+        setJumpEvents(prev => prev.filter(event => (now - event.timestamp) < fadeDuration));
     };
 
-    // Main pose detection loop - simplified and direct
+    // Main pose detection loop
     const detectPose = async () => {
-        if (!detectorRef.current || !videoRef.current || !canvasRef.current || videoRef.current.paused) {
-            return;
-        }
+        if (detectorRef.current && videoRef.current && canvasRef.current && effectCanvasRef.current && !videoRef.current.paused) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const effectCanvas = effectCanvasRef.current;
+            const ctx = canvas.getContext('2d');
+            const effectCtx = effectCanvas.getContext('2d');
 
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
+            if (ctx && effectCtx && video.videoWidth > 0 && video.videoHeight > 0) {
+                try {
+                    // First, draw the video frame to the effect canvas for shader processing
+                    effectCtx.drawImage(video, 0, 0, effectCanvas.width, effectCanvas.height);
 
-        if (!ctx || video.videoWidth === 0 || video.videoHeight === 0) {
-            animationFrameRef.current = requestAnimationFrame(detectPose);
-            return;
-        }
+                    // Apply shader effects to the effect canvas
+                    if (selectedEffect !== 'none') {
+                        applyShaderEffect(effectCtx, selectedEffect, videoRef.current?.currentTime ?? 0);
+                    }
 
-        try {
-            // Step 1: Clear canvas and draw video frame
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    // Now do pose detection on the original video (unaffected by shaders)
+                    const poses = await detectorRef.current.estimatePoses(video);
 
-            // Step 2: Apply shader effect if selected
-            if (selectedEffect !== 'none') {
-                applyShaderEffect(ctx, selectedEffect, Date.now());
+                    // Clear the pose overlay canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Calculate scale factors for pose overlay
+                    const scaleX = canvas.width / video.videoWidth;
+                    const scaleY = canvas.height / video.videoHeight;
+                    ctx.save();
+                    ctx.scale(scaleX, scaleY);
+
+                    poses.forEach(pose => {
+                        const nose = pose.keypoints.find(k => k.name === 'nose');
+                        if (nose && nose.score && nose.score > 0.5) {
+                            if (lastYRef.current !== null) {
+                                const deltaY = nose.y - lastYRef.current;
+                                if (deltaY < -10) {
+                                    sendMidiNote(60);
+                                }
+                            }
+                            lastYRef.current = nose.y;
+                        }
+
+                        const leftWrist = pose.keypoints.find(k => k.name === 'left_wrist');
+                        const rightWrist = pose.keypoints.find(k => k.name === 'right_wrist');
+
+                        if (leftWrist && leftWrist.score && leftWrist.score > 0.5) {
+                            const leftStatus = calculateMovement(
+                                { x: leftWrist.x, y: leftWrist.y },
+                                leftHandMovement,
+                                'left'
+                            );
+                            updateStatusWithPersistence(leftStatus, displayLeftHandStatus, setDisplayLeftHandStatus, leftHandStatusTimer);
+                        }
+
+                        if (rightWrist && rightWrist.score && rightWrist.score > 0.5) {
+                            const rightStatus = calculateMovement(
+                                { x: rightWrist.x, y: rightWrist.y },
+                                rightHandMovement,
+                                'right'
+                            );
+                            updateStatusWithPersistence(rightStatus, displayRightHandStatus, setDisplayRightHandStatus, rightHandStatusTimer);
+                        }
+
+                        detectJump(pose.keypoints);
+                        drawSkeleton(pose.keypoints, 0.5, ctx);
+                    });
+
+                    drawJumpMarkers(ctx);
+                    ctx.restore();
+                } catch (error) {
+                    console.warn('Detection loop error:', error);
+                }
             }
-
-            // Step 3: Perform pose detection on original video
-            const poses = await detectorRef.current.estimatePoses(video);
-
-            // Step 4: Draw pose skeleton on top of effects
-            const scaleX = canvas.width / video.videoWidth;
-            const scaleY = canvas.height / video.videoHeight;
-
-            ctx.save();
-            ctx.scale(scaleX, scaleY);
-
-            poses.forEach(pose => {
-                // Hand movement tracking
-                const leftWrist = pose.keypoints.find(k => k.name === 'left_wrist');
-                const rightWrist = pose.keypoints.find(k => k.name === 'right_wrist');
-
-                if (leftWrist && leftWrist.score && leftWrist.score > 0.5) {
-                    const leftStatus = calculateMovement(
-                        { x: leftWrist.x, y: leftWrist.y },
-                        leftHandMovement,
-                        'left'
-                    );
-                    updateStatusWithPersistence(leftStatus, displayLeftHandStatus, setDisplayLeftHandStatus, leftHandStatusTimer);
-                }
-
-                if (rightWrist && rightWrist.score && rightWrist.score > 0.5) {
-                    const rightStatus = calculateMovement(
-                        { x: rightWrist.x, y: rightWrist.y },
-                        rightHandMovement,
-                        'right'
-                    );
-                    updateStatusWithPersistence(rightStatus, displayRightHandStatus, setDisplayRightHandStatus, rightHandStatusTimer);
-                }
-
-                detectJump(pose.keypoints);
-                drawSkeleton(pose.keypoints, 0.5, ctx);
-            });
-
-            drawJumpMarkers(ctx);
-            ctx.restore();
-
-        } catch (error) {
-            console.warn('Detection loop error:', error);
-        }
-
-        animationFrameRef.current = requestAnimationFrame(detectPose);
-    };
-
-    const startPoseDetection = () => {
-        if (modelLoaded && detectorRef.current && !animationFrameRef.current) {
-            console.log('Starting pose detection');
-            detectPose();
-        }
-    };
-
-    const stopPoseDetection = () => {
-        if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-            animationFrameRef.current = null;
-            console.log('Stopped pose detection');
+            requestAnimationFrame(detectPose);
+        } else {
+            detectionLoopRunning.current = false;
         }
     };
 
@@ -856,9 +765,9 @@ const Jog: React.FC = () => {
             setModelLoaded(true);
             console.log("Pose detection model loaded successfully");
 
-            // Start detection if video is already playing
-            if (videoRef.current && !videoRef.current.paused) {
-                startPoseDetection();
+            if (shouldStartDetection.current) {
+                shouldStartDetection.current = false;
+                startDetectionLoop();
             }
         } catch (err) {
             console.error("Error loading model: ", err);
@@ -908,6 +817,7 @@ const Jog: React.FC = () => {
         isJumping.current = false;
         jumpStartY.current = null;
         setJumpEvents([]);
+
         setDisplayLeftHandStatus('Stationary');
         setDisplayRightHandStatus('Stationary');
         setDisplayJumpStatus('On Ground');
@@ -923,26 +833,69 @@ const Jog: React.FC = () => {
         jumpResetTimer.current = null;
     };
 
+    const handleCanPlay = () => {
+        console.log("Video can play, model loaded:", modelLoaded);
+        updateCanvasSize();
+
+        if (modelLoaded && detectorRef.current) {
+            startDetectionLoop();
+        } else {
+            shouldStartDetection.current = true;
+            console.log("Waiting for model to load before starting detection");
+        }
+    };
+
     const updateCanvasSize = () => {
-        if (videoRef.current && canvasRef.current && containerRef.current) {
+        if (videoRef.current && canvasRef.current && effectCanvasRef.current && containerRef.current) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
+            const effectCanvas = effectCanvasRef.current;
             const container = containerRef.current;
 
             if (video.videoWidth && video.videoHeight) {
+                // Calculate the display size while maintaining aspect ratio
                 const containerWidth = Math.min(640, window.innerWidth * 0.8);
                 const containerHeight = containerWidth / videoAspectRatio;
 
+                // Set container size
                 container.style.width = `${containerWidth}px`;
                 container.style.height = `${containerHeight}px`;
 
+                // Set canvas internal resolution to match video
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
+                effectCanvas.width = video.videoWidth;
+                effectCanvas.height = video.videoHeight;
+
+                // Set canvas display size to match container
                 canvas.style.width = `${containerWidth}px`;
                 canvas.style.height = `${containerHeight}px`;
+                effectCanvas.style.width = `${containerWidth}px`;
+                effectCanvas.style.height = `${containerHeight}px`;
 
                 console.log(`Canvas updated: ${video.videoWidth}x${video.videoHeight} -> ${containerWidth}x${containerHeight}`);
             }
+        }
+    };
+
+    const startDetectionLoop = () => {
+        if (detectionLoopRunning.current || !modelLoaded || !detectorRef.current) {
+            return;
+        }
+
+        console.log("Starting detection loop");
+        detectionLoopRunning.current = true;
+
+        setTimeout(() => {
+            updateCanvasSize();
+            detectPose();
+        }, 100);
+    };
+
+    const handleVideoPlay = () => {
+        if (!detectionLoopRunning.current) {
+            detectionLoopRunning.current = true;
+            requestAnimationFrame(detectPose);
         }
     };
 
@@ -955,11 +908,37 @@ const Jog: React.FC = () => {
         }
     };
 
+    // Format time for display
     const formatTime = (time: number): string => {
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
+
+    // Format current time clock
+    const formatCurrentTime = (date: Date): string => {
+        return date.toLocaleTimeString('en-US', {
+            hour12: true,
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    };
+
+    // Update current time clock
+    useEffect(() => {
+        const updateClock = () => {
+            setCurrentClockTime(formatCurrentTime(new Date()));
+        };
+
+        // Update immediately
+        updateClock();
+
+        // Set up interval to update every second
+        const clockInterval = setInterval(updateClock, 1000);
+
+        return () => clearInterval(clockInterval);
+    }, []);
 
     // Add wheel event listener for scrubbing
     useEffect(() => {
@@ -990,13 +969,13 @@ const Jog: React.FC = () => {
 
     useEffect(() => {
         return () => {
-            stopPoseDetection();
             if (leftHandStatusTimer.current) clearTimeout(leftHandStatusTimer.current);
             if (rightHandStatusTimer.current) clearTimeout(rightHandStatusTimer.current);
             if (jumpStatusTimer.current) clearTimeout(jumpStatusTimer.current);
             if (jumpResetTimer.current) clearTimeout(jumpResetTimer.current);
             if (jogIntervalRef.current) clearInterval(jogIntervalRef.current);
 
+            // Cleanup streaming players
             if (hlsRef.current) hlsRef.current.destroy();
             if (dashPlayerRef.current) dashPlayerRef.current.destroy();
         };
@@ -1007,13 +986,13 @@ const Jog: React.FC = () => {
         if (!video) return;
 
         const handleVideoEnd = () => {
+            detectionLoopRunning.current = false;
             setIsPlaying(false);
-            stopPoseDetection();
         };
 
-        const handleVideoError = () => {
+        const handleVideoError = (_e: Event) => {
+            detectionLoopRunning.current = false;
             setIsPlaying(false);
-            stopPoseDetection();
         };
 
         video.addEventListener('ended', handleVideoEnd);
@@ -1022,6 +1001,7 @@ const Jog: React.FC = () => {
         video.addEventListener('pause', handlePause);
         video.addEventListener('timeupdate', handleTimeUpdate);
         video.addEventListener('loadedmetadata', handleLoadedMetadata);
+        video.addEventListener('canplay', handleCanPlay);
 
         return () => {
             video.removeEventListener('ended', handleVideoEnd);
@@ -1030,6 +1010,7 @@ const Jog: React.FC = () => {
             video.removeEventListener('pause', handlePause);
             video.removeEventListener('timeupdate', handleTimeUpdate);
             video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+            video.removeEventListener('canplay', handleCanPlay);
         };
     }, [handlePlay, handlePause, handleTimeUpdate, handleLoadedMetadata]);
 
@@ -1037,6 +1018,7 @@ const Jog: React.FC = () => {
     useEffect(() => {
         resetTrackingState();
         loadVideoWithStreaming(DEFAULT_STREAM_URL);
+        // Try to autoplay after loading
         setTimeout(() => {
             videoRef.current?.play().catch(() => {});
         }, 500);
@@ -1108,17 +1090,12 @@ const Jog: React.FC = () => {
                             onChange={e => setSelectedEffect(e.target.value as ShaderEffect)}
                             style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
                         >
-                            {Object.entries(effectGroups).map(([groupName, effects]) => (
-                                <optgroup key={groupName} label={groupName}>
-                                    {effects.map(effect => (
-                                        <option key={effect} value={effect}>
-                                            {effect.split('-').map(word =>
-                                                word.charAt(0).toUpperCase() + word.slice(1)
-                                            ).join(' ')}
-                                        </option>
-                                    ))}
-                                </optgroup>
-                            ))}
+                            <option value="none">None</option>
+                            <option value="tint-red">Tint Red</option>
+                            <option value="ripple">Ripple</option>
+                            <option value="glow">Glow</option>
+                            <option value="vignette">Vignette</option>
+                            <option value="analog-film">Analog Film</option>
                         </select>
                     </div>
                 </div>
@@ -1139,24 +1116,32 @@ const Jog: React.FC = () => {
                         playsInline
                         style={{
                             position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
                             opacity: 0,
-                            pointerEvents: 'none',
-                            zIndex: -1
+                            pointerEvents: 'none'
                         }}
                     />
 
-                    {/* Main canvas - displays video with effects and pose overlay */}
+                    {/* Effect canvas - displays the video with shaders */}
+                    <canvas
+                        ref={effectCanvasRef}
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            borderRadius: '6px',
+                            display: 'block'
+                        }}
+                    />
+
+                    {/* Pose overlay canvas - displays skeleton and markers */}
                     <canvas
                         ref={canvasRef}
                         style={{
-                            borderRadius: '6px',
-                            display: 'block',
-                            width: '100%',
-                            height: '100%'
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            pointerEvents: 'none',
+                            borderRadius: '6px'
                         }}
                     />
                 </div>
@@ -1168,6 +1153,35 @@ const Jog: React.FC = () => {
                     borderRadius: '8px',
                     border: '1px solid #ccc'
                 }}>
+                    {/* Current Time Clock - Large for Presentations */}
+                    <div style={{
+                        textAlign: 'center',
+                        marginBottom: '20px',
+                        padding: '16px',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                    }}>
+                        <div style={{
+                            fontSize: '48px',
+                            fontFamily: 'monospace',
+                            fontWeight: 'bold',
+                            color: 'white',
+                            textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                            letterSpacing: '2px'
+                        }}>
+                            {currentClockTime}
+                        </div>
+                        <div style={{
+                            fontSize: '14px',
+                            color: 'rgba(255,255,255,0.8)',
+                            marginTop: '4px',
+                            fontWeight: '500'
+                        }}>
+                            CURRENT TIME
+                        </div>
+                    </div>
+
                     {/* Transport Controls */}
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                         <button onClick={() => videoRef.current && (videoRef.current.currentTime = 0)}>⏮</button>
@@ -1395,10 +1409,11 @@ const Jog: React.FC = () => {
                     <li>Hold transport buttons (◀/▶/⏪/⏩) for jog control</li>
                     <li>Click timeline markers to jump to specific times</li>
                     <li>Add markers at current playhead position</li>
-                    <li>Select from 35+ professional shader effects organized by category</li>
+                    <li>Select shader effects to apply visual filters</li>
                     <li>Video maintains correct aspect ratio automatically</li>
-                    <li>Effects are applied directly to the video with pose skeleton on top</li>
+                    <li>Pose detection works independently of shader effects</li>
                     <li>Supports MP4, HLS (.m3u8), and DASH (.mpd) streams</li>
+                    <li>Large current time clock for presentations</li>
                 </ul>
             </div>
         </div>
