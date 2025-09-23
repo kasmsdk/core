@@ -804,15 +804,15 @@ const WebXR: React.FC = () => {
     }, []);
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1>WebXR Virtual Instrument Controller</h1>
+        <div style={{ padding: '20px', color: 'white' }}>
+            <h1>WebXR Virtual Instrument 6DoF Controller</h1>
 
             {/* Status Info with Debug */}
             <div style={{
                 textAlign: 'center',
                 margin: '10px 0',
                 fontSize: '12px',
-                color: '#666',
+                color: '#fff',
                 fontFamily: 'monospace'
             }}>
                 <div>WebXR Support - AR: {xrSupported.ar ? 'Yes' : 'No'} | VR: {xrSupported.vr ? 'Yes' : 'No'}</div>
@@ -904,7 +904,7 @@ const WebXR: React.FC = () => {
                             cursor: 'pointer'
                         }}
                     >
-                        Test Render
+                        &nbsp;
                     </button>
                 </div>
 
@@ -945,11 +945,8 @@ const WebXR: React.FC = () => {
                 width: 'min(640px, 80vw)',
                 margin: '0 auto',
                 padding: '20px',
-                border: '2px solid #007acc',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
             }}>
-                <h3 style={{ margin: '0 0 16px 0', textAlign: 'center', color: '#333' }}>Virtual Instrument Controller</h3>
+                <h3 style={{ margin: '0 0 16px 0', textAlign: 'center', color: '#ff0' }}>Virtual Instrument 6DoF Controller</h3>
 
                 <div style={{
                     display: 'grid',
@@ -958,15 +955,15 @@ const WebXR: React.FC = () => {
                     fontFamily: 'monospace',
                     fontSize: '16px'
                 }}>
-                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px' }}>
-                        <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>Position (XYZ)</h4>
+                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}>
+                        <h4 style={{ margin: '0 0 8px 0', color: '#ff7acc' }}>Spatial Position (XYZ)</h4>
                         <div><strong>X:</strong> {instrumentState.position.x.toFixed(3)}</div>
                         <div><strong>Y:</strong> {instrumentState.position.y.toFixed(3)}</div>
                         <div><strong>Z:</strong> {instrumentState.position.z.toFixed(3)}</div>
                     </div>
 
-                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px' }}>
-                        <h4 style={{ margin: '0 0 8px 0', color: '#007acc' }}>Rotation (ABC)</h4>
+                    <div style={{ padding: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px' }}>
+                        <h4 style={{ margin: '0 0 8px 0', color: '#7affcc' }}>3D Rotation (ABC)</h4>
                         <div><strong>A:</strong> {instrumentState.rotation.a.toFixed(1)}°</div>
                         <div><strong>B:</strong> {instrumentState.rotation.b.toFixed(1)}°</div>
                         <div><strong>C:</strong> {instrumentState.rotation.c.toFixed(1)}°</div>
@@ -976,7 +973,7 @@ const WebXR: React.FC = () => {
                 <div style={{
                     marginTop: '16px',
                     padding: '12px',
-                    background: instrumentState.isGrabbed ? 'rgba(255,68,68,0.2)' : 'rgba(0,255,136,0.2)',
+                    background: instrumentState.isGrabbed ? 'rgba(255,68,68,0.8)' : 'rgba(0,255,136,0.8)',
                     borderRadius: '8px',
                     textAlign: 'center',
                     fontWeight: 'bold',
@@ -1023,9 +1020,6 @@ const WebXR: React.FC = () => {
                 maxWidth: '640px',
                 margin: '20px auto 0',
                 padding: '16px',
-                background: '#e8f4f8',
-                border: '1px solid #bee5eb',
-                borderRadius: '8px',
                 fontSize: '14px'
             }}>
                 <h4 style={{ margin: '0 0 8px 0' }}>Instructions:</h4>
