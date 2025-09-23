@@ -9,6 +9,7 @@ import LooperDocs from './LooperDocs';
 import CanvasDocs from './CanvasDocs';
 import RulezDocs from './RulezDocs';
 import KrumhanselDocs from './KrumhanselDocs';
+import JogDocs from './JogDocs';
 
 interface KasmProps {
   onNavigate: (app: string) => void;
@@ -25,6 +26,7 @@ type DocPage =
   | 'rulez'
   | 'krumhansel'
   | 'lfo'
+  | 'jog'
   | 'looper';
 
 type ActiveSection = 'whatsnew' | DocPage;
@@ -60,6 +62,8 @@ export default function Kasm({ onNavigate }: KasmProps) {
         return <LFODocs />;
       case 'looper':
         return <LooperDocs />;
+      case 'jog':
+        return <JogDocs />;
       default:
         return <EmanatorDocs />;
     }
@@ -115,6 +119,12 @@ export default function Kasm({ onNavigate }: KasmProps) {
                 🎹 <br/>Triggaz
               </button>
               <button className="kasm-demo-btn" onClick={() => setActiveSection('triggaz')}>📖 <br/>Triggaz<br/>Docs</button>
+            </div>
+            <div className="kasm-demo-buttons-group">
+              <button className="kasm-demo-btn" onClick={() => onNavigate('jog')}>
+                🎹 <br/>Jog
+              </button>
+              <button className="kasm-demo-btn" onClick={() => setActiveSection('jog')}>📖 <br/>Jog<br/>Docs</button>
             </div>
             <div className="kasm-demo-buttons-group">
               <button className="kasm-demo-btn" onClick={() => onNavigate('lfo')}>
