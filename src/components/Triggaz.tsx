@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs';
+import LatestDemoTriggaz from "./LatestDemoTriggaz.tsx";
 
 interface HandMovement {
     direction: 'up' | 'down' | 'left' | 'right' | 'stationary';
@@ -858,13 +859,13 @@ const Triggaz: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', margin: '16px 0' }}>
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    <button className="kasm-demo-btn" onClick={initMidi} disabled={!!midiOutput || !midiSupported}>
+                    <button className="kasm-demo-btn" style={{ display: 'none' }}  onClick={initMidi} disabled={!!midiOutput || !midiSupported}>
                         {midiOutput ? 'MIDI Connected' : midiSupported ? 'Connect MIDI' : 'MIDI Unsupported'}
                     </button>
                     <button className="kasm-demo-btn" onClick={startCamera} disabled={!!stream}>
                         {stream ? 'Webcam On' : 'Start Webcam'}
                     </button>
-                    <label className="kasm-demo-btn">
+                    <label className="kasm-demo-btn" style={{ textAlign: 'center' }}>
                         Upload Video
                         <input type="file" accept="video/*" onChange={handleFileChange} style={{ display: 'none' }} />
                     </label>
@@ -951,6 +952,8 @@ const Triggaz: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <LatestDemoTriggaz/>
 
         </div>
     );

@@ -1,4 +1,5 @@
 import React from "react";
+import LatestDemoTriggaz from "./LatestDemoTriggaz.tsx";
 
 const TriggazDocs: React.FC = () => {
   return (
@@ -89,6 +90,8 @@ const TUNE_COMPLETIONS: &[(&str, &[i32], &[f64])] = &[
         <li>Happy Birthday</li>
       </ul>
       </p>
+
+        <LatestDemoTriggaz/>
     </div>
   );
 };
