@@ -1,79 +1,53 @@
-# KasmSDK Core
+# kasmsdk.github.io
+KasmSDK Open Source community for web based musical instruments and tools
 
-React, Three.js, and WebGPU/WebMIDI playground for exploring cutting-edge web technologies.
+This is a shared space for projects built with the "Kasm SDK"
 
-## Features
+Kasm SDK is a paid product to support the Pyrmont Brewery in Sydney Australia
+https://pyrmontbrewery.com/get_kasm
 
-- **Pose Detection**: Real-time human pose tracking using TensorFlow.js
-- **POI Gesture Detection**: Advanced gesture recognition via external WASM module (see below)
-- **3D Graphics**: Interactive 3D scenes with Three.js and React Three Fiber
-- **WebMIDI**: MIDI device integration for musical applications
-- **WebXR**: Virtual reality support (experimental)
 
-## POI Module (External)
+To get going/build contribute...
 
-The Points of Interest (POI) gesture detection module is maintained as a separate private repository at `~/workspace/poi`. To use it:
+Fork this github repository and its submodules and clone it to your local machine.
+[README.md](README.md)
 
-1. Build and sync from POI repo:
-   ```bash
-   cd ~/workspace/poi
-   ./sync_to_core.sh
-   ```
-
-2. WASM files will be copied to `public/poi/`
-3. TypeScript wrapper will be at `src/utils/poi/poiWasm.ts`
-
-The core project gracefully handles the absence of POI - if WASM files aren't present, pose detection works without advanced gesture recognition.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js and npm
-- (Optional) Rust and wasm-pack for other WASM modules
-
-### Installation
-
-```bash
 git clone --recursive https://github.com/kasmsdk/core.git
-cd core
+
+Make things better, submit GitHub issues and PRs at
+https://github.com/kasmsdk/core/issues
+
+
+## Prerequisites
+
+### Install Node.js and npm
+- Download and install from [nodejs.org](https://nodejs.org/)
+- On macOS, you can use Homebrew:
+  ```sh
+  brew install node
+  ```
+
+### Install Rust
+- Install Rust using [rustup](https://rustup.rs/):
+  ```sh
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  ```
+- Follow the prompts to complete installation.
+
+### Install wasm-pack
+- After installing Rust, install wasm-pack via cargo:
+  ```sh
+  cargo install wasm-pack
+  ```
+- Or download from [wasm-pack official site](https://rustwasm.github.io/wasm-pack/).
+
+## Build and Run
+
+```sh
 npm install
-```
-
-### Development
-
-```bash
 npm run dev
 ```
 
-### Building for Production
+open http://localhost:5174
 
-```bash
-npm run build
-```
 
-## Project Structure
-
-```
-core/
-├── src/
-│   ├── components/       # React components
-│   │   ├── Triggaz.tsx   # Pose detection demo
-│   │   └── ...
-│   ├── utils/
-│   │   └── poi/          # POI WASM wrapper (synced from external repo)
-│   └── ...
-├── public/
-│   └── poi/              # POI WASM binaries (synced from external repo)
-└── ...
-```
-
-## Contributing
-
-Make things better, submit GitHub issues and PRs at https://github.com/kasmsdk/core/issues
-
-## License
-
-Open Source - See LICENSE file for details
-
-Note: POI module is proprietary and maintained separately.
